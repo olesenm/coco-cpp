@@ -47,6 +47,82 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Parser.h"
 #include "Tab.h"
 
+void printUsage()
+{
+	wprintf(L"Usage: Coco Grammar.atg {Option}\n");
+	wprintf(L"Options:\n");
+	wprintf(L"  -namespace <namespaceName>\n");
+	wprintf(L"  -frames    <frameFilesDirectory>\n");
+	wprintf(L"  -trace     <traceString>\n");
+	wprintf(L"  -o         <outputDirectory>\n");
+	wprintf(L"  -lines     include #line pragmas in the generated code\n");
+	wprintf(L"  -help      print this usage\n");
+	wprintf(L"Valid characters in the trace string:\n");
+	wprintf(L"  A  trace automaton\n");
+	wprintf(L"  F  list first/follow sets\n");
+	wprintf(L"  G  print syntax graph\n");
+	wprintf(L"  I  trace computation of first sets\n");
+	wprintf(L"  J  list ANY and SYNC sets\n");
+	wprintf(L"  P  print statistics\n");
+	wprintf(L"  S  list symbol table\n");
+	wprintf(L"  X  list cross reference table\n");
+	wprintf(L"Scanner.frame and Parser.frame must be in atg directory\n");
+	wprintf(L"or in a directory specified in the -frames option.\n");
+}
+
+
+//
+// reduce multiple '::' -> ':', skip initial ':'
+// does not handle trailing ':' very well, but that is really
+// beyond the C++ specifications
+//
+// This routine is quite C-like at the moment.
+//
+void cleanseNamespace(wchar_t *nsName)
+{
+    if (nsName == NULL || coco_string_length(nsName) == 0)
+    {
+        return;
+    }
+
+    wchar_t *dst, *src, ch;
+
+    dst = src = nsName;
+
+    // skip leading ':'
+    while ((ch = *src++) != 0)
+    {
+        if (ch == COCO_CPP_NAMESPACE_SEPARATOR)
+        {
+            while (*src == COCO_CPP_NAMESPACE_SEPARATOR)
+            {
+                src++;
+            }
+        }
+        else
+        {
+            *dst++ = ch;
+            break;
+        }
+    }
+
+    // copy string, but reduce multiple ':' to a single one
+    while ((ch = *src++) != 0)
+    {
+        *dst++ = ch;
+        if (ch == COCO_CPP_NAMESPACE_SEPARATOR)
+        {
+            while (*src == COCO_CPP_NAMESPACE_SEPARATOR)
+            {
+                src++;
+            }
+        }
+    }
+
+    *dst = 0;
+}
+
+
 #ifdef _WIN32
 int wmain(int argc, wchar_t *argv[]) {
 #elif defined __GNUC__
@@ -67,11 +143,20 @@ int main(int argc, char *argv_[]) {
 	bool emitLines = false;
 
 	for (int i = 1; i < argc; i++) {
-		if (coco_string_equal(argv[i], L"-namespace") && i < argc - 1) nsName = coco_string_create(argv[++i]);
+		if (coco_string_equal(argv[i], L"-namespace") && i < argc - 1)
+		{
+			nsName = coco_string_create(argv[++i]);
+			cleanseNamespace(nsName);
+		}
 		else if (coco_string_equal(argv[i], L"-frames") && i < argc - 1) frameDir = coco_string_create(argv[++i]);
 		else if (coco_string_equal(argv[i], L"-trace") && i < argc - 1) ddtString = coco_string_create(argv[++i]);
 		else if (coco_string_equal(argv[i], L"-o") && i < argc - 1) outDir = coco_string_create_append(argv[++i], L"/");
 		else if (coco_string_equal(argv[i], L"-lines")) emitLines = true;
+		else if (coco_string_equal(argv[i], L"-help"))
+		{
+			printUsage();
+			return 0;
+		}
 		else srcName = coco_string_create(argv[i]);
 	}
 
@@ -95,8 +180,8 @@ int main(int argc, char *argv_[]) {
 		chTrFileName = coco_string_create_char(traceFileName);
 
 		if ((parser->trace = fopen(chTrFileName, "w")) == NULL) {
-			wprintf(L"-- could not open %ls\n", chTrFileName);
-			exit(1);
+			wprintf(L"-- cannot write trace file to %ls\n", chTrFileName);
+			return 1;
 		}
 
 		parser->tab  = new Coco::Tab(parser);
@@ -128,7 +213,7 @@ int main(int argc, char *argv_[]) {
 
 		wprintf(L"%d errors detected\n", parser->errors->count);
 		if (parser->errors->count != 0) {
-			exit(1);
+			return 1;
 		}
 
 		delete parser->pgen;
@@ -139,24 +224,7 @@ int main(int argc, char *argv_[]) {
 		coco_string_delete(file);
 		coco_string_delete(srcDir);
 	} else {
-		wprintf(L"Usage: Coco Grammar.ATG {Option}\n");
-		wprintf(L"Options:\n");
-		wprintf(L"  -namespace <namespaceName>\n");
-		wprintf(L"  -frames    <frameFilesDirectory>\n");
-		wprintf(L"  -trace     <traceString>\n");
-		wprintf(L"  -o         <outputDirectory>\n");
-		wprintf(L"  -lines\n");
-		wprintf(L"Valid characters in the trace string:\n");
-		wprintf(L"  A  trace automaton\n");
-		wprintf(L"  F  list first/follow sets\n");
-		wprintf(L"  G  print syntax graph\n");
-		wprintf(L"  I  trace computation of first sets\n");
-		wprintf(L"  J  list ANY and SYNC sets\n");
-		wprintf(L"  P  print statistics\n");
-		wprintf(L"  S  list symbol table\n");
-		wprintf(L"  X  list cross reference table\n");
-		wprintf(L"Scanner.frame and Parser.frame files needed in ATG directory\n");
-		wprintf(L"or in a directory specified in the -frames option.\n");
+		printUsage();
 	}
 
 	coco_string_delete(srcName);

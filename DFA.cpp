@@ -37,6 +37,10 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 namespace Coco {
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+bool DFA::makeBackup = false;
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 //---------- Output primitives
@@ -759,7 +763,7 @@ void DFA::OpenGen(const wchar_t *genName, bool backUp) { /* pdt */
 	FILE* tmp;
 	if (backUp && ((tmp = fopen(chFn, "r")) != NULL)) {
 		fclose(tmp);
-		wchar_t *oldName = coco_string_create_append(fn, L".old");
+		wchar_t *oldName = coco_string_create_append(fn, L".bak");
 		char *chOldName = coco_string_create_char(oldName);
 		remove(chOldName); rename(chFn, chOldName); // copy with overwrite
 		coco_string_delete(chOldName);
@@ -805,11 +809,12 @@ void DFA::WriteScanner() {
 	if (dirtyDFA) MakeDeterministic();
 
 	// Header
-	OpenGen(L"Scanner.h", true); /* pdt */
+	OpenGen(L"Scanner.h", makeBackup); /* pdt */
 	CopyFramePart(L"-->begin");
 	wchar_t* res = coco_string_create_lower(tab->srcName);
 	if (!coco_string_endswith(res, L"coco.atg")) {
-		fclose(gen); OpenGen(L"Scanner.h", false); /* pdt */
+		fclose(gen);
+		OpenGen(L"Scanner.h", false); /* pdt */
 	}
 	coco_string_delete(res);
 
@@ -834,12 +839,13 @@ void DFA::WriteScanner() {
 	fclose(gen);
 
 	// Source
-	OpenGen(L"Scanner.cpp", true); /* pdt */
+	OpenGen(L"Scanner.cpp", makeBackup); /* pdt */
 	CopyFramePart(L"-->begin");
 
 	res = coco_string_create_lower(tab->srcName);
 	if (!coco_string_endswith(res, L"coco.atg")) {
-		fclose(gen); OpenGen(L"Scanner.cpp", false); /* pdt */
+		fclose(gen);
+		OpenGen(L"Scanner.cpp", false); /* pdt */
 	}
 	coco_string_delete(res);
 

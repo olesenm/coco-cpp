@@ -51,6 +51,9 @@ class BitArray;
 class ParserGen
 {
 public:
+	//! control if backup files (.bak) are generated. default: false
+	static bool makeBackup;
+
 	//! sets of size < maxTerm are enumerated
 	int maxTerm;
 	char CR;

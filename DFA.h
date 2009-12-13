@@ -52,6 +52,8 @@ class BitArray;
 class DFA
 {
 public:
+	//! control if backup files (.bak) are generated. default: false
+	static bool makeBackup;
 
 	//! End-of-file? ... unused?
 	static const int eoF = -1;

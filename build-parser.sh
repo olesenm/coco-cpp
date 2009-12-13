@@ -8,9 +8,9 @@ echo
 coco=Coco
 [ -x "$coco" ] && coco=./Coco
 
-echo "$coco Coco.atg -namespace Coco"
+echo "$coco Coco.atg -bak -namespace Coco"
 
-$coco Coco.atg -namespace Coco
+$coco Coco.atg -bak -namespace Coco
 echo
 
 # ----------------------------------------------------------------- end-of-file

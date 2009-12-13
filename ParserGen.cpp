@@ -36,6 +36,11 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 namespace Coco {
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+bool ParserGen::makeBackup = false;
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void ParserGen::Indent (int n) {
@@ -385,7 +390,7 @@ void ParserGen::OpenGen(const wchar_t* genName, bool backUp) { /* pdt */
 	FILE* tmp;
 	if (backUp && ((tmp = fopen(chFn, "r")) != NULL)) {
 		fclose(tmp);
-		wchar_t* oldName = coco_string_create_append(fn, L".old");
+		wchar_t* oldName = coco_string_create_append(fn, L".bak");
 		char *chOldName = coco_string_create_char(oldName);
 		remove(chOldName); rename(chFn, chOldName); // copy with overwrite
 		coco_string_delete(chOldName);
@@ -429,7 +434,7 @@ void ParserGen::WriteParser () {
 	coco_string_delete(chFr);
 	coco_string_delete(fr);
 
-	OpenGen(L"Parser.h", true); /* pdt */
+	OpenGen(L"Parser.h", makeBackup); /* pdt */
 
 	Symbol *sym;
 	for (int i=0; i<tab->terminals->Count; i++) {
@@ -440,7 +445,8 @@ void ParserGen::WriteParser () {
 	CopyFramePart(L"-->begin");
 	wchar_t *subSrcName = coco_string_create_lower(tab->srcName);
 	if (!coco_string_endswith(subSrcName, L"coco.atg")) {
-		fclose(gen); OpenGen(L"Parser.h", false); /* pdt */
+		fclose(gen);
+		OpenGen(L"Parser.h", false); /* pdt */
 	}
 	coco_string_delete(subSrcName);
 
@@ -462,11 +468,12 @@ void ParserGen::WriteParser () {
 	fclose(gen);
 
 	// Source
-	OpenGen(L"Parser.cpp", true); /* pdt */
+	OpenGen(L"Parser.cpp", makeBackup); /* pdt */
 	CopyFramePart(L"-->begin");
 	subSrcName = coco_string_create_lower(tab->srcName);
 	if (!coco_string_endswith(subSrcName, L"coco.atg")) {
-		fclose(gen); OpenGen(L"Parser.cpp", false); /* pdt */
+		fclose(gen);
+		OpenGen(L"Parser.cpp", false); /* pdt */
 	}
 	coco_string_delete(subSrcName);
 	CopyFramePart(L"-->namespace_open");

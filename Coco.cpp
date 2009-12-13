@@ -59,6 +59,7 @@ void printUsage()
 	wprintf(L"  -trace     <traceString>\n");
 	wprintf(L"  -o         <outputDirectory>\n");
 	wprintf(L"  -lines     include #line pragmas in the generated code\n");
+	wprintf(L"  -bak       save existing Parser/Scanner files as .bak\n");
 	wprintf(L"  -help      print this usage\n");
 	wprintf(L"Valid characters in the trace string:\n");
 	wprintf(L"  A  trace automaton\n");
@@ -146,21 +147,33 @@ int main(int argc, char *argv_[]) {
 	bool emitLines = false;
 
 	for (int i = 1; i < argc; i++) {
-		if (coco_string_equal(argv[i], L"-namespace") && i < argc - 1)
-		{
+		if (coco_string_equal(argv[i], L"-namespace") && i < argc - 1) {
 			nsName = coco_string_create(argv[++i]);
 			cleanseNamespace(nsName);
 		}
-		else if (coco_string_equal(argv[i], L"-frames") && i < argc - 1) frameDir = coco_string_create(argv[++i]);
-		else if (coco_string_equal(argv[i], L"-trace") && i < argc - 1) ddtString = coco_string_create(argv[++i]);
-		else if (coco_string_equal(argv[i], L"-o") && i < argc - 1) outDir = coco_string_create_append(argv[++i], L"/");
-		else if (coco_string_equal(argv[i], L"-lines")) emitLines = true;
+		else if (coco_string_equal(argv[i], L"-frames") && i < argc - 1) {
+			frameDir = coco_string_create(argv[++i]);
+		}
+		else if (coco_string_equal(argv[i], L"-trace") && i < argc - 1) {
+			ddtString = coco_string_create(argv[++i]);
+		}
+		else if (coco_string_equal(argv[i], L"-o") && i < argc - 1) {
+			outDir = coco_string_create_append(argv[++i], L"/");
+		}
+		else if (coco_string_equal(argv[i], L"-lines")) {
+			emitLines = true;
+		}
+		else if (coco_string_equal(argv[i], L"-bak")) {
+			Coco::DFA::makeBackup = Coco::ParserGen::makeBackup = true;
+		}
 		else if (coco_string_equal(argv[i], L"-help"))
 		{
 			printUsage();
 			return 0;
 		}
-		else srcName = coco_string_create(argv[i]);
+		else {
+			srcName = coco_string_create(argv[i]);
+		}
 	}
 
 #if defined __GNUC__

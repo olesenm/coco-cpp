@@ -37,6 +37,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 -->namespace_open
 
+//! Parser error handing
 class Errors {
 public:
 	int count;		// number of errors detected
@@ -51,6 +52,7 @@ public:
 }; // Errors
 
 
+//! A Coco/R Parser
 class Parser {
 private:
 -->constantsheader

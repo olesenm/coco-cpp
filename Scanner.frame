@@ -56,6 +56,12 @@ Coco/R itself) does not fall under the GNU General Public License.
 #define MAX_BUFFER_LENGTH (64*MIN_BUFFER_LENGTH)
 #define HEAP_BLOCK_SIZE   (64*1024)
 
+
+-->namespace_open
+
+
+// * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
+
 //
 // string handling, wide character
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -113,7 +119,6 @@ int   coco_string_compareto(const wchar_t* str1, const wchar_t* str2);
 //! Simple string hashing function
 int   coco_string_hash(const wchar_t* str);
 
-
 //
 // String conversions
 // ~~~~~~~~~~~~~~~~~~
@@ -123,7 +128,6 @@ double coco_string_toDouble(const wchar_t* str);
 
 //! Convert wide string to float
 float coco_string_toFloat(const wchar_t* str);
-
 
 //
 // String handling, byte character
@@ -155,9 +159,11 @@ double coco_string_toDouble(const char* str);
 //! Convert byte string to float
 float coco_string_toFloat(const char* str);
 
+// * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
 
--->namespace_open
 
+
+//! Scanner Token
 class Token
 {
 public:
@@ -181,6 +187,7 @@ public:
 };
 
 
+//! Scanner Buffer
 class Buffer {
 // This Buffer supports the following cases:
 // 1) seekable stream (file)
@@ -218,7 +225,7 @@ public:
 };
 
 
-//! A buffer that handles UTF-8 characters
+//! A Scanner buffer that handles UTF-8 characters
 class UTF8Buffer : public Buffer {
 public:
 	UTF8Buffer(Buffer* b) : Buffer(b) {}
@@ -329,6 +336,7 @@ public:
 };
 
 
+//! A Coco/R Scanner
 class Scanner {
 private:
 	static const unsigned char EOL = '\n';   // end-of-line character
@@ -426,6 +434,10 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include <memory.h>
 #include <string.h>
 #include "Scanner.h"
+
+-->namespace_open
+
+// * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
 
 // string handling, wide character
 
@@ -657,7 +669,8 @@ float coco_string_toFloat(const char* str)
 }
 
 
--->namespace_open
+// * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
+
 
 Token::Token()
 :

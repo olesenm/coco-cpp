@@ -50,6 +50,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Parser.h"
 #include "Tab.h"
 
+using namespace Coco;
+
 void printUsage()
 {
 	wprintf(L"Usage: Coco Grammar.atg {Option}\n");

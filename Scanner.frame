@@ -51,10 +51,10 @@ Coco/R itself) does not fall under the GNU General Public License.
 #define coco_swprintf swprintf
 #endif
 
-#define COCO_WCHAR_MAX 65535
+#define COCO_WCHAR_MAX    65535
 #define MIN_BUFFER_LENGTH 1024
 #define MAX_BUFFER_LENGTH (64*MIN_BUFFER_LENGTH)
-#define HEAP_BLOCK_SIZE (64*1024)
+#define HEAP_BLOCK_SIZE   (64*1024)
 #define COCO_CPP_NAMESPACE_SEPARATOR L':'
 
 //
@@ -173,6 +173,7 @@ public:
 	~Token();
 };
 
+
 class Buffer {
 // This Buffer supports the following cases:
 // 1) seekable stream (file)
@@ -197,6 +198,7 @@ public:
 
 	Buffer(FILE*, bool isUserStream);
 	Buffer(const unsigned char* buf, int len);
+	Buffer(const char* buf, int len);
 	Buffer(Buffer*);
 	virtual ~Buffer();
 
@@ -207,6 +209,7 @@ public:
 	virtual int GetPos();
 	virtual void SetPos(int value);
 };
+
 
 class UTF8Buffer : public Buffer {
 public:
@@ -315,6 +318,7 @@ public:
 	}
 };
 
+
 class Scanner {
 private:
 	static const unsigned char EOL = '\n';   // end-of-line character
@@ -360,6 +364,7 @@ public:
 	Buffer *buffer;   // scanner buffer
 
 	Scanner(const unsigned char* buf, int len);
+	Scanner(const char* buf, int len);
 	Scanner(const wchar_t* fileName);
 	Scanner(FILE* s);
 	~Scanner();
@@ -648,9 +653,11 @@ Token::Token() {
 	next = NULL;
 }
 
+
 Token::~Token() {
 	coco_string_delete(val);
 }
+
 
 Buffer::Buffer(FILE* s, bool isUserStream) {
 // ensure binary read on windows
@@ -675,6 +682,7 @@ Buffer::Buffer(FILE* s, bool isUserStream) {
 	if (bufLen == fileLen && CanSeek()) Close();
 }
 
+
 Buffer::Buffer(Buffer* b) {
 	buf = b->buf;
 	bufCapacity = b->bufCapacity;
@@ -688,6 +696,7 @@ Buffer::Buffer(Buffer* b) {
 	isUserStream = b->isUserStream;
 }
 
+
 Buffer::Buffer(const unsigned char* buf, int len) {
 	this->buf = new unsigned char[len];
 	memcpy(this->buf, buf, len*sizeof(unsigned char));
@@ -698,6 +707,18 @@ Buffer::Buffer(const unsigned char* buf, int len) {
 	stream = NULL;
 }
 
+
+Buffer::Buffer(const char* buf, int len) {
+	this->buf = new unsigned char[len];
+	memcpy(this->buf, buf, len*sizeof(unsigned char));
+	bufStart = 0;
+	bufCapacity = bufLen = len;
+	fileLen = len;
+	bufPos = 0;
+	stream = NULL;
+}
+
+
 Buffer::~Buffer() {
 	Close();
 	if (buf != NULL) {
@@ -706,12 +727,14 @@ Buffer::~Buffer() {
 	}
 }
 
+
 void Buffer::Close() {
 	if (!isUserStream && stream != NULL) {
 		fclose(stream);
 		stream = NULL;
 	}
 }
+
 
 int Buffer::Read() {
 	if (bufPos < bufLen) {
@@ -726,12 +749,14 @@ int Buffer::Read() {
 	}
 }
 
+
 int Buffer::Peek() {
 	int curPos = GetPos();
 	int ch = Read();
 	SetPos(curPos);
 	return ch;
 }
+
 
 wchar_t* Buffer::GetString(int beg, int end) {
 	int len = 0;
@@ -745,9 +770,11 @@ wchar_t* Buffer::GetString(int beg, int end) {
 	return res;
 }
 
+
 int Buffer::GetPos() {
 	return bufPos + bufStart;
 }
+
 
 void Buffer::SetPos(int value) {
 	if ((value >= fileLen) && (stream != NULL) && !CanSeek()) {
@@ -773,6 +800,7 @@ void Buffer::SetPos(int value) {
 		bufPos = fileLen - bufStart; // make Pos return fileLen
 	}
 }
+
 
 // Read the next chunk of bytes from the stream, increases the buffer
 // if needed and updates the fields fileLen and bufLen.
@@ -800,9 +828,11 @@ int Buffer::ReadNextStreamChunk() {
 	return 0;
 }
 
+
 bool Buffer::CanSeek() {
 	return (stream != NULL) && (ftell(stream) != -1);
 }
+
 
 int UTF8Buffer::Read() {
 	int ch;
@@ -835,10 +865,18 @@ int UTF8Buffer::Read() {
 	return ch;
 }
 
+
 Scanner::Scanner(const unsigned char* buf, int len) {
 	buffer = new Buffer(buf, len);
 	Init();
 }
+
+
+Scanner::Scanner(const char* buf, int len) {
+	buffer = new Buffer(buf, len);
+	Init();
+}
+
 
 Scanner::Scanner(const wchar_t* fileName) {
 	FILE* stream;
@@ -852,10 +890,12 @@ Scanner::Scanner(const wchar_t* fileName) {
 	Init();
 }
 
+
 Scanner::Scanner(FILE* s) {
 	buffer = new Buffer(s, true);
 	Init();
 }
+
 
 Scanner::~Scanner() {
 	char* cur = (char*) firstHeap;
@@ -868,6 +908,7 @@ Scanner::~Scanner() {
 	delete [] tval;
 	delete buffer;
 }
+
 
 void Scanner::Init() {
 -->declarations
@@ -906,6 +947,7 @@ void Scanner::Init() {
 	pt = tokens = CreateToken(); // first token is a dummy
 }
 
+
 void Scanner::NextCh() {
 	if (oldEols > 0) {
 		ch = EOL;
@@ -922,6 +964,7 @@ void Scanner::NextCh() {
 -->casing1
 }
 
+
 void Scanner::AddCh() {
 	if (tlen >= tvalLength) {
 		tvalLength *= 2;
@@ -935,6 +978,7 @@ void Scanner::AddCh() {
 		NextCh();
 	}
 }
+
 
 -->comments
 
@@ -957,6 +1001,7 @@ void Scanner::CreateHeapBlock() {
 	heapTop = heap;
 }
 
+
 Token* Scanner::CreateToken() {
 	Token *t;
 	if (((char*) heapTop + (int) sizeof(Token)) >= (char*) heapEnd) {
@@ -968,6 +1013,7 @@ Token* Scanner::CreateToken() {
 	t->next = NULL;
 	return t;
 }
+
 
 void Scanner::AppendVal(Token *t) {
 	int reqMem = (tlen + 1) * sizeof(wchar_t);
@@ -984,6 +1030,7 @@ void Scanner::AppendVal(Token *t) {
 	wcsncpy(t->val, tval, tlen);
 	t->val[tlen] = L'\0';
 }
+
 
 Token* Scanner::NextToken() {
 	while (ch == ' ' ||
@@ -1004,6 +1051,7 @@ Token* Scanner::NextToken() {
 	return t;
 }
 
+
 // get the next token (possibly a token already seen during peeking)
 Token* Scanner::Scan() {
 	if (tokens->next == NULL) {
@@ -1013,6 +1061,7 @@ Token* Scanner::Scan() {
 		return tokens;
 	}
 }
+
 
 // peek for the next token, ignore pragmas
 Token* Scanner::Peek() {
@@ -1026,10 +1075,12 @@ Token* Scanner::Peek() {
 	return pt;
 }
 
+
 // make sure that peeking starts at the current scan position
 void Scanner::ResetPeek() {
 	pt = tokens;
 }
+
 
 -->namespace_close
 

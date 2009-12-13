@@ -44,6 +44,7 @@ public:
 	virtual ~SortedEntry();
 };
 
+
 class SortedList
 {
 public:
@@ -51,12 +52,13 @@ public:
 	virtual ~SortedList();
 
 	void Set(Symbol *key, void *value);
-	void* Get( Symbol* key ) const; // Value
-	void* GetKey( int index ) const ;// Key
+	void* Get( Symbol* key ) const;      // Value
+	void* GetKey( int index ) const ;    // Key
 	SortedEntry* operator[]( int index ) const;
 
 	int Count;
 private:
+	static int Compare(Symbol* x, Symbol* y);
 	bool Find(Symbol* key);
 
 	SortedEntry *Data;

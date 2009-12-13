@@ -52,8 +52,12 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 using namespace Coco;
 
-void printUsage()
+void printUsage(const char* message)
 {
+	if (message) {
+		wprintf(L"\nError: %s\n\n", message);
+	}
+
 	wprintf(L"Usage: Coco Grammar.atg {Option}\n");
 	wprintf(L"Options:\n");
 	wprintf(L"  -namespace <namespaceName>\n");
@@ -149,18 +153,34 @@ int main(int argc, char *argv_[]) {
 	bool emitLines = false;
 
 	for (int i = 1; i < argc; i++) {
-		if (coco_string_equal(argv[i], L"-namespace") && i < argc - 1) {
-			nsName = coco_string_create(argv[++i]);
+		if (coco_string_equal(argv[i], L"-namespace")) {
+			if (++i == argc) {
+				printUsage("missing parameter on -namespace");
+				return 1;
+			}
+			nsName = coco_string_create(argv[i]);
 			cleanseNamespace(nsName);
 		}
-		else if (coco_string_equal(argv[i], L"-frames") && i < argc - 1) {
-			frameDir = coco_string_create(argv[++i]);
+		else if (coco_string_equal(argv[i], L"-frames")) {
+			if (++i == argc) {
+				printUsage("missing parameter on -frames");
+				return 1;
+			}
+			frameDir = coco_string_create(argv[i]);
 		}
-		else if (coco_string_equal(argv[i], L"-trace") && i < argc - 1) {
-			ddtString = coco_string_create(argv[++i]);
+		else if (coco_string_equal(argv[i], L"-trace")) {
+			if (++i == argc) {
+				printUsage("missing parameter on -trace");
+				return 1;
+			}
+			ddtString = coco_string_create(argv[i]);
 		}
-		else if (coco_string_equal(argv[i], L"-o") && i < argc - 1) {
-			outDir = coco_string_create_append(argv[++i], L"/");
+		else if (coco_string_equal(argv[i], L"-o")) {
+			if (++i == argc) {
+				printUsage("missing parameter on -o");
+				return 1;
+			}
+			outDir = coco_string_create_append(argv[i], L"/");
 		}
 		else if (coco_string_equal(argv[i], L"-lines")) {
 			emitLines = true;
@@ -170,7 +190,7 @@ int main(int argc, char *argv_[]) {
 		}
 		else if (coco_string_equal(argv[i], L"-help"))
 		{
-			printUsage();
+			printUsage(NULL);
 			return 0;
 		}
 		else {
@@ -242,7 +262,7 @@ int main(int argc, char *argv_[]) {
 		coco_string_delete(file);
 		coco_string_delete(srcDir);
 	} else {
-		printUsage();
+		printUsage(NULL);
 	}
 
 	coco_string_delete(srcName);

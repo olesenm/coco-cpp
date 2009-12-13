@@ -263,7 +263,7 @@ void Errors::Warning(const wchar_t *s) {
 
 void Errors::Exception(const wchar_t* s) {
 	wprintf(L"%ls", s);
-	exit(1);
+	::exit(1);
 }
 
 -->namespace_close

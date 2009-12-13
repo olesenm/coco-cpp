@@ -760,7 +760,7 @@ void Buffer::SetPos(int value) {
 
 	if ((value < 0) || (value > fileLen)) {
 		wprintf(L"--- buffer out of bounds access, position: %d\n", value);
-		exit(1);
+		::exit(1);
 	}
 
 	if ((value >= bufStart) && (value < (bufStart + bufLen))) { // already in buffer
@@ -845,7 +845,7 @@ Scanner::Scanner(const wchar_t* fileName) {
 	char *chFileName = coco_string_create_char(fileName);
 	if ((stream = fopen(chFileName, "rb")) == NULL) {
 		wprintf(L"--- Cannot open file %ls\n", fileName);
-		exit(1);
+		::exit(1);
 	}
 	coco_string_delete(chFileName);
 	buffer = new Buffer(stream, false);
@@ -883,7 +883,7 @@ void Scanner::Init() {
 	heapTop = heap;
 	if (sizeof(Token) > HEAP_BLOCK_SIZE) {
 		wprintf(L"--- Too small HEAP_BLOCK_SIZE\n");
-		exit(1);
+		::exit(1);
 	}
 
 	pos = -1; line = 1; col = 0;
@@ -894,7 +894,7 @@ void Scanner::Init() {
 		NextCh(); int ch2 = ch;
 		if (ch1 != 0xBB || ch2 != 0xBF) {
 			wprintf(L"Illegal byte order mark at start of file");
-			exit(1);
+			::exit(1);
 		}
 		Buffer *oldBuf = buffer;
 		buffer = new UTF8Buffer(buffer); col = 0;
@@ -974,7 +974,7 @@ void Scanner::AppendVal(Token *t) {
 	if (((char*) heapTop + reqMem) >= (char*) heapEnd) {
 		if (reqMem > HEAP_BLOCK_SIZE) {
 			wprintf(L"--- Too long token value\n");
-			exit(1);
+			::exit(1);
 		}
 		CreateHeapBlock();
 	}

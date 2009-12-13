@@ -28,12 +28,12 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 -->begin
 
-#ifndef COCO_PARSER_H__
-#define COCO_PARSER_H__
+#ifndef COCO_$PREFIX$PARSER_H__
+#define COCO_$PREFIX$PARSER_H__
 
 -->headerdef
 
-#include "Scanner.h"
+#include "$PREFIX$Scanner.h"
 
 -->namespace_open
 
@@ -87,7 +87,7 @@ public:
 
 -->namespace_close
 
-#endif // COCO_PARSER_H__
+#endif // COCO_$PREFIX$PARSER_H__
 
 -->implementation
 /*----------------------------------------------------------------------
@@ -120,7 +120,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 -->begin
 
 #include <wchar.h>
-#include "Parser.h"
+#include "$PREFIX$Parser.h"
 
 
 -->namespace_open

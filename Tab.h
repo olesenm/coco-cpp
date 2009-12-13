@@ -64,6 +64,9 @@ public:
 	//! String representations for the token kinds (in Symbol class)
 	static const char* tKind[];
 
+	//! String for replacing the file prefix name
+	static const wchar_t* prefixMacro;
+
 	//! position of global semantic declarations
 	Position *semDeclPos;
 
@@ -96,6 +99,9 @@ public:
 
 	//! namespace for generated files
 	wchar_t* nsName;
+
+	//! prefix for generated files
+	wchar_t* prefixName;
 
 	//! directory containing the frame files
 	wchar_t* frameDir;

@@ -27,8 +27,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 -----------------------------------------------------------------------*/
 -->begin
 
-#ifndef COCO_SCANNER_H__
-#define COCO_SCANNER_H__
+#ifndef COCO_$PREFIX$SCANNER_H__
+#define COCO_$PREFIX$SCANNER_H__
 
 #include <limits.h>
 #include <stdio.h>
@@ -399,7 +399,7 @@ public:
 
 -->namespace_close
 
-#endif // COCO_SCANNER_H__
+#endif // COCO_$PREFIX$SCANNER_H__
 
 -->implementation
 /*-------------------------------------------------------------------------
@@ -433,7 +433,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 #include <memory.h>
 #include <string.h>
-#include "Scanner.h"
+#include "$PREFIX$Scanner.h"
 
 -->namespace_open
 

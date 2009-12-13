@@ -48,6 +48,8 @@ const char* Tab::tKind[] = {
 	"fixedToken", "classToken", "litToken", "classLitToken"
 };
 
+const wchar_t* Tab::prefixMacro = L"$PREFIX$";
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

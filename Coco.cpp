@@ -61,6 +61,7 @@ void printUsage(const char* message)
 	wprintf(L"Usage: Coco Grammar.atg {Option}\n");
 	wprintf(L"Options:\n");
 	wprintf(L"  -namespace <namespaceName>\n");
+	wprintf(L"  -prefix    <prefixName> (NOT IMPLEMENTED)\n");
 	wprintf(L"  -frames    <frameFilesDirectory>\n");
 	wprintf(L"  -trace     <traceString>\n");
 	wprintf(L"  -o         <outputDirectory>\n");
@@ -147,8 +148,9 @@ int main(int argc, char *argv_[]) {
 
 	wprintf(L"Coco/R (Jun 22, 2009)\n");
 
-	wchar_t *srcName = NULL, *nsName = NULL, *frameDir = NULL, *ddtString = NULL, *traceFileName = NULL;
-	wchar_t *outDir = NULL;
+	wchar_t *srcName = NULL, *nsName = NULL, *prefixName = NULL;
+	wchar_t *frameDir = NULL, *outDir = NULL;
+	wchar_t *ddtString = NULL, *traceFileName = NULL;
 	char *chTrFileName = NULL;
 	bool emitLines = false;
 
@@ -160,6 +162,13 @@ int main(int argc, char *argv_[]) {
 			}
 			nsName = coco_string_create(argv[i]);
 			cleanseNamespace(nsName);
+		}
+		else if (coco_string_equal(argv[i], L"-prefix")) {
+			if (++i == argc) {
+				printUsage("missing parameter on -prefix");
+				return 1;
+			}
+			prefixName = coco_string_create(argv[i]);
 		}
 		else if (coco_string_equal(argv[i], L"-frames")) {
 			if (++i == argc) {
@@ -229,6 +238,7 @@ int main(int argc, char *argv_[]) {
 		parser->tab->srcName  = coco_string_create(srcName);
 		parser->tab->srcDir   = coco_string_create(srcDir);
 		parser->tab->nsName   = coco_string_create(nsName);
+		parser->tab->prefixName = coco_string_create(prefixName);
 		parser->tab->frameDir = coco_string_create(frameDir);
 		parser->tab->outDir   = coco_string_create(outDir != NULL ? outDir : srcDir);
 		parser->tab->emitLines = emitLines;
@@ -267,6 +277,7 @@ int main(int argc, char *argv_[]) {
 
 	coco_string_delete(srcName);
 	coco_string_delete(nsName);
+	coco_string_delete(prefixName);
 	coco_string_delete(frameDir);
 	coco_string_delete(ddtString);
 	coco_string_delete(chTrFileName);

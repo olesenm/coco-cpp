@@ -27,7 +27,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 -----------------------------------------------------------------------*/
 
 
-#if !defined(COCO_SCANNER_H__)
+#ifndef COCO_SCANNER_H__
 #define COCO_SCANNER_H__
 
 #include <limits.h>
@@ -51,98 +51,102 @@ Coco/R itself) does not fall under the GNU General Public License.
 #define coco_swprintf swprintf
 #endif
 
-#define COCO_WCHAR_MAX 65535
+#define COCO_WCHAR_MAX    65535
 #define MIN_BUFFER_LENGTH 1024
 #define MAX_BUFFER_LENGTH (64*MIN_BUFFER_LENGTH)
-#define HEAP_BLOCK_SIZE (64*1024)
-#define COCO_CPP_NAMESPACE_SEPARATOR L':'
+#define HEAP_BLOCK_SIZE   (64*1024)
+
+
+namespace Coco {
+
+
+
+// * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
 
 //
 // string handling, wide character
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Create by copying str
+//! Create by copying str
 wchar_t* coco_string_create(const wchar_t* str);
 
-// Create a substring of str starting at index and length characters long
+//! Create a substring of str starting at index and length characters long
 wchar_t* coco_string_create(const wchar_t* str, int index, int length);
 
-// Create an uppercase string from str
+//! Create an uppercase string from str
 wchar_t* coco_string_create_upper(const wchar_t* str);
 
-// Create an uppercase substring from str starting at index and length characters long
+//! Create an uppercase substring from str starting at index and length characters long
 wchar_t* coco_string_create_upper(const wchar_t* str, int index, int length);
 
-// Create a lowercase string from str
+//! Create a lowercase string from str
 wchar_t* coco_string_create_lower(const wchar_t* str);
 
-// Create a lowercase substring from str starting at index and length characters long
+//! Create a lowercase substring from str starting at index and length characters long
 wchar_t* coco_string_create_lower(const wchar_t* str, int index, int length);
 
-// Create a string by concatenating str1 and str2
+//! Create a string by concatenating str1 and str2
 wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2);
 
-// Create a string by concatenating a character to the end of str
+//! Create a string by concatenating a character to the end of str
 wchar_t* coco_string_create_append(const wchar_t* str, const wchar_t ch);
 
-// Free storage and nullify the argument
+//! Free storage and nullify the argument
 void  coco_string_delete(wchar_t* &str);
 
-// The length of the str, or 0 if the str is NULL
+//! The length of the str, or 0 if the str is NULL
 int   coco_string_length(const wchar_t* str);
 
-// Return true if the str ends with the endstr
+//! Return true if the str ends with the endstr
 bool  coco_string_endswith(const wchar_t* str, const wchar_t* endstr);
 
-// Return the index of the first occurrence of ch.
-// Return -1 if nothing is found.
+//! Return the index of the first occurrence of ch.
+//  Return -1 if nothing is found.
 int   coco_string_indexof(const wchar_t* str, const wchar_t ch);
 
-// Return the index of the last occurrence of ch.
-// Return -1 if nothing is found.
+//! Return the index of the last occurrence of ch.
+//  Return -1 if nothing is found.
 int   coco_string_lastindexof(const wchar_t* str, const wchar_t ch);
 
-// Append str to dest
+//! Append str to dest
 void  coco_string_merge(wchar_t* &dest, const wchar_t* str);
 
-// Compare strings, return true if they are equal
+//! Compare strings, return true if they are equal
 bool  coco_string_equal(const wchar_t* str1, const wchar_t* str2);
 
-// Compare strings, return 0 if they are equal
+//! Compare strings, return 0 if they are equal
 int   coco_string_compareto(const wchar_t* str1, const wchar_t* str2);
 
-// Simple string hashing function
+//! Simple string hashing function
 int   coco_string_hash(const wchar_t* str);
-
 
 //
 // String conversions
 // ~~~~~~~~~~~~~~~~~~
 
-// Convert wide string to double
+//! Convert wide string to double
 double coco_string_toDouble(const wchar_t* str);
 
-// Convert wide string to float
+//! Convert wide string to float
 float coco_string_toFloat(const wchar_t* str);
-
 
 //
 // String handling, byte character
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Create by copying byte str
+//! Create by copying byte str
 wchar_t* coco_string_create(const char* str);
 
-// Create a substring of byte str starting at index and length characters long
+//! Create a substring of byte str starting at index and length characters long
 wchar_t* coco_string_create(const char* str, int index, int length);
 
-// Create a byte string by copying str
+//! Create a byte string by copying str
 char* coco_string_create_char(const wchar_t* str);
 
-// Create a byte substring of str starting at index and length characters long
+//! Create a byte substring of str starting at index and length characters long
 char* coco_string_create_char(const wchar_t* str, int index, int length);
 
-// Free storage and nullify the argument
+//! Free storage and nullify the argument
 void  coco_string_delete(char* &str);
 
 
@@ -150,30 +154,41 @@ void  coco_string_delete(char* &str);
 // String conversions, byte character
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Convert byte string to double
+//! Convert byte string to double
 double coco_string_toDouble(const char* str);
 
-// Convert byte string to float
+//! Convert byte string to float
 float coco_string_toFloat(const char* str);
 
+// * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
 
-namespace Coco {
 
 
+//! Scanner Token
 class Token
 {
 public:
-	int kind;     // token kind
-	int pos;      // token position in the source text (starting at 0)
-	int col;      // token column (starting at 1)
-	int line;     // token line (starting at 1)
-	wchar_t* val; // token value
-	Token *next;  // ML 2005-03-11 Peek tokens are kept in linked list
+	//! token kind
+	int kind;
+	//! token position in the source text (starting at 0)
+	int pos;
+	//! token column (starting at 1)
+	int col;
+	//! token line (starting at 1)
+	int line;
+	//! token value
+	wchar_t* val;
+	//! Peek tokens are kept in linked list
+	Token *next;
 
+	//! Construct null
 	Token();
+	//! Destructor - cleanup allocated val
 	~Token();
 };
 
+
+//! Scanner Buffer
 class Buffer {
 // This Buffer supports the following cases:
 // 1) seekable stream (file)
@@ -198,6 +213,7 @@ public:
 
 	Buffer(FILE*, bool isUserStream);
 	Buffer(const unsigned char* buf, int len);
+	Buffer(const char* buf, int len);
 	Buffer(Buffer*);
 	virtual ~Buffer();
 
@@ -209,15 +225,18 @@ public:
 	virtual void SetPos(int value);
 };
 
+
+//! A Scanner buffer that handles UTF-8 characters
 class UTF8Buffer : public Buffer {
 public:
-	UTF8Buffer(Buffer* b) : Buffer(b) {};
+	UTF8Buffer(Buffer* b) : Buffer(b) {}
 	virtual int Read();
 };
 
 //------------------------------------------------------------------------------
-// StartStates  -- maps characters to start states of tokens
+// StartStates
 //------------------------------------------------------------------------------
+//! maps characters to start states of tokens
 class StartStates {
 private:
 	class Elem {
@@ -265,8 +284,9 @@ public:
 };
 
 //------------------------------------------------------------------------------
-// KeywordMap  -- maps strings to integers (identifiers to keyword kinds)
+// KeywordMap
 //------------------------------------------------------------------------------
+//! maps strings to integers (identifiers to keyword kinds)
 class KeywordMap {
 private:
 	class Elem {
@@ -316,6 +336,8 @@ public:
 	}
 };
 
+
+//! A Coco/R Scanner
 class Scanner {
 private:
 	static const unsigned char EOL = '\n';   // end-of-line character
@@ -360,10 +382,16 @@ private:
 	Token* NextToken();
 
 public:
-	Buffer *buffer;   // scanner buffer
+	//! scanner buffer
+	Buffer *buffer;
 
+	//- Attach scanner to an existing character buffer
 	Scanner(const unsigned char* buf, int len);
+	//- Attach scanner to an existing character buffer
+	Scanner(const char* buf, int len);
+	//- Open a file for reading and attach scanner
 	Scanner(const wchar_t* fileName);
+	//- Using an existing open file handle for the scanner
 	Scanner(FILE* s);
 	~Scanner();
 	Token* Scan();
@@ -375,5 +403,5 @@ public:
 } // namespace
 
 
-#endif // !defined(COCO_SCANNER_H__)
+#endif // COCO_SCANNER_H__
 

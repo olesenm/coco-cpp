@@ -28,7 +28,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 
 
-#if !defined(COCO_PARSER_H__)
+#ifndef COCO_PARSER_H__
 #define COCO_PARSER_H__
 
 #include "Tab.h"
@@ -41,9 +41,10 @@ Coco/R itself) does not fall under the GNU General Public License.
 namespace Coco {
 
 
+//! Parser error handing
 class Errors {
 public:
-	int count;			// number of errors detected
+	int count;		// number of errors detected
 
 	Errors();
 	void SynErr(int line, int col, int n);
@@ -54,6 +55,8 @@ public:
 
 }; // Errors
 
+
+//! A Coco/R Parser
 class Parser {
 private:
 	enum {
@@ -82,8 +85,8 @@ public:
 	Scanner *scanner;
 	Errors  *errors;
 
-	Token *t;			// last recognized token
-	Token *la;			// lookahead token
+	Token *t;		// last recognized token
+	Token *la;		// lookahead token
 
 int id;
 	int str;
@@ -138,5 +141,5 @@ int id;
 } // namespace
 
 
-#endif // !defined(COCO_PARSER_H__)
+#endif // COCO_PARSER_H__
 

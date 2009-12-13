@@ -30,7 +30,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 #include <wchar.h>
 #include "Parser.h"
-#include "Scanner.h"
 
 
 namespace Coco {
@@ -41,10 +40,12 @@ void Parser::SynErr(int n) {
 	errDist = 0;
 }
 
+
 void Parser::SemErr(const wchar_t* msg) {
 	if (errDist >= minErrDist) errors->Error(t->line, t->col, msg);
 	errDist = 0;
 }
+
 
 void Parser::Get() {
 	for (;;) {
@@ -72,6 +73,7 @@ void Parser::Get() {
 	}
 }
 
+
 void Parser::Expect(int n) {
 	if (la->kind == n) {
 		Get();
@@ -80,6 +82,7 @@ void Parser::Expect(int n) {
 		SynErr(n);
 	}
 }
+
 
 void Parser::ExpectWeak(int n, int follow) {
 	if (la->kind == n) {
@@ -90,6 +93,7 @@ void Parser::ExpectWeak(int n, int follow) {
 		while (!StartOf(follow)) Get();
 	}
 }
+
 
 bool Parser::WeakSeparator(int n, int syFol, int repFol) {
 	if (la->kind == n) {
@@ -107,6 +111,7 @@ bool Parser::WeakSeparator(int n, int syFol, int repFol) {
 		return StartOf(syFol);
 	}
 }
+
 
 void Parser::Coco() {
 		Symbol *sym; Graph *g, *g1, *g2; wchar_t* gramName = NULL; CharSet *s; 
@@ -705,6 +710,7 @@ void Parser::Parse() {
 	Expect(0);
 }
 
+
 Parser::Parser(Scanner *scanner) {
 	maxT = 41;
 
@@ -715,6 +721,7 @@ Parser::Parser(Scanner *scanner) {
 	this->scanner = scanner;
 	errors = new Errors();
 }
+
 
 bool Parser::StartOf(int s) {
 	const bool T = true;
@@ -749,14 +756,17 @@ bool Parser::StartOf(int s) {
 	return set[s][la->kind];
 }
 
+
 Parser::~Parser() {
 	delete errors;
 	delete dummyToken;
 }
 
+
 Errors::Errors() {
 	count = 0;
 }
+
 
 void Errors::SynErr(int line, int col, int n) {
 	wchar_t* s;
@@ -827,22 +837,26 @@ void Errors::SynErr(int line, int col, int n) {
 	count++;
 }
 
+
 void Errors::Error(int line, int col, const wchar_t *s) {
 	wprintf(L"-- line %d col %d: %ls\n", line, col, s);
 	count++;
 }
 
+
 void Errors::Warning(int line, int col, const wchar_t *s) {
 	wprintf(L"-- line %d col %d: %ls\n", line, col, s);
 }
+
 
 void Errors::Warning(const wchar_t *s) {
 	wprintf(L"%ls\n", s);
 }
 
+
 void Errors::Exception(const wchar_t* s) {
 	wprintf(L"%ls", s);
-	exit(1);
+	::exit(1);
 }
 
 } // namespace

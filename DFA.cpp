@@ -579,24 +579,59 @@ void DFA::GenComment(Comment *com, int i) {
 void DFA::CopyFramePart(const wchar_t* stop) {
 	wchar_t startCh = stop[0];
 	int endOfStopString = coco_string_length(stop)-1;
-	wchar_t ch = 0;
 
+	const wchar_t* prefixMacro = tab->prefixMacro;
+	int endOfPrefixMacro = coco_string_length(prefixMacro)-1;
+	wchar_t startPrefixCh = prefixMacro[0];
+	int isPrefixSet = coco_string_length(tab->prefixName);
+
+	wchar_t ch = 0;
 	fwscanf(fram, L"%lc", &ch); //	fram.ReadByte();
 	while (!feof(fram)) // ch != EOF
+	{
 		if (ch == startCh) {
 			int i = 0;
 			do {
 				if (i == endOfStopString) return; // stop[0..i] found
-				fwscanf(fram, L"%lc", &ch); i++;
+				fwscanf(fram, L"%lc", &ch);
+				i++;
 			} while (ch == stop[i]);
 			// stop[0..i-1] found; continue with last read character
-			wchar_t *subStop = coco_string_create(stop, 0, i);
-			fwprintf(gen, L"%ls", subStop);
-			coco_string_delete(subStop);
-		} else {
+			for (int subI = 0; subI < i; ++subI) {
+				fwprintf(gen, L"%lc", stop[subI]);
+			}
+		}
+		else if (ch == startPrefixCh) {
+			bool found = false;
+			int i = 0;
+			do {
+				if (i == endOfPrefixMacro) {
+					found = true;
+					break;
+				}
+				fwscanf(fram, L"%lc", &ch);
+				i++;
+			} while (ch == prefixMacro[i]);
+			// prefixMacro[0..i-1] found; continue with last read character
+			if (found)
+			{
+				if (isPrefixSet) {
+					fwprintf(gen, L"%ls", tab->prefixName);
+				}
+				fwscanf(fram, L"%lc", &ch);
+			}
+			else
+			{
+				for (int subI = 0; subI < i; ++subI) {
+					fwprintf(gen, L"%lc", prefixMacro[subI]);
+				}
+			}
+		}
+		else {
 			fwprintf(gen, L"%lc", ch);
 			fwscanf(fram, L"%lc", &ch);
 		}
+	}
 	errors->Exception(L" -- incomplete or corrupt scanner frame file");
 }
 
@@ -809,13 +844,19 @@ void DFA::WriteScanner() {
 
 	if (dirtyDFA) MakeDeterministic();
 
+	//
 	// Header
-	OpenGen(L"Scanner.h", makeBackup); /* pdt */
+	//
+	wchar_t* outputFileName =
+		coco_string_create_append(tab->prefixName, L"Scanner.h");
+
+	OpenGen(outputFileName, makeBackup); /* pdt */
+
 	CopyFramePart(L"-->begin");
 	wchar_t* res = coco_string_create_lower(tab->srcName);
 	if (!coco_string_endswith(res, L"coco.atg")) {
 		fclose(gen);
-		OpenGen(L"Scanner.h", false); /* pdt */
+		OpenGen(outputFileName, false); /* pdt */
 	}
 	coco_string_delete(res);
 
@@ -838,15 +879,21 @@ void DFA::WriteScanner() {
 
 	CopyFramePart(L"-->implementation");
 	fclose(gen);
+	coco_string_delete(outputFileName);
 
+	//
 	// Source
-	OpenGen(L"Scanner.cpp", makeBackup); /* pdt */
+	//
+	outputFileName =
+		coco_string_create_append(tab->prefixName, L"Scanner.cpp");
+
+	OpenGen(outputFileName, makeBackup); /* pdt */
 	CopyFramePart(L"-->begin");
 
 	res = coco_string_create_lower(tab->srcName);
 	if (!coco_string_endswith(res, L"coco.atg")) {
 		fclose(gen);
-		OpenGen(L"Scanner.cpp", false); /* pdt */
+		OpenGen(outputFileName, false); /* pdt */
 	}
 	coco_string_delete(res);
 
@@ -910,7 +957,9 @@ void DFA::WriteScanner() {
 
 	CopyFramePart(L"$$$");
 	fclose(gen);
+	coco_string_delete(outputFileName);
 }
+
 
 DFA::DFA(Parser *parser) {
 	this->parser = parser;

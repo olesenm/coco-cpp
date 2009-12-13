@@ -32,6 +32,11 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include <string.h>
 #include "Scanner.h"
 
+namespace Coco {
+
+
+// * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
+
 // string handling, wide character
 
 wchar_t* coco_string_create(const wchar_t* str) {
@@ -262,21 +267,24 @@ float coco_string_toFloat(const char* str)
 }
 
 
-namespace Coco {
+// * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
 
 
-Token::Token() {
-	kind = 0;
-	pos  = 0;
-	col  = 0;
-	line = 0;
-	val  = NULL;
-	next = NULL;
-}
+Token::Token()
+:
+    kind(0),
+    pos(0),
+    col(0),
+    line(0),
+    val(NULL),
+    next(NULL)
+{}
+
 
 Token::~Token() {
 	coco_string_delete(val);
 }
+
 
 Buffer::Buffer(FILE* s, bool isUserStream) {
 // ensure binary read on windows
@@ -296,10 +304,11 @@ Buffer::Buffer(FILE* s, bool isUserStream) {
 	}
 	bufCapacity = (bufLen > 0) ? bufLen : MIN_BUFFER_LENGTH;
 	buf = new unsigned char[bufCapacity];
-	if (fileLen > 0) SetPos(0);          // setup  buffer to position 0 (start)
+	if (fileLen > 0) SetPos(0);          // setup buffer to position 0 (start)
 	else bufPos = 0; // index 0 is already after the file, thus Pos = 0 is invalid
 	if (bufLen == fileLen && CanSeek()) Close();
 }
+
 
 Buffer::Buffer(Buffer* b) {
 	buf = b->buf;
@@ -314,6 +323,7 @@ Buffer::Buffer(Buffer* b) {
 	isUserStream = b->isUserStream;
 }
 
+
 Buffer::Buffer(const unsigned char* buf, int len) {
 	this->buf = new unsigned char[len];
 	memcpy(this->buf, buf, len*sizeof(unsigned char));
@@ -324,6 +334,18 @@ Buffer::Buffer(const unsigned char* buf, int len) {
 	stream = NULL;
 }
 
+
+Buffer::Buffer(const char* buf, int len) {
+	this->buf = new unsigned char[len];
+	memcpy(this->buf, buf, len*sizeof(unsigned char));
+	bufStart = 0;
+	bufCapacity = bufLen = len;
+	fileLen = len;
+	bufPos = 0;
+	stream = NULL;
+}
+
+
 Buffer::~Buffer() {
 	Close();
 	if (buf != NULL) {
@@ -332,12 +354,14 @@ Buffer::~Buffer() {
 	}
 }
 
+
 void Buffer::Close() {
 	if (!isUserStream && stream != NULL) {
 		fclose(stream);
 		stream = NULL;
 	}
 }
+
 
 int Buffer::Read() {
 	if (bufPos < bufLen) {
@@ -352,12 +376,14 @@ int Buffer::Read() {
 	}
 }
 
+
 int Buffer::Peek() {
 	int curPos = GetPos();
 	int ch = Read();
 	SetPos(curPos);
 	return ch;
 }
+
 
 wchar_t* Buffer::GetString(int beg, int end) {
 	int len = 0;
@@ -371,9 +397,11 @@ wchar_t* Buffer::GetString(int beg, int end) {
 	return res;
 }
 
+
 int Buffer::GetPos() {
 	return bufPos + bufStart;
 }
+
 
 void Buffer::SetPos(int value) {
 	if ((value >= fileLen) && (stream != NULL) && !CanSeek()) {
@@ -386,7 +414,7 @@ void Buffer::SetPos(int value) {
 
 	if ((value < 0) || (value > fileLen)) {
 		wprintf(L"--- buffer out of bounds access, position: %d\n", value);
-		exit(1);
+		::exit(1);
 	}
 
 	if ((value >= bufStart) && (value < (bufStart + bufLen))) { // already in buffer
@@ -399,6 +427,7 @@ void Buffer::SetPos(int value) {
 		bufPos = fileLen - bufStart; // make Pos return fileLen
 	}
 }
+
 
 // Read the next chunk of bytes from the stream, increases the buffer
 // if needed and updates the fields fileLen and bufLen.
@@ -426,9 +455,11 @@ int Buffer::ReadNextStreamChunk() {
 	return 0;
 }
 
+
 bool Buffer::CanSeek() {
 	return (stream != NULL) && (ftell(stream) != -1);
 }
+
 
 int UTF8Buffer::Read() {
 	int ch;
@@ -461,27 +492,37 @@ int UTF8Buffer::Read() {
 	return ch;
 }
 
+
 Scanner::Scanner(const unsigned char* buf, int len) {
 	buffer = new Buffer(buf, len);
 	Init();
 }
+
+
+Scanner::Scanner(const char* buf, int len) {
+	buffer = new Buffer(buf, len);
+	Init();
+}
+
 
 Scanner::Scanner(const wchar_t* fileName) {
 	FILE* stream;
 	char *chFileName = coco_string_create_char(fileName);
 	if ((stream = fopen(chFileName, "rb")) == NULL) {
 		wprintf(L"--- Cannot open file %ls\n", fileName);
-		exit(1);
+		::exit(1);
 	}
 	coco_string_delete(chFileName);
 	buffer = new Buffer(stream, false);
 	Init();
 }
 
+
 Scanner::Scanner(FILE* s) {
 	buffer = new Buffer(s, true);
 	Init();
 }
+
 
 Scanner::~Scanner() {
 	char* cur = (char*) firstHeap;
@@ -494,6 +535,7 @@ Scanner::~Scanner() {
 	delete [] tval;
 	delete buffer;
 }
+
 
 void Scanner::Init() {
 	maxT = 41;
@@ -550,7 +592,7 @@ void Scanner::Init() {
 	heapTop = heap;
 	if (sizeof(Token) > HEAP_BLOCK_SIZE) {
 		wprintf(L"--- Too small HEAP_BLOCK_SIZE\n");
-		exit(1);
+		::exit(1);
 	}
 
 	pos = -1; line = 1; col = 0;
@@ -561,7 +603,7 @@ void Scanner::Init() {
 		NextCh(); int ch2 = ch;
 		if (ch1 != 0xBB || ch2 != 0xBF) {
 			wprintf(L"Illegal byte order mark at start of file");
-			exit(1);
+			::exit(1);
 		}
 		Buffer *oldBuf = buffer;
 		buffer = new UTF8Buffer(buffer); col = 0;
@@ -572,6 +614,7 @@ void Scanner::Init() {
 
 	pt = tokens = CreateToken(); // first token is a dummy
 }
+
 
 void Scanner::NextCh() {
 	if (oldEols > 0) {
@@ -589,6 +632,7 @@ void Scanner::NextCh() {
 
 }
 
+
 void Scanner::AddCh() {
 	if (tlen >= tvalLength) {
 		tvalLength *= 2;
@@ -602,6 +646,7 @@ void Scanner::AddCh() {
 		NextCh();
 	}
 }
+
 
 
 bool Scanner::Comment0() {
@@ -670,6 +715,7 @@ void Scanner::CreateHeapBlock() {
 	heapTop = heap;
 }
 
+
 Token* Scanner::CreateToken() {
 	Token *t;
 	if (((char*) heapTop + (int) sizeof(Token)) >= (char*) heapEnd) {
@@ -682,12 +728,13 @@ Token* Scanner::CreateToken() {
 	return t;
 }
 
+
 void Scanner::AppendVal(Token *t) {
 	int reqMem = (tlen + 1) * sizeof(wchar_t);
 	if (((char*) heapTop + reqMem) >= (char*) heapEnd) {
 		if (reqMem > HEAP_BLOCK_SIZE) {
 			wprintf(L"--- Too long token value\n");
-			exit(1);
+			::exit(1);
 		}
 		CreateHeapBlock();
 	}
@@ -697,6 +744,7 @@ void Scanner::AppendVal(Token *t) {
 	wcsncpy(t->val, tval, tlen);
 	t->val[tlen] = L'\0';
 }
+
 
 Token* Scanner::NextToken() {
 	while (ch == ' ' ||
@@ -812,6 +860,7 @@ Token* Scanner::NextToken() {
 	return t;
 }
 
+
 // get the next token (possibly a token already seen during peeking)
 Token* Scanner::Scan() {
 	if (tokens->next == NULL) {
@@ -821,6 +870,7 @@ Token* Scanner::Scan() {
 		return tokens;
 	}
 }
+
 
 // peek for the next token, ignore pragmas
 Token* Scanner::Peek() {
@@ -834,10 +884,12 @@ Token* Scanner::Peek() {
 	return pt;
 }
 
+
 // make sure that peeking starts at the current scan position
 void Scanner::ResetPeek() {
 	pt = tokens;
 }
+
 
 } // namespace
 

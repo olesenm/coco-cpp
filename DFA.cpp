@@ -75,7 +75,8 @@ void DFA::PutRange(CharSet *s) {
 			wchar_t *from = Ch((wchar_t) r->from);
 			wchar_t *to = Ch((wchar_t) r->to);
 			fwprintf(gen, L"(ch >= %ls && ch <= %ls)", from, to);
-			delete [] from; delete [] to;
+			delete [] from;
+			delete [] to;
 		}
 		if (r->next != NULL) fwprintf(gen, L" || ");
 	}
@@ -784,7 +785,7 @@ void DFA::WriteScanner() {
 	FILE* tmp;
 	if ((tmp = fopen(chFr, "r")) == NULL) {
 		if (coco_string_length(tab->frameDir) != 0) {
-			delete [] fr;
+			coco_string_delete(fr);
 			fr = coco_string_create(tab->frameDir);
 			coco_string_merge(fr, L"/");
 			coco_string_merge(fr, L"Scanner.frame");

@@ -419,7 +419,7 @@ void ParserGen::WriteParser () {
 	FILE* tmp;
 	if ((tmp = fopen(chFr, "r")) == NULL) {
 		if (coco_string_length(tab->frameDir) != 0) {
-			delete [] fr;
+			coco_string_delete(fr);
 			fr = coco_string_create(tab->frameDir);
 			coco_string_merge(fr, L"/");
 			coco_string_merge(fr, L"Parser.frame");

@@ -41,7 +41,10 @@ Coco/R itself) does not fall under the GNU General Public License.
   in the attributed grammar or as a command-line option
   -------------------------------------------------------------------------*/
 
-
+/*!
+ * @namespace Coco
+ * @brief Compiler Generator Coco/R, C++ version
+ */
 #include <stdio.h>
 #include "Scanner.h"
 #include "Parser.h"

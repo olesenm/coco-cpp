@@ -31,6 +31,9 @@ core
 # ignore generated executable
 /Coco
 
+# ignore Doxygen docs
+/html
+
 # source packages - anywhere
 *.tar.bz2
 *.tar.gz

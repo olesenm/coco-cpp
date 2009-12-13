@@ -61,57 +61,57 @@ Coco/R itself) does not fall under the GNU General Public License.
 // string handling, wide character
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Create by copying str
+//! Create by copying str
 wchar_t* coco_string_create(const wchar_t* str);
 
-// Create a substring of str starting at index and length characters long
+//! Create a substring of str starting at index and length characters long
 wchar_t* coco_string_create(const wchar_t* str, int index, int length);
 
-// Create an uppercase string from str
+//! Create an uppercase string from str
 wchar_t* coco_string_create_upper(const wchar_t* str);
 
-// Create an uppercase substring from str starting at index and length characters long
+//! Create an uppercase substring from str starting at index and length characters long
 wchar_t* coco_string_create_upper(const wchar_t* str, int index, int length);
 
-// Create a lowercase string from str
+//! Create a lowercase string from str
 wchar_t* coco_string_create_lower(const wchar_t* str);
 
-// Create a lowercase substring from str starting at index and length characters long
+//! Create a lowercase substring from str starting at index and length characters long
 wchar_t* coco_string_create_lower(const wchar_t* str, int index, int length);
 
-// Create a string by concatenating str1 and str2
+//! Create a string by concatenating str1 and str2
 wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2);
 
-// Create a string by concatenating a character to the end of str
+//! Create a string by concatenating a character to the end of str
 wchar_t* coco_string_create_append(const wchar_t* str, const wchar_t ch);
 
-// Free storage and nullify the argument
+//! Free storage and nullify the argument
 void  coco_string_delete(wchar_t* &str);
 
-// The length of the str, or 0 if the str is NULL
+//! The length of the str, or 0 if the str is NULL
 int   coco_string_length(const wchar_t* str);
 
-// Return true if the str ends with the endstr
+//! Return true if the str ends with the endstr
 bool  coco_string_endswith(const wchar_t* str, const wchar_t* endstr);
 
-// Return the index of the first occurrence of ch.
-// Return -1 if nothing is found.
+//! Return the index of the first occurrence of ch.
+//  Return -1 if nothing is found.
 int   coco_string_indexof(const wchar_t* str, const wchar_t ch);
 
-// Return the index of the last occurrence of ch.
-// Return -1 if nothing is found.
+//! Return the index of the last occurrence of ch.
+//  Return -1 if nothing is found.
 int   coco_string_lastindexof(const wchar_t* str, const wchar_t ch);
 
-// Append str to dest
+//! Append str to dest
 void  coco_string_merge(wchar_t* &dest, const wchar_t* str);
 
-// Compare strings, return true if they are equal
+//! Compare strings, return true if they are equal
 bool  coco_string_equal(const wchar_t* str1, const wchar_t* str2);
 
-// Compare strings, return 0 if they are equal
+//! Compare strings, return 0 if they are equal
 int   coco_string_compareto(const wchar_t* str1, const wchar_t* str2);
 
-// Simple string hashing function
+//! Simple string hashing function
 int   coco_string_hash(const wchar_t* str);
 
 
@@ -119,10 +119,10 @@ int   coco_string_hash(const wchar_t* str);
 // String conversions
 // ~~~~~~~~~~~~~~~~~~
 
-// Convert wide string to double
+//! Convert wide string to double
 double coco_string_toDouble(const wchar_t* str);
 
-// Convert wide string to float
+//! Convert wide string to float
 float coco_string_toFloat(const wchar_t* str);
 
 
@@ -130,19 +130,19 @@ float coco_string_toFloat(const wchar_t* str);
 // String handling, byte character
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Create by copying byte str
+//! Create by copying byte str
 wchar_t* coco_string_create(const char* str);
 
-// Create a substring of byte str starting at index and length characters long
+//! Create a substring of byte str starting at index and length characters long
 wchar_t* coco_string_create(const char* str, int index, int length);
 
-// Create a byte string by copying str
+//! Create a byte string by copying str
 char* coco_string_create_char(const wchar_t* str);
 
-// Create a byte substring of str starting at index and length characters long
+//! Create a byte substring of str starting at index and length characters long
 char* coco_string_create_char(const wchar_t* str, int index, int length);
 
-// Free storage and nullify the argument
+//! Free storage and nullify the argument
 void  coco_string_delete(char* &str);
 
 
@@ -150,10 +150,10 @@ void  coco_string_delete(char* &str);
 // String conversions, byte character
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Convert byte string to double
+//! Convert byte string to double
 double coco_string_toDouble(const char* str);
 
-// Convert byte string to float
+//! Convert byte string to float
 float coco_string_toFloat(const char* str);
 
 

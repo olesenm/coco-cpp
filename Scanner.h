@@ -318,16 +318,17 @@ public:
 
 class Scanner {
 private:
+	static const unsigned char EOL = '\n';   // end-of-line character
+	static const int eofSym = 0;             // end-of-file token id
+
 	void *firstHeap;
 	void *heap;
 	void *heapTop;
 	void **heapEnd;
 
-	unsigned char EOL;
-	int eofSym;
-	int noSym;
+	int noSym;        // noSym gets highest number, set in Parser
 	int maxT;
-	int charSetSize;
+	int charSetSize;  // unused?
 	StartStates start;
 	KeywordMap keywords;
 

@@ -496,8 +496,6 @@ Scanner::~Scanner() {
 }
 
 void Scanner::Init() {
-	EOL    = '\n';
-	eofSym = 0;
 	maxT = 41;
 	noSym = 41;
 	int i;

@@ -32,6 +32,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 namespace Coco {
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 SortedEntry::SortedEntry(Symbol* Key, void* Value) {
 	this->Key   = Key;
 	this->Value = Value;
@@ -139,7 +141,8 @@ SortedEntry* SortedList::operator[]( int index ) const {
 }
 
 
-} // End namespace Coco
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace Coco
 
 // ************************************************************************* //

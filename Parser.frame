@@ -85,7 +85,7 @@ public:
 
 -->namespace_close
 
-#endif // !defined(COCO_PARSER_H__)
+#endif // COCO_PARSER_H__
 
 -->implementation
 /*----------------------------------------------------------------------

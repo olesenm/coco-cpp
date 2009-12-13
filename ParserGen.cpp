@@ -36,6 +36,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 namespace Coco {
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 void ParserGen::Indent (int n) {
 	for (int i = 1; i <= n; i++) fwprintf(gen, L"\t");
 }
@@ -513,4 +515,9 @@ ParserGen::ParserGen (Parser *parser) {
 	err = NULL;
 }
 
-}; // namespace
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Coco
+
+// ************************************************************************* //

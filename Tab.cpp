@@ -35,6 +35,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 namespace Coco {
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 const char* Tab::nTyp[] =
 		{"    ", "t   ", "pr  ", "nt  ", "clas", "chr ", "wt  ", "any ", "eps ",
 		 "sync", "sem ", "alt ", "iter", "opt ", "rslv"};
@@ -1221,4 +1223,8 @@ void Tab::SetDDT(const wchar_t* s) {
 	coco_string_delete(st);
 }
 
-}; // namespace
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Coco
+
+// ************************************************************************* //

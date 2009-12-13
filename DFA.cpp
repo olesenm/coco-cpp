@@ -37,6 +37,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 namespace Coco {
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 //---------- Output primitives
 wchar_t* DFA::Ch(wchar_t ch) {
 	wchar_t* format = new wchar_t[10];
@@ -608,11 +610,11 @@ wchar_t* DFA::SymName(Symbol *sym) { // real name value is stored in Tab.literal
 
 void DFA::GenLiterals () {
 	Symbol *sym;
-	
+
 	ArrayList *ts[2];
 	ts[0] = tab->terminals;
 	ts[1] = tab->pragmas;
-	
+
 	for (int i = 0; i < 2; ++i) {
 		for (int j = 0; j < ts[i]->Count; j++) {
 			sym = (Symbol*) ((*(ts[i]))[j]);
@@ -903,7 +905,7 @@ void DFA::WriteScanner() {
 	fclose(gen);
 }
 
-DFA::DFA(Parser *parser) : eoF (-1) {
+DFA::DFA(Parser *parser) {
 	this->parser = parser;
 	tab = parser->tab;
 	errors = parser->errors;
@@ -916,4 +918,9 @@ DFA::DFA(Parser *parser) : eoF (-1) {
 	hasCtxMoves = false;
 }
 
-}; // namespace
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Coco
+
+// ************************************************************************* //

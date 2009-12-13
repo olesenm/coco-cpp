@@ -30,8 +30,18 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 namespace Coco {
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 Position::Position(int beg, int end, int col, int line) {
-	this->beg = beg; this->end = end; this->col = col; this->line = line;
+	this->beg = beg;
+	this->end = end;
+	this->col = col;
+	this->line = line;
 }
 
-}; // namespace
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Coco
+
+// ************************************************************************* //

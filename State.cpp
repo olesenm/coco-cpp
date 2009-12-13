@@ -31,6 +31,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 namespace Coco {
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 State::State() {
 	this->firstAction = NULL;
 	this->endOf       = NULL;
@@ -74,4 +76,9 @@ void State::MeltWith(State *s) { // copy actions of s to state
 	}
 }
 
-}; // namespace
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Coco
+
+// ************************************************************************* //

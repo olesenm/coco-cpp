@@ -61,7 +61,7 @@ void printUsage(const char* message)
 	wprintf(L"Usage: Coco Grammar.atg {Option}\n");
 	wprintf(L"Options:\n");
 	wprintf(L"  -namespace <namespaceName>\n");
-	wprintf(L"  -prefix    <prefixName> (NOT IMPLEMENTED)\n");
+	wprintf(L"  -prefix    <prefixName>\n");
 	wprintf(L"  -frames    <frameFilesDirectory>\n");
 	wprintf(L"  -trace     <traceString>\n");
 	wprintf(L"  -o         <outputDirectory>\n");

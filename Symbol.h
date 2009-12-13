@@ -45,24 +45,24 @@ class BitArray;
 class Symbol {
 public:
 	// token kinds
-	static int fixedToken;    // e.g. 'a' ('b' | 'c') (structure of literals)
-	static int classToken;    // e.g. digit {digit}   (at least one char class)
-	static int litToken;      // e.g. "while"
-	static int classLitToken; // e.g. letter {letter} but without literals that have the same structure*/
+	static const int fixedToken;    //!< e.g. 'a' ('b' | 'c') (structure of literals)
+	static const int classToken;    //!< eg. digit {digit}   (at least one char class)
+	static const int litToken;      //!< e.g. "while"
+	static const int classLitToken; //!< e.g. letter {letter} but without literals that have the same structure*/
 
-	int      n;           // symbol number
-	int      typ;         // t, nt, pr, unknown, rslv /* ML 29_11_2002 slv added */ /* AW slv --> rslv */
-	wchar_t  *name;       // symbol name
-	Node     *graph;      // nt: to first node of syntax graph
-	int      tokenKind;   // t:  token kind (fixedToken, classToken, ...)
-	bool     deletable;   // nt: true if nonterminal is deletable
-	bool     firstReady;  // nt: true if terminal start symbols have already been computed
-	BitArray *first;      // nt: terminal start symbols
-	BitArray *follow;     // nt: terminal followers
-	BitArray *nts;        // nt: nonterminals whose followers have to be added to this sym
-	int      line;        // source text line number of item in this node
-	Position *attrPos;    // nt: position of attributes in source text (or null)
-	Position *semPos;     // pr: pos of semantic action in source text (or null)
+	int      n;           //!< symbol number
+	int      typ;         //!< t, nt, pr, unknown, rslv /* ML 29_11_2002 slv added */ /* AW slv --> rslv */
+	wchar_t  *name;       //!< symbol name
+	Node     *graph;      //!< nt: to first node of syntax graph
+	int      tokenKind;   //!< t:  token kind (fixedToken, classToken, ...)
+	bool     deletable;   //!< nt: true if nonterminal is deletable
+	bool     firstReady;  //!< nt: true if terminal start symbols have already been computed
+	BitArray *first;      //!< nt: terminal start symbols
+	BitArray *follow;     //!< nt: terminal followers
+	BitArray *nts;        //!< nt: nonterminals whose followers have to be added to this sym
+	int      line;        //!< source text line number of item in this node
+	Position *attrPos;    //!< nt: position of attributes in source text (or null)
+	Position *semPos;     //!< pr: pos of semantic action in source text (or null)
 	                      // nt: pos of local declarations in source text (or null)
 
 

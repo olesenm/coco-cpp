@@ -46,26 +46,26 @@ class BitArray;
 class Node {
 public:
 	// enum constants for node kinds
-	static int t;      //!< terminal symbol
-	static int pr;     //!< pragma
-	static int nt;     //!< nonterminal symbol
-	static int clas;   //!< character class
-	static int chr;    //!< character
-	static int wt;     //!< weak terminal symbol
-	static int any;    //!< any character
-	static int eps;    //!< empty
-	static int sync;   //!< synchronization symbol
-	static int sem;    //!< semantic action: (. .)
-	static int alt;    //!< alternative: |
-	static int iter;   //!< iteration: { }
-	static int opt;    //!< option: [ ]
-	static int rslv;   //!< resolver expression
+	static const int t;      //!< terminal symbol
+	static const int pr;     //!< pragma
+	static const int nt;     //!< nonterminal symbol
+	static const int clas;   //!< character class
+	static const int chr;    //!< character
+	static const int wt;     //!< weak terminal symbol
+	static const int any;    //!< any character
+	static const int eps;    //!< empty
+	static const int sync;   //!< synchronization symbol
+	static const int sem;    //!< semantic action: (. .)
+	static const int alt;    //!< alternative: |
+	static const int iter;   //!< iteration: { }
+	static const int opt;    //!< option: [ ]
+	static const int rslv;   //!< resolver expression
 
 	//! normal transition
-	static int normalTrans;
+	static const int normalTrans;
 
 	//! context transition
-	static int contextTrans;
+	static const int contextTrans;
 
 	//! node number
 	int      n;

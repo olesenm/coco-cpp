@@ -35,13 +35,21 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 namespace Coco {
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+const char* Tab::nTyp[] = {
+	"    ", "t   ", "pr  ", "nt  ",
+	"clas", "chr ", "wt  ", "any ",
+	"eps ", "sync", "sem ", "alt ",
+	"iter", "opt ", "rslv"
+};
+
+const char* Tab::tKind[] = {
+	"fixedToken", "classToken", "litToken", "classLitToken"
+};
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-const char* Tab::nTyp[] =
-		{"    ", "t   ", "pr  ", "nt  ", "clas", "chr ", "wt  ", "any ", "eps ",
-		 "sync", "sem ", "alt ", "iter", "opt ", "rslv"};
-
-const char* Tab::tKind[] = {"fixedToken", "classToken", "litToken", "classLitToken"};
 
 Tab::Tab(Parser *parser) {
 	for (int i=0; i<10; i++) ddt[i] = false;

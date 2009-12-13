@@ -41,23 +41,30 @@ class Graph {
 public:
 	//! left end of graph = head
 	Node *l;
-	// right end of graph = list of nodes to be linked to successor graph
+
+	//! right end of graph = list of nodes to be linked to successor graph
 	Node *r;
 
-	Graph() {
-		l = NULL; r = NULL;
-	}
+	Graph()
+	:
+		l(NULL),
+		r(NULL)
+	{}
 
-	Graph(Node *left, Node *right) {
-		l = left; r = right;
-	}
+	Graph(Node *left, Node *right)
+	:
+		l(left),
+		r(right)
+	{}
 
-	Graph(Node *p) {
-		l = p; r = p;
-	}
+	Graph(Node *p)
+	:
+		l(p),
+		r(p)
+	{}
 
-	virtual ~Graph() {
-	}
+	virtual ~Graph()
+	{}
 };
 
 

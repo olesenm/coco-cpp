@@ -162,14 +162,22 @@ float coco_string_toFloat(const char* str);
 class Token
 {
 public:
-	int kind;     // token kind
-	int pos;      // token position in the source text (starting at 0)
-	int col;      // token column (starting at 1)
-	int line;     // token line (starting at 1)
-	wchar_t* val; // token value
-	Token *next;  // ML 2005-03-11 Peek tokens are kept in linked list
+	//! token kind
+	int kind;
+	//! token position in the source text (starting at 0)
+	int pos;
+	//! token column (starting at 1)
+	int col;
+	//! token line (starting at 1)
+	int line;
+	//! token value
+	wchar_t* val;
+	//! Peek tokens are kept in linked list
+	Token *next;
 
+	//! Construct null
 	Token();
+	//! Destructor - cleanup allocated val
 	~Token();
 };
 
@@ -211,15 +219,17 @@ public:
 };
 
 
+//! A buffer that handles UTF-8 characters
 class UTF8Buffer : public Buffer {
 public:
-	UTF8Buffer(Buffer* b) : Buffer(b) {};
+	UTF8Buffer(Buffer* b) : Buffer(b) {}
 	virtual int Read();
 };
 
 //------------------------------------------------------------------------------
-// StartStates  -- maps characters to start states of tokens
+// StartStates
 //------------------------------------------------------------------------------
+//! maps characters to start states of tokens
 class StartStates {
 private:
 	class Elem {
@@ -267,8 +277,9 @@ public:
 };
 
 //------------------------------------------------------------------------------
-// KeywordMap  -- maps strings to integers (identifiers to keyword kinds)
+// KeywordMap
 //------------------------------------------------------------------------------
+//! maps strings to integers (identifiers to keyword kinds)
 class KeywordMap {
 private:
 	class Elem {
@@ -361,11 +372,16 @@ private:
 	Token* NextToken();
 
 public:
-	Buffer *buffer;   // scanner buffer
+	//! scanner buffer
+	Buffer *buffer;
 
+	//- Attach scanner to an existing character buffer
 	Scanner(const unsigned char* buf, int len);
+	//- Attach scanner to an existing character buffer
 	Scanner(const char* buf, int len);
+	//- Open a file for reading and attach scanner
 	Scanner(const wchar_t* fileName);
+	//- Using an existing open file handle for the scanner
 	Scanner(FILE* s);
 	~Scanner();
 	Token* Scan();
@@ -644,14 +660,15 @@ float coco_string_toFloat(const char* str)
 
 -->namespace_open
 
-Token::Token() {
-	kind = 0;
-	pos  = 0;
-	col  = 0;
-	line = 0;
-	val  = NULL;
-	next = NULL;
-}
+Token::Token()
+:
+    kind(0),
+    pos(0),
+    col(0),
+    line(0),
+    val(NULL),
+    next(NULL)
+{}
 
 
 Token::~Token() {
@@ -677,7 +694,7 @@ Buffer::Buffer(FILE* s, bool isUserStream) {
 	}
 	bufCapacity = (bufLen > 0) ? bufLen : MIN_BUFFER_LENGTH;
 	buf = new unsigned char[bufCapacity];
-	if (fileLen > 0) SetPos(0);          // setup  buffer to position 0 (start)
+	if (fileLen > 0) SetPos(0);          // setup buffer to position 0 (start)
 	else bufPos = 0; // index 0 is already after the file, thus Pos = 0 is invalid
 	if (bufLen == fileLen && CanSeek()) Close();
 }

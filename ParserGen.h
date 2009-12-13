@@ -53,39 +53,47 @@ class ParserGen
 public:
 	//! control if backup files (.bak) are generated. default: false
 	static bool makeBackup;
+	static const char CR;  //!< carriage-return character
+	static const char LF;  //!< line-feed character
 
-	//! sets of size < maxTerm are enumerated
-	int maxTerm;
-	char CR;
-	char LF;
-	// unused: const int EOF = -1;
+	// unused: static const int EOF = -1;
 
 	//! error codes
-	int tErr;
-	int altErr;
-	int syncErr;
+	static const int tErr;
+	static const int altErr;
+	static const int syncErr;
+
+	//! sets of size < maxTerm are enumerated
+	static const int maxTerm;
 
 	//! "using" definitions from the attributed grammar
 	Position *usingPos;
 
 	//! highest parser error number
 	int errorNr;
+
 	//! symbol whose production is currently generated
 	Symbol *curSy;
+
 	//! parser frame file
 	FILE* fram;
+
 	//! generated parser source file
 	FILE* gen;
+
 	//! generated parser error messages
 	wchar_t* err;
 	ArrayList *symSet;
 
 	//! other Coco objects
 	Tab *tab;
+
+	//! trace file
 	FILE* trace;
 	Errors *errors;
 	Buffer *buffer;
 
+	//! indent with tabs to the specified level
 	void Indent(int n);
 	bool UseSwitch(Node *p);
 	void CopyFramePart(const wchar_t* stop);

@@ -55,6 +55,12 @@ class BitArray;
 
 class Tab {
 public:
+	//! String representations for the node types (in Node class)
+	static const char* nTyp[];
+
+	//! String representations for the token kinds (in Symbol class)
+	static const char* tKind[];
+
 	//! position of global semantic declarations
 	Position *semDeclPos;
 
@@ -117,7 +123,6 @@ public:
 
 
 	ArrayList *nodes;
-	static const char* nTyp[];
 	Node *dummyNode;
 
 	ArrayList *classes;
@@ -130,8 +135,6 @@ public:
 	//  Symbol list management
 	//---------------------------------------------------------------------
 
-
-	static const char* tKind[];
 
 	Symbol* NewSym(int typ, const wchar_t* name, int line);
 	Symbol* FindSym(const wchar_t* name);

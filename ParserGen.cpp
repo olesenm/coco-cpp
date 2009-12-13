@@ -40,11 +40,18 @@ namespace Coco {
 
 bool ParserGen::makeBackup = false;
 
+const char ParserGen::CR = '\r';
+const char ParserGen::LF = '\n';
+
+const int ParserGen::tErr = 0;
+const int ParserGen::altErr = 1;
+const int ParserGen::syncErr = 2;
+const int ParserGen::maxTerm = 3;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void ParserGen::Indent (int n) {
-	for (int i = 1; i <= n; i++) fwprintf(gen, L"\t");
+	for (int i = 0; i < n; ++i) fwprintf(gen, L"\t");
 }
 
 // AW: use a switch if more than 5 alternatives and none starts with a resolver
@@ -52,10 +59,10 @@ bool ParserGen::UseSwitch (Node *p) {
 	if (p->typ != Node::alt) return false;
 	int nAlts = 0;
 	while (p != NULL) {
-	  ++nAlts;
-	  // must not optimize with switch-statement, if alt uses a resolver expression
-	  if (p->sub->typ == Node::rslv) return false;
-	  p = p->down;
+		++nAlts;
+		// must not optimize with switch-statement, if alt uses a resolver expression
+		if (p->sub->typ == Node::rslv) return false;
+		p = p->down;
 	}
 	return nAlts > 5;
 }
@@ -505,12 +512,6 @@ void ParserGen::WriteStatistics () {
 
 
 ParserGen::ParserGen (Parser *parser) {
-	maxTerm = 3;
-	CR = '\r';
-	LF = '\n';
-	tErr = 0;
-	altErr = 1;
-	syncErr = 2;
 	tab = parser->tab;
 	errors = parser->errors;
 	trace = parser->trace;

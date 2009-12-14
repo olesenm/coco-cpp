@@ -53,16 +53,16 @@ class ParserGen
 public:
 	//! control if backup files (.bak) are generated. default: false
 	static bool makeBackup;
-	static const char CR;  //!< carriage-return character
-	static const char LF;  //!< line-feed character
+	static const char CR = '\r';    //!< carriage-return character
+	static const char LF = '\n';    //!< line-feed character
 
 	// unused: static const int EOF = -1;
 
 	//! error codes
-	static const int tErr;
-	static const int altErr;
-	static const int syncErr;
-	static const int maxTerm;   //!< sets of size < maxTerm are enumerated
+	static const int tErr    = 0;   //!< terminal error
+	static const int altErr  = 1;   //!< alt error
+	static const int syncErr = 2;   //!< sync error
+	static const int maxTerm = 3;   //!< sets of size < maxTerm are enumerated
 
 	Position *usingPos;     //!< "using" definitions from the attributed grammar
 	int errorNr;            //!< highest parser error number

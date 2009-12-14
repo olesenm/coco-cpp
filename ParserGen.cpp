@@ -40,13 +40,6 @@ namespace Coco {
 
 bool ParserGen::makeBackup = false;
 
-const char ParserGen::CR = '\r';
-const char ParserGen::LF = '\n';
-
-const int ParserGen::tErr = 0;
-const int ParserGen::altErr = 1;
-const int ParserGen::syncErr = 2;
-const int ParserGen::maxTerm = 3;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

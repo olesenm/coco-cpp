@@ -31,13 +31,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 namespace Coco {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-const int Symbol::fixedToken     = 0;
-const int Symbol::classToken     = 1;
-const int Symbol::litToken       = 2;
-const int Symbol::classLitToken  = 3;
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 Symbol::Symbol(int typ, const wchar_t* name, int line) {

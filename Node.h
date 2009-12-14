@@ -46,23 +46,23 @@ class BitArray;
 class Node {
 public:
 	// enum constants for node kinds
-	static const int t;      //!< terminal symbol
-	static const int pr;     //!< pragma
-	static const int nt;     //!< nonterminal symbol
-	static const int clas;   //!< character class
-	static const int chr;    //!< character
-	static const int wt;     //!< weak terminal symbol
-	static const int any;    //!< any character
-	static const int eps;    //!< empty
-	static const int sync;   //!< synchronization symbol
-	static const int sem;    //!< semantic action: (. .)
-	static const int alt;    //!< alternative: |
-	static const int iter;   //!< iteration: { }
-	static const int opt;    //!< option: [ ]
-	static const int rslv;   //!< resolver expression
+	static const int t    =  1;  //!< terminal symbol
+	static const int pr   =  2;  //!< pragma
+	static const int nt   =  3;  //!< nonterminal symbol
+	static const int clas =  4;  //!< character class
+	static const int chr  =  5;  //!< character
+	static const int wt   =  6;  //!< weak terminal symbol
+	static const int any  =  7;  //!< any character
+	static const int eps  =  8;  //!< empty
+	static const int sync =  9;  //!< synchronization symbol
+	static const int sem  = 10;  //!< semantic action: (. .)
+	static const int alt  = 11;  //!< alternative: |
+	static const int iter = 12;  //!< iteration: { }
+	static const int opt  = 13;  //!< option: [ ]
+	static const int rslv = 14;  //!< resolver expression
 
-	static const int normalTrans;   //!< normal transition
-	static const int contextTrans;  //!< context transition
+	static const int normalTrans  = 0;  //!< normal transition
+	static const int contextTrans = 1;  //!< context transition
 
 	int      n;     //!< node number
 	int      typ;   //!< node type, one of t, nt, wt, chr, clas, any, eps, sem, sync, alt, iter, opt, rslv

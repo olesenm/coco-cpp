@@ -40,14 +40,9 @@ namespace Coco {
 //! names character classes
 class CharClass {
 public:
-	//! class number
-	int n;
-
-	//! class name
-	wchar_t* name;
-
-	//! set representing the class
-	CharSet *set;
+	int n;          //!< class number
+	wchar_t* name;  //!< class name
+	CharSet *set;   //!< the CharSet representing the class
 
 	CharClass(const wchar_t* name, CharSet *s);
 	virtual ~CharClass();

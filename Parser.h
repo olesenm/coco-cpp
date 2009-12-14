@@ -44,7 +44,7 @@ namespace Coco {
 //! Parser error handing
 class Errors {
 public:
-	int count;		// number of errors detected
+	int count;      //!< number of errors detected
 
 	Errors();
 	void SynErr(int line, int col, int n);
@@ -85,8 +85,8 @@ public:
 	Scanner *scanner;
 	Errors  *errors;
 
-	Token *t;		// last recognized token
-	Token *la;		// lookahead token
+	Token *t;       //!< last recognized token
+	Token *la;      //!< lookahead token
 
 int id;
 	int str;
@@ -112,7 +112,7 @@ int id;
 
 
 	Parser(Scanner *scanner);
-	~Parser();
+	~Parser();      //!< Destructor - cleanup errors and dummyToken
 	void SemErr(const wchar_t* msg);
 
 	void Coco();

@@ -42,11 +42,8 @@ class State;
 class Target
 {
 public:
-	//! The target state
-	State *state;
-
-	//! The next target
-	Target *next;
+	State *state;   //!< The target state
+	Target *next;   //!< The next target
 
 	Target (State *s);
 

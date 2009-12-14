@@ -41,9 +41,9 @@ namespace Coco {
 class Comment
 {
 public:
-	wchar_t* start;
-	wchar_t* stop;
-	bool nested;
+	wchar_t* start; //!< The start character sequence
+	wchar_t* stop;  //!< The stop character sequence
+	bool nested;    //!< Can comments be nested?
 	Comment *next;
 
 	Comment(wchar_t* start, wchar_t* stop, bool nested);

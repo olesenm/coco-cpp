@@ -38,17 +38,10 @@ namespace Coco {
 //! position of source code stretch (e.g. semantic action, resolver expressions)
 class Position {
 public:
-	//! start relative to the beginning of the file
-	int beg;
-
-	//! end of stretch
-	int end;
-
-	//! column number of start position
-	int col;
-
-	//! line number of beginning of source code stretch
-	int line;
+	int beg;        //!< start relative to the beginning of the file
+	int end;        //!< end of stretch
+	int col;        //!< column number of start position
+	int line;       //!< line number of beginning of source code stretch
 
 	Position(int beg, int end, int col, int line);
 };

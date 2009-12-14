@@ -39,11 +39,8 @@ namespace Coco {
 
 class Graph {
 public:
-	//! left end of graph = head
-	Node *l;
-
-	//! right end of graph = list of nodes to be linked to successor graph
-	Node *r;
+	Node *l;   //!< left end of graph = head
+	Node *r;   //!< right end of graph = list of nodes to be linked to successor graph
 
 	Graph()
 	:

@@ -67,62 +67,25 @@ public:
 	//! String for replacing the file prefix name
 	static const wchar_t* prefixMacro;
 
-	//! position of global semantic declarations
-	Position *semDeclPos;
-
-	//! characters ignored by the scanner
-	CharSet *ignored;
-
-	//! debug and test switches
-	bool ddt[10];
-
-	//! root nonterminal; filled by ATG
-	Symbol *gramSy;
-
-	//! end of file symbol
-	Symbol *eofSy;
-
-	//! used in case of an error
-	Symbol *noSym;
-
-	//! union of all synchronisation sets
-	BitArray *allSyncSets;
-
-	//! symbols that are used as literals
-	HashTable *literals;
-
-	//! name of the atg file (including path)
-	wchar_t* srcName;
-
-	//! directory path of the atg file
-	wchar_t* srcDir;
-
-	//! namespace for generated files
-	wchar_t* nsName;
-
-	//! prefix for generated files
-	wchar_t* prefixName;
-
-	//! directory containing the frame files
-	wchar_t* frameDir;
-
-	//! directory for generated files
-	wchar_t* outDir;
-
-	//! emit line directives in generated parser
-	bool emitLines;
-
-	//! mark list for graph traversals
-	BitArray *visited;
-
-	//! current symbol in computation of sets
-	Symbol *curSy;
-
-	//! other Coco objects
-	Parser *parser;
-
-	//! trace file
-	FILE* trace;
+	Position *semDeclPos;   //!< position of global semantic declarations
+	CharSet *ignored;       //!< characters ignored by the scanner
+	bool ddt[10];           //!< debug and test switches
+	Symbol *gramSy;         //!< root nonterminal; filled by ATG
+	Symbol *eofSy;          //!< end of file symbol
+	Symbol *noSym;          //!< used in case of an error
+	BitArray *allSyncSets;  //!< union of all synchronisation sets
+	HashTable *literals;    //!< symbols that are used as literals
+	wchar_t* srcName;       //!< name of the atg file (including path)
+	wchar_t* srcDir;        //!< directory path of the atg file
+	wchar_t* nsName;        //!< namespace for generated files
+	wchar_t* prefixName;    //!< prefix for generated files
+	wchar_t* frameDir;      //!< directory containing the frame files
+	wchar_t* outDir;        //!< directory for generated files
+	bool emitLines;         //!< emit line directives in generated parser
+	BitArray *visited;      //!< mark list for graph traversals
+	Symbol *curSy;          //!< current symbol in computation of sets
+	Parser *parser;         //!< other Coco objects
+	FILE* trace;            //!< trace file
 
 	Errors *errors;
 
@@ -203,7 +166,7 @@ public:
 	//  Symbol set computations
 	//---------------------------------------------------------------------
 
-	/* Computes the first set for the given Node. */
+	//! Computes the first set for the given Node
 	BitArray* First0(Node *p, BitArray *mark);
 	BitArray* First(Node *p);
 	void CompFirstSets();
@@ -214,7 +177,7 @@ public:
 	void FindAS(Node *p); // find ANY sets
 	void CompAnySets();
 	BitArray* Expected(Node *p, Symbol *curSy);
-	// does not look behind resolvers; only called during LL(1) test and in CheckRes
+	//! does not look behind resolvers; only called during LL(1) test and in CheckRes
 	BitArray* Expected0(Node *p, Symbol *curSy);
 	void CompSync(Node *p);
 	void CompSyncSets();
@@ -244,10 +207,7 @@ public:
 	class CNode {
 	public:
 		Symbol *left, *right;
-
-		CNode (Symbol *l, Symbol *r) {
-			left = l; right = r;
-		}
+		CNode (Symbol *l, Symbol *r) : left(l), right(r) {}
 	};
 
 	void GetSingles(Node *p, ArrayList *singles);

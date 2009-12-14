@@ -46,27 +46,16 @@ class CharSet;
 class Action
 {
 public:
-	//! type of action symbol: clas, chr
-	int typ;
-
-	//! action symbol
-	int sym;
-
-	//! transition code: normalTrans, contextTrans
-	int tc;
-
-	//! states reached from this action
-	Target *target;
-
-	Action *next;
+	int typ;        //!< type of action symbol: clas, chr
+	int sym;        //!< action symbol
+	int tc;         //!< transition code: normalTrans, contextTrans
+	Target *target; //!< states reached from this action
+	Action *next;   //!< the next Action
 
 	Action(int typ, int sym, int tc);
 
-	//! add t to the action.targets
-	void AddTarget(Target *t);
-
-	//! add copy of a.targets to action.targets
-	void AddTargets(Action *a);
+	void AddTarget(Target *t);  //!< add t to the action.targets
+	void AddTargets(Action *a); //!< add copy of a.targets to action.targets
 
 	CharSet* Symbols(Tab *tab);
 	void ShiftWith(CharSet *s, Tab *tab);

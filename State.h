@@ -44,24 +44,17 @@ class Action;
 class State
 {
 public:
-	//! state number
-	int nr;
-
-	//! to first action of this state
-	Action *firstAction;
-
-	//! recognized token if state is final
-	Symbol *endOf;
-
-	//! true if state is reached via contextTrans
-	bool ctx;
+	int nr;                 //!< state number
+	Action *firstAction;    //!< to first action of this state
+	Symbol *endOf;          //!< recognized token if state is final
+	bool ctx;               //!< true if state is reached via contextTrans
 
 	State *next;
 
 	State();
-	void AddAction(Action *act);
-	void DetachAction(Action *act);
-	void MeltWith(State *s);
+	void AddAction(Action *);
+	void DetachAction(Action *);
+	void MeltWith(State *);
 };
 
 

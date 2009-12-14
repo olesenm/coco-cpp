@@ -63,8 +63,7 @@ public:
 	int      line;        //!< source text line number of item in this node
 	Position *attrPos;    //!< nt: position of attributes in source text (or null)
 	Position *semPos;     //!< pr: pos of semantic action in source text (or null)
-	                      // nt: pos of local declarations in source text (or null)
-
+	                      //!< nt: pos of local declarations in source text (or null)
 
 	Symbol(int typ, const wchar_t* name, int line);
 	virtual ~Symbol();

@@ -168,45 +168,38 @@ float coco_string_toFloat(const char* str);
 class Token
 {
 public:
-	//! token kind
-	int kind;
-	//! token position in the source text (starting at 0)
-	int pos;
-	//! token column (starting at 1)
-	int col;
-	//! token line (starting at 1)
-	int line;
-	//! token value
-	wchar_t* val;
-	//! Peek tokens are kept in linked list
-	Token *next;
+	int kind;       //!< token kind
+	int pos;        //!< token position in the source text (starting at 0)
+	int col;        //!< token column (starting at 1)
+	int line;       //!< token line (starting at 1)
+	wchar_t* val;   //!< token value
+	Token *next;    //!< Peek tokens are kept in linked list
 
-	//! Construct null
-	Token();
-	//! Destructor - cleanup allocated val
-	~Token();
+	Token();        //! Construct null
+	~Token();       //! Destructor - cleanup allocated val
 };
 
 
 //! Scanner Buffer
+//
+//! This Buffer supports the following cases:
+//! -# seekable stream (file)
+//!    -# whole stream in buffer
+//!    -# part of stream in buffer
+//! -# non seekable stream (network, console)
 class Buffer {
-// This Buffer supports the following cases:
-// 1) seekable stream (file)
-//    a) whole stream in buffer
-//    b) part of stream in buffer
-// 2) non seekable stream (network, console)
 private:
-	unsigned char *buf; // input buffer
-	int bufCapacity;    // capacity of buf
-	int bufStart;       // position of first byte in buffer relative to input stream
-	int bufLen;         // length of buffer
-	int fileLen;        // length of input stream (may change if the stream is no file)
-	int bufPos;         // current position in buffer
-	FILE* stream;       // input stream (seekable)
-	bool isUserStream;  // was the stream opened by the user?
+	unsigned char *buf; //!< input buffer
+	int bufCapacity;    //!< capacity of buf
+	int bufStart;       //!< position of first byte in buffer relative to input stream
+	int bufLen;         //!< length of buffer
+	int fileLen;        //!< length of input stream (may change if the stream is no file)
+	int bufPos;         //!< current position in buffer
+	FILE* stream;       //!< input stream (seekable)
+	bool isUserStream;  //!< was the stream opened by the user?
 
 	int ReadNextStreamChunk();
-	bool CanSeek();     // true if stream can be seeked otherwise false
+	bool CanSeek();     //!< true if stream can be seeked otherwise false
 
 public:
 	static const int EoF = COCO_WCHAR_MAX + 1;
@@ -348,26 +341,26 @@ private:
 	void *heapTop;
 	void **heapEnd;
 
-	int noSym;        // noSym gets highest number, set in Parser
+	int noSym;        //!< noSym gets highest number, set in Parser
 	int maxT;
-	int charSetSize;  // unused?
+	int charSetSize;  //!< unused?
 	StartStates start;
 	KeywordMap keywords;
 
-	Token *t;         // current token
-	wchar_t *tval;    // text of current token
-	int tvalLength;   // length of text of current token
-	int tlen;         // length of current token
+	Token *t;         //!< current token
+	wchar_t *tval;    //!< text of current token
+	int tvalLength;   //!< length of text of current token
+	int tlen;         //!< length of current token
 
-	Token *tokens;    // list of tokens already peeked (first token is a dummy)
-	Token *pt;        // current peek token
+	Token *tokens;    //!< list of tokens already peeked (first token is a dummy)
+	Token *pt;        //!< current peek token
 
-	int ch;           // current input character
+	int ch;           //!< current input character
 
-	int pos;          // byte position of current character
-	int line;         // line number of current character
-	int col;          // column number of current character
-	int oldEols;      // EOLs that appeared in a comment;
+	int pos;          //!< byte position of current character
+	int line;         //!< line number of current character
+	int col;          //!< column number of current character
+	int oldEols;      //!< EOLs that appeared in a comment;
 
 	void CreateHeapBlock();
 	Token* CreateToken();
@@ -385,13 +378,13 @@ public:
 	//! scanner buffer
 	Buffer *buffer;
 
-	//- Attach scanner to an existing character buffer
+	//! Attach scanner to an existing character buffer
 	Scanner(const unsigned char* buf, int len);
-	//- Attach scanner to an existing character buffer
+	//! Attach scanner to an existing character buffer
 	Scanner(const char* buf, int len);
-	//- Open a file for reading and attach scanner
+	//! Open a file for reading and attach scanner
 	Scanner(const wchar_t* fileName);
-	//- Using an existing open file handle for the scanner
+	//! Using an existing open file handle for the scanner
 	Scanner(FILE* s);
 	~Scanner();
 	Token* Scan();

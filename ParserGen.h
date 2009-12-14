@@ -62,39 +62,25 @@ public:
 	static const int tErr;
 	static const int altErr;
 	static const int syncErr;
+	static const int maxTerm;   //!< sets of size < maxTerm are enumerated
 
-	//! sets of size < maxTerm are enumerated
-	static const int maxTerm;
+	Position *usingPos;     //!< "using" definitions from the attributed grammar
+	int errorNr;            //!< highest parser error number
+	Symbol *curSy;          //!< symbol whose production is currently generated
 
-	//! "using" definitions from the attributed grammar
-	Position *usingPos;
+	FILE* fram;             //!< parser frame file
+	FILE* gen;              //!< generated parser source file
+	wchar_t* err;           //!< generated parser error messages
 
-	//! highest parser error number
-	int errorNr;
-
-	//! symbol whose production is currently generated
-	Symbol *curSy;
-
-	//! parser frame file
-	FILE* fram;
-
-	//! generated parser source file
-	FILE* gen;
-
-	//! generated parser error messages
-	wchar_t* err;
 	ArrayList *symSet;
 
-	//! other Coco objects
-	Tab *tab;
-
-	//! trace file
-	FILE* trace;
+	Tab *tab;               //!< other Coco objects
+	FILE* trace;            //!< trace file
 	Errors *errors;
 	Buffer *buffer;
 
-	//! indent with tabs to the specified level
-	void Indent(int n);
+	void Indent(int n);     //!< indent with tabs to the specified level
+
 	bool UseSwitch(Node *p);
 	void CopyFramePart(const wchar_t* stop);
 	void CopySourcePart(Position *pos, int indent);
@@ -116,6 +102,7 @@ public:
 	void OpenGen(const wchar_t* genName, bool backUp);
 	void WriteParser ();
 	void WriteStatistics ();
+
 	ParserGen (Parser *parser);
 
 };

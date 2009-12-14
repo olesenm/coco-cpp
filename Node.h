@@ -61,49 +61,26 @@ public:
 	static const int opt;    //!< option: [ ]
 	static const int rslv;   //!< resolver expression
 
-	//! normal transition
-	static const int normalTrans;
+	static const int normalTrans;   //!< normal transition
+	static const int contextTrans;  //!< context transition
 
-	//! context transition
-	static const int contextTrans;
-
-	//! node number
-	int      n;
-
-	//! node type, one of t, nt, wt, chr, clas, any, eps, sem, sync, alt, iter, opt, rslv
-	int      typ;
-
-	//! to successor node
-	Node     *next;
-
-	//! alt: to next alternative
-	Node     *down;
-
-	//! alt, iter, opt: to first node of substructure
-	Node     *sub;
-
-	//! true: "next" leads to successor in enclosing structure
-	bool     up;
-
-	//! nt, t, wt: symbol represented by this node
-	Symbol   *sym;
-
-	//! chr:  ordinal character value, clas: index of character class
-	int      val;
-
-	//! chr, clas: transition code
-	int      code;
-
-	//! any, sync: the set represented by this node
-	BitArray *set;
+	int      n;     //!< node number
+	int      typ;   //!< node type, one of t, nt, wt, chr, clas, any, eps, sem, sync, alt, iter, opt, rslv
+	Node     *next; //!< to successor node
+	Node     *down; //!< alt: to next alternative
+	Node     *sub;  //!< alt, iter, opt: to first node of substructure
+	bool     up;    //!< true: "next" leads to successor in enclosing structure
+	Symbol   *sym;  //!< nt, t, wt: symbol represented by this node
+	int      val;   //!< chr:  ordinal character value, clas: index of character class
+	int      code;  //!< chr, clas: transition code
+	BitArray *set;  //!< any, sync: the set represented by this node
 
 	//! nt, t, wt: pos of actual attributes
 	//! sem:  pos of semantic action in source text
 	//! rslv: pos of resolver in source text
 	Position *pos;
 
-	//! source text line number of item in this node
-	int      line;
+	int      line;  //!< source text line number of item in this node
 
 	//! DFA state corresponding to this node
 	// (only used in DFA.ConvertToStates)

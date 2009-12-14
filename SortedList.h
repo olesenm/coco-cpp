@@ -61,8 +61,8 @@ public:
 	virtual ~SortedList();
 
 	void Set(Symbol *key, void *value);
-	void* Get( Symbol* key ) const;      // Value
-	void* GetKey( int index ) const ;    // Key
+	void* Get( Symbol* key ) const;      //!< return Value
+	void* GetKey( int index ) const ;    //!< return Key
 	SortedEntry* operator[]( int index ) const;
 
 	int Count;

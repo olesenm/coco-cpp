@@ -45,13 +45,9 @@ class BitArray;
 class Melted
 {
 public:
-	//! set of old states
-	BitArray *set;
-
-	//! new state
-	State *state;
-
-	Melted *next;
+	BitArray *set;  //!< set of old states
+	State *state;   //!< new state
+	Melted *next;   //!< next Melted
 
 	Melted(BitArray *set, State *state);
 };

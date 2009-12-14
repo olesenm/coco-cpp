@@ -55,59 +55,31 @@ public:
 	//! control if backup files (.bak) are generated. default: false
 	static bool makeBackup;
 
-	//! End-of-file? ... unused?
-	static const int eoF = -1;
+	static const int eoF = -1;  //!< End-of-file? ... unused?
 
 	int maxStates;
 
-	//! highest state number
-	int lastStateNr;
-
+	int lastStateNr;    //!< highest state number
 	State *firstState;
-
-	//! last allocated state
-	State *lastState;
-
-	//! last non melted state
-	int lastSimState;
-
-	//! scanner frame input
-	FILE* fram;
-
-	//! generated scanner file
-	FILE* gen;
-
-	//! current token to be recognized (in FindTrans)
-	Symbol *curSy;
-
-	//! start of graph for current token (in FindTrans)
-	Node *curGraph;
-
-	//! true if input should be treated case-insensitively
-	bool ignoreCase;
-
-	//! DFA may become nondeterministic in MatchLiteral
-	bool dirtyDFA;
-
-	//! DFA has context transitions
-	bool hasCtxMoves;
-
-	//! checking the Labels (in order to avoid the warning messages)
-	bool *existLabel;
+	State *lastState;   //!< last allocated state
+	int lastSimState;   //!< last non melted state
+	FILE* fram;         //!< scanner frame input
+	FILE* gen;          //!< generated scanner file
+	Symbol *curSy;      //!< current token to be recognized (in FindTrans)
+	Node *curGraph;     //!< start of graph for current token (in FindTrans)
+	bool ignoreCase;    //!< true if input should be treated case-insensitively
+	bool dirtyDFA;      //!< DFA may become nondeterministic in MatchLiteral
+	bool hasCtxMoves;   //!< DFA has context transitions
+	bool *existLabel;   //!< checking the Labels (to avoid the warning messages)
 
 	//! other Coco objects
 	Parser     *parser;
 	Tab        *tab;
 	Errors     *errors;
 
-	//! trace file
-	FILE* trace;
-
-	//! head of melted state list
-	Melted *firstMelted;
-
-	//! list of comments
-	Comment *firstComment;
+	FILE* trace;            //!< trace file
+	Melted *firstMelted;    //!< head of melted state list
+	Comment *firstComment;  //!< list of comments
 
 	//---------- Output primitives
 	wchar_t* Ch(wchar_t ch);
@@ -155,7 +127,7 @@ public:
 	void GenCommentHeader(Comment *com, int i);
 	void GenComment(Comment *com, int i);
 	void CopyFramePart(const wchar_t* stop);
-	wchar_t* SymName(Symbol *sym); // real name value is stored in Tab.literals
+	wchar_t* SymName(Symbol *sym); //!< real name value is stored in Tab.literals
 	void GenLiterals ();
 	int GenNamespaceOpen(const wchar_t* nsName);
 	void GenNamespaceClose(int nrOfNs);

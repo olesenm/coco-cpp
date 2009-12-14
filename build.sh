@@ -1,14 +1,49 @@
 #!/bin/sh
-# compile Coco executable, optionally rebuild the parser itself
-#
+#------------------------------------------------------------------------------
+usage() {
+    while [ "$#" -ge 1 ]; do echo "$1"; shift; done
+    cat<<USAGE
+
+usage: ${0##*/} [OPTION]
+options:
+  -parser        create new parser code first
+  -warn          enable additional gcc warnings
+
+* compile Coco executable
+
+USAGE
+    exit 1
+}
+#------------------------------------------------------------------------------
 cd ${0%/*} || exit 1    # run from this directory
 
-[ "$1" = all ] && ./build-parser.sh
+unset warn
+
+# parse options
+while [ "$#" -gt 0 ]
+do
+    case "$1" in
+    -h | -help)
+        usage
+        ;;
+    -parser)
+        ./build-parser.sh
+        ;;
+    -warn)
+        warn="-Wno-strict-aliasing -Wextra -Wno-unused-parameter -Wold-style-cast -Wnon-virtual-dtor"
+        ;;
+    *)
+        usage "unknown option/argument: '$*'"
+        ;;
+    esac
+    shift
+done
+
 
 echo "compile Coco executable"
 echo "~~~~~~~~~~~~~~~~~~~~~~~"
 set -x
 
-g++ *.cpp -o Coco -g -Wall
+g++ *.cpp -o Coco -g -Wall $warn
 
 # ----------------------------------------------------------------- end-of-file

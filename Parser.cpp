@@ -90,7 +90,9 @@ void Parser::ExpectWeak(int n, int follow) {
 	}
 	else {
 		SynErr(n);
-		while (!StartOf(follow)) Get();
+		while (!StartOf(follow)) {
+			Get();
+		}
 	}
 }
 

@@ -186,14 +186,12 @@ int coco_string_hash(const wchar_t* str) {
 
 double coco_string_toDouble(const wchar_t* str)
 {
-	if (!str) { return 0; }
-	return wcstod(str, NULL);
+	return str ? wcstod(str, NULL) : 0;
 }
 
 float coco_string_toFloat(const wchar_t* str)
 {
-	if (!str) { return 0; }
-	return wcstof(str, NULL);
+	return str ? wcstof(str, NULL) : 0;
 }
 
 
@@ -256,14 +254,12 @@ void coco_string_delete(char* &str) {
 
 double coco_string_toDouble(const char* str)
 {
-	if (!str) { return 0; }
-	return strtod(str, NULL);
+	return str ? strtod(str, NULL) : 0;
 }
 
 float coco_string_toFloat(const char* str)
 {
-	if (!str) { return 0; }
-	return strtof(str, NULL);
+	return str ? strtof(str, NULL) : 0;
 }
 
 
@@ -409,7 +405,8 @@ void Buffer::SetPos(int value) {
 		// is not seek-able e.g. network or console,
 		// thus we have to read the stream manually till
 		// the wanted position is in sight.
-		while ((value >= fileLen) && (ReadNextStreamChunk() > 0));
+		while ((value >= fileLen) && (ReadNextStreamChunk() > 0))
+		{}
 	}
 
 	if ((value < 0) || (value > fileLen)) {

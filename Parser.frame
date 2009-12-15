@@ -40,28 +40,28 @@ Coco/R itself) does not fall under the GNU General Public License.
 //! Parser error handing
 class Errors {
 public:
+	int count;      //!< The number of errors detected
+
 	//! Allocate and return a string describing the given error code.
 	/** It is the responsibility of the caller to free this string,
 	 *  eg, with coco_string_delete()
 	 */
 	static wchar_t* strerror(int n);
 
-	//! The number of errors detected
-	int count;
+	Errors();               //!< Construct null - start with no errors
+	virtual ~Errors();      //!< Destructor
+	virtual void clear();   //!< Clear the error count
 
-	//! Construct null - start with no errors
-	Errors();
-
-	//! Handle syntax error 'n', uses strerror for the message
-	void SynErr(int line, int col, int n);
+	//! Handle a general warning 'msg'
+	virtual void Warning(const wchar_t* msg);
+	//! Handle a general warning 'msg'
+	virtual void Warning(int line, int col, const wchar_t* msg);
 	//! Handle general error 'msg' (eg, a semantic error)
-	void Error(int line, int col, const wchar_t* msg);
-	//! Handle a general warning 'msg'
-	void Warning(int line, int col, const wchar_t* msg);
-	//! Handle a general warning 'msg'
-	void Warning(const wchar_t* msg);
+	virtual void Error(int line, int col, const wchar_t* msg);
+	//! Handle syntax error 'n', uses strerror for the message, calls Error()
+	virtual void SynErr(int line, int col, int n);
 	//! Handle a general exception 'msg'
-	void Exception(const wchar_t* msg);
+	virtual void Exception(const wchar_t* msg);
 
 }; // Errors
 
@@ -71,10 +71,11 @@ class Parser {
 private:
 -->constantsheader
 	Token *dummyToken;
+	bool deleteErrorsDestruct_; //!< delete the 'errors' member in destructor
 	int  minErrDist;
 	int  errDist;
 
-	void SynErr(int n);    //!< Handle syntax error 'n'
+	void SynErr(int n);         //!< Handle syntax error 'n'
 	void Get();
 	void Expect(int n);
 	bool StartOf(int s);
@@ -85,18 +86,22 @@ public:
 	Scanner *scanner;
 	Errors  *errors;
 
-	Token *t;       //!< last recognized token
-	Token *la;      //!< lookahead token
+	Token *t;                   //!< last recognized token
+	Token *la;                  //!< lookahead token
 
 -->declarations
 
 	//! Construct for the specified scanner
-	Parser(Scanner* scanner);
+	/**
+	 *  Use the default error handling, or optionally provide an error
+	 *  handler, which will not be deleted upon destruction.
+	 */
+	Parser(Scanner* scan, Errors* err = 0);
 	~Parser();      //!< Destructor - cleanup errors and dummyToken
-	void SemErr(const wchar_t* msg);
+	void SemErr(const wchar_t* msg);    //!< Handle semantic error
 
 -->productionsheader
-	void Parse();
+	void Parse();                       //!< Execute the parse operation
 
 }; // end Parser
 
@@ -140,9 +145,9 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 -->namespace_open
 
-//
+// ----------------------------------------------------------------------------
 // Parser Implementation
-//
+// ----------------------------------------------------------------------------
 
 void Parser::SynErr(int n) {
 	if (errDist >= minErrDist) errors->SynErr(la->line, la->col, n);
@@ -236,14 +241,21 @@ void Parser::Parse() {
 }
 
 
-Parser::Parser(Scanner *scanner) {
+Parser::Parser(Scanner* scan, Errors* err)
+:
+	dummyToken(NULL),
+	deleteErrorsDestruct_(!err),
+	minErrDist(2),
+	errDist(minErrDist),
+	scanner(scan),
+	errors(err),
+	t(NULL),
+	la(NULL)
+{
 -->constants
-	dummyToken = NULL;
-	t = la = NULL;
-	minErrDist = 2;
-	errDist = minErrDist;
-	this->scanner = scanner;
-	errors = new Errors();
+	if (!errors) {   // add in default error handling
+		errors = new Errors();
+	}
 }
 
 
@@ -258,14 +270,16 @@ bool Parser::StartOf(int s) {
 
 
 Parser::~Parser() {
-	delete errors;
+	if (deleteErrorsDestruct_) {    // delete default error handling
+		delete errors;
+	}
 	delete dummyToken;
 }
 
 
-//
+// ----------------------------------------------------------------------------
 // Errors Implementation
-//
+// ----------------------------------------------------------------------------
 
 Errors::Errors()
 :
@@ -273,7 +287,17 @@ Errors::Errors()
 {}
 
 
-wchar_t* Errors::strerror(int n) {
+Errors::~Errors()
+{}
+
+
+void Errors::clear() {
+	count = 0;
+}
+
+
+wchar_t* Errors::strerror(int n)
+{
 	wchar_t* s;
 	switch (n) {
 -->errors
@@ -289,11 +313,13 @@ wchar_t* Errors::strerror(int n) {
 }
 
 
-void Errors::SynErr(int line, int col, int n) {
-	wchar_t* msg = this->strerror(n);
+void Errors::Warning(const wchar_t* msg) {
+	wprintf(L"%ls\n", msg);
+}
+
+
+void Errors::Warning(int line, int col, const wchar_t* msg) {
 	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
-	coco_string_delete(msg);
-	count++;
 }
 
 
@@ -303,13 +329,10 @@ void Errors::Error(int line, int col, const wchar_t* msg) {
 }
 
 
-void Errors::Warning(int line, int col, const wchar_t* msg) {
-	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
-}
-
-
-void Errors::Warning(const wchar_t* msg) {
-	wprintf(L"%ls\n", msg);
+void Errors::SynErr(int line, int col, int n) {
+	wchar_t* msg = this->strerror(n);
+	this->Error(line, col, msg);
+	coco_string_delete(msg);
 }
 
 

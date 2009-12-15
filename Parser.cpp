@@ -35,6 +35,10 @@ Coco/R itself) does not fall under the GNU General Public License.
 namespace Coco {
 
 
+// ----------------------------------------------------------------------------
+// Parser Implementation
+// ----------------------------------------------------------------------------
+
 void Parser::SynErr(int n) {
 	if (errDist >= minErrDist) errors->SynErr(la->line, la->col, n);
 	errDist = 0;
@@ -704,6 +708,9 @@ void Parser::TokenFactor(Graph* &g) {
 
 void Parser::Parse() {
 	t = NULL;
+	if (dummyToken) {    // safety: someone might call Parse() twice
+		delete dummyToken;
+	}
 	la = dummyToken = new Token();
 	la->val = coco_string_create(L"Dummy Token");
 	Get();
@@ -713,15 +720,22 @@ void Parser::Parse() {
 }
 
 
-Parser::Parser(Scanner *scanner) {
+Parser::Parser(Scanner* scan, Errors* err)
+:
+	dummyToken(NULL),
+	deleteErrorsDestruct_(!err),
+	minErrDist(2),
+	errDist(minErrDist),
+	scanner(scan),
+	errors(err),
+	t(NULL),
+	la(NULL)
+{
 	maxT = 41;
 
-	dummyToken = NULL;
-	t = la = NULL;
-	minErrDist = 2;
-	errDist = minErrDist;
-	this->scanner = scanner;
-	errors = new Errors();
+	if (!errors) {   // add in default error handling
+		errors = new Errors();
+	}
 }
 
 
@@ -760,17 +774,34 @@ bool Parser::StartOf(int s) {
 
 
 Parser::~Parser() {
-	delete errors;
+	if (deleteErrorsDestruct_) {    // delete default error handling
+		delete errors;
+	}
 	delete dummyToken;
 }
 
 
-Errors::Errors() {
+// ----------------------------------------------------------------------------
+// Errors Implementation
+// ----------------------------------------------------------------------------
+
+Errors::Errors()
+:
+	count(0)
+{}
+
+
+Errors::~Errors()
+{}
+
+
+void Errors::clear() {
 	count = 0;
 }
 
 
-void Errors::SynErr(int line, int col, int n) {
+wchar_t* Errors::strerror(int n)
+{
 	wchar_t* s;
 	switch (n) {
 			case 0: s = coco_string_create(L"EOF expected"); break;
@@ -834,30 +865,35 @@ void Errors::SynErr(int line, int col, int n) {
 		}
 		break;
 	}
-	wprintf(L"-- line %d col %d: %ls\n", line, col, s);
-	coco_string_delete(s);
+	return s;
+}
+
+
+void Errors::Warning(const wchar_t* msg) {
+	wprintf(L"%ls\n", msg);
+}
+
+
+void Errors::Warning(int line, int col, const wchar_t* msg) {
+	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
+}
+
+
+void Errors::Error(int line, int col, const wchar_t* msg) {
+	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
 	count++;
 }
 
 
-void Errors::Error(int line, int col, const wchar_t *s) {
-	wprintf(L"-- line %d col %d: %ls\n", line, col, s);
-	count++;
+void Errors::SynErr(int line, int col, int n) {
+	wchar_t* msg = this->strerror(n);
+	this->Error(line, col, msg);
+	coco_string_delete(msg);
 }
 
 
-void Errors::Warning(int line, int col, const wchar_t *s) {
-	wprintf(L"-- line %d col %d: %ls\n", line, col, s);
-}
-
-
-void Errors::Warning(const wchar_t *s) {
-	wprintf(L"%ls\n", s);
-}
-
-
-void Errors::Exception(const wchar_t* s) {
-	wprintf(L"%ls", s);
+void Errors::Exception(const wchar_t* msg) {
+	wprintf(L"%ls", msg);
 	::exit(1);
 }
 

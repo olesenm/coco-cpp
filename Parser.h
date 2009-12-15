@@ -44,14 +44,28 @@ namespace Coco {
 //! Parser error handing
 class Errors {
 public:
-	int count;      //!< number of errors detected
+	int count;      //!< The number of errors detected
 
-	Errors();
-	void SynErr(int line, int col, int n);
-	void Error(int line, int col, const wchar_t *s);
-	void Warning(int line, int col, const wchar_t *s);
-	void Warning(const wchar_t *s);
-	void Exception(const wchar_t *s);
+	//! Allocate and return a string describing the given error code.
+	/** It is the responsibility of the caller to free this string,
+	 *  eg, with coco_string_delete()
+	 */
+	static wchar_t* strerror(int n);
+
+	Errors();               //!< Construct null - start with no errors
+	virtual ~Errors();      //!< Destructor
+	virtual void clear();   //!< Clear the error count
+
+	//! Handle a general warning 'msg'
+	virtual void Warning(const wchar_t* msg);
+	//! Handle a general warning 'msg'
+	virtual void Warning(int line, int col, const wchar_t* msg);
+	//! Handle general error 'msg' (eg, a semantic error)
+	virtual void Error(int line, int col, const wchar_t* msg);
+	//! Handle syntax error 'n', uses strerror for the message, calls Error()
+	virtual void SynErr(int line, int col, int n);
+	//! Handle a general exception 'msg'
+	virtual void Exception(const wchar_t* msg);
 
 }; // Errors
 
@@ -71,10 +85,11 @@ private:
 	int maxT;
 
 	Token *dummyToken;
-	int errDist;
-	int minErrDist;
+	bool deleteErrorsDestruct_; //!< delete the 'errors' member in destructor
+	int  minErrDist;
+	int  errDist;
 
-	void SynErr(int n);
+	void SynErr(int n);         //!< Handle syntax error 'n'
 	void Get();
 	void Expect(int n);
 	bool StartOf(int s);
@@ -85,8 +100,8 @@ public:
 	Scanner *scanner;
 	Errors  *errors;
 
-	Token *t;       //!< last recognized token
-	Token *la;      //!< lookahead token
+	Token *t;                   //!< last recognized token
+	Token *la;                  //!< lookahead token
 
 int id;
 	int str;
@@ -111,9 +126,14 @@ int id;
 
 
 
-	Parser(Scanner *scanner);
+	//! Construct for the specified scanner
+	/**
+	 *  Use the default error handling, or optionally provide an error
+	 *  handler, which will not be deleted upon destruction.
+	 */
+	Parser(Scanner* scan, Errors* err = 0);
 	~Parser();      //!< Destructor - cleanup errors and dummyToken
-	void SemErr(const wchar_t* msg);
+	void SemErr(const wchar_t* msg);    //!< Handle semantic error
 
 	void Coco();
 	void SetDecl();
@@ -134,7 +154,7 @@ int id;
 	void TokenTerm(Graph* &g);
 	void TokenFactor(Graph* &g);
 
-	void Parse();
+	void Parse();                       //!< Execute the parse operation
 
 }; // end Parser
 

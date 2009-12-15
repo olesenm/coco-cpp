@@ -175,8 +175,8 @@ public:
 	wchar_t* val;   //!< token value
 	Token *next;    //!< Peek tokens are kept in linked list
 
-	Token();        //! Construct null
-	~Token();       //! Destructor - cleanup allocated val
+	Token();        //!< Construct null
+	~Token();       //!< Destructor - cleanup allocated val
 };
 
 
@@ -225,6 +225,7 @@ public:
 	UTF8Buffer(Buffer* b) : Buffer(b) {}
 	virtual int Read();
 };
+
 
 //------------------------------------------------------------------------------
 // StartStates
@@ -275,6 +276,7 @@ public:
 		return e == NULL ? 0 : e->val;
 	}
 };
+
 
 //------------------------------------------------------------------------------
 // KeywordMap

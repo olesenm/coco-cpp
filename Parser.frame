@@ -44,10 +44,10 @@ public:
 
 	Errors();
 	void SynErr(int line, int col, int n);
-	void Error(int line, int col, const wchar_t *s);
-	void Warning(int line, int col, const wchar_t *s);
-	void Warning(const wchar_t *s);
-	void Exception(const wchar_t *s);
+	void Error(int line, int col, const wchar_t *msg);
+	void Warning(int line, int col, const wchar_t *msg);
+	void Warning(const wchar_t *msg);
+	void Exception(const wchar_t *msg);
 
 }; // Errors
 
@@ -124,6 +124,10 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 
 -->namespace_open
+
+//
+// Parser Implementation
+//
 
 void Parser::SynErr(int n) {
 	if (errDist >= minErrDist) errors->SynErr(la->line, la->col, n);
@@ -206,6 +210,9 @@ bool Parser::WeakSeparator(int n, int syFol, int repFol) {
 
 void Parser::Parse() {
 	t = NULL;
+	if (dummyToken) {    // safety: someone might call Parse() twice
+		delete dummyToken;
+	}
 	la = dummyToken = new Token();
 	la->val = coco_string_create(L"Dummy Token");
 	Get();
@@ -241,9 +248,14 @@ Parser::~Parser() {
 }
 
 
-Errors::Errors() {
-	count = 0;
-}
+//
+// Errors Implementation
+//
+
+Errors::Errors()
+:
+	count(0)
+{}
 
 
 void Errors::SynErr(int line, int col, int n) {
@@ -264,24 +276,24 @@ void Errors::SynErr(int line, int col, int n) {
 }
 
 
-void Errors::Error(int line, int col, const wchar_t *s) {
-	wprintf(L"-- line %d col %d: %ls\n", line, col, s);
+void Errors::Error(int line, int col, const wchar_t* msg) {
+	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
 	count++;
 }
 
 
-void Errors::Warning(int line, int col, const wchar_t *s) {
-	wprintf(L"-- line %d col %d: %ls\n", line, col, s);
+void Errors::Warning(int line, int col, const wchar_t* msg) {
+	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
 }
 
 
-void Errors::Warning(const wchar_t *s) {
-	wprintf(L"%ls\n", s);
+void Errors::Warning(const wchar_t* msg) {
+	wprintf(L"%ls\n", msg);
 }
 
 
-void Errors::Exception(const wchar_t* s) {
-	wprintf(L"%ls", s);
+void Errors::Exception(const wchar_t* msg) {
+	wprintf(L"%ls", msg);
 	::exit(1);
 }
 

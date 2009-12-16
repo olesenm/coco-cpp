@@ -65,8 +65,28 @@ public:
 	Position *semPos;     //!< pr: pos of semantic action in source text (or null)
 	                      //!< nt: pos of local declarations in source text (or null)
 
-	Symbol(int typ, const wchar_t* name, int line);
-	virtual ~Symbol();
+	//! Construct from components
+	Symbol(int symTyp, const wchar_t* symName, int lineNr) :
+		n(0),
+		typ(symTyp),
+		name(coco_string_create(symName)),
+		graph(0),
+		tokenKind(0),
+		deletable(false),
+		firstReady(false),
+		first(0),
+		follow(0),
+		nts(0),
+		line(lineNr),
+		attrPos(0),
+		semPos(0)
+	{}
+
+
+	virtual ~Symbol() {
+		coco_string_delete(name);
+	}
+
 };
 
 

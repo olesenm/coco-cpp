@@ -29,10 +29,9 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_TARGET_H__
 #define COCO_TARGET_H__
 
-namespace Coco {
+#include "State.h"
 
-// forward declarations
-class State;
+namespace Coco {
 
 /*---------------------------------------------------------------------------*\
                            Class Target Declaration
@@ -42,11 +41,10 @@ class State;
 class Target
 {
 public:
-	State *state;   //!< The target state
-	Target *next;   //!< The next target
+	State*  state;   //!< The target state
+	Target* next;    //!< The next target
 
-	Target (State *s);
-
+	Target(State* s) : state(s), next(0) {}
 };
 
 

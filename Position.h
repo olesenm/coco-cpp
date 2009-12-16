@@ -43,7 +43,13 @@ public:
 	int col;        //!< column number of start position
 	int line;       //!< line number of beginning of source code stretch
 
-	Position(int beg, int end, int col, int line);
+	Position(int begPos, int endPos, int colNr, int lineNr) :
+		beg(begPos),
+		end(endPos),
+		col(colNr),
+		line(lineNr)
+	{}
+
 };
 
 

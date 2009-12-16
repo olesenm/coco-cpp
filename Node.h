@@ -85,7 +85,21 @@ public:
 	// (only used in DFA.ConvertToStates)
 	State    *state;
 
-	Node(int typ, Symbol *sym, int line);
+	Node(int theTyp, Symbol* theSym, int lineNr) :
+		n(0),
+		typ(theTyp),
+		next(0),
+		down(0),
+		sub(0),
+		up(false),
+		sym(theSym),
+		val(0),
+		code(0),
+		set(0),
+		pos(0),
+		line(lineNr),
+		state(0)
+	{}
 };
 
 

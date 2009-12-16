@@ -32,10 +32,11 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Melted::Melted(BitArray *set, State *state) {
-	this->set = set;
-	this->state = state;
-}
+Melted::Melted(BitArray *oldStates, State *newState) :
+	set(oldStates),
+	state(newState),
+	next(0)
+{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

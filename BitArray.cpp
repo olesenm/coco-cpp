@@ -53,7 +53,7 @@ BitArray::BitArray(const BitArray &copy) {
 BitArray::~BitArray()
 {
 	delete [] Data;
-	Data = NULL;
+	Data = 0;
 }
 
 int BitArray::getCount() {

@@ -106,7 +106,7 @@ Symbol* Tab::FindSym(const wchar_t* name) {
 }
 
 int Tab::Num(Node *p) {
-	if (p == NULL) return 0; else return p->n;
+	return (p ? p->n : 0);
 }
 
 void Tab::PrintSym(Symbol *sym) {
@@ -114,7 +114,7 @@ void Tab::PrintSym(Symbol *sym) {
 	fwprintf(trace, L"%3d %14s %ls", sym->n, paddedName, nTyp[sym->typ]);
 	coco_string_delete(paddedName);
 
-	if (sym->attrPos==NULL) fwprintf(trace, L" false "); else fwprintf(trace, L" true  ");
+	if (sym->attrPos) fwprintf(trace, L" true  "); else fwprintf(trace, L" false ");
 	if (sym->typ == Node::nt) {
 		fwprintf(trace, L"%5d", Num(sym->graph));
 		if (sym->deletable) fwprintf(trace, L" true  "); else fwprintf(trace, L" false ");

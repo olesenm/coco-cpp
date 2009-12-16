@@ -49,7 +49,7 @@ public:
 	State *state;   //!< new state
 	Melted *next;   //!< next Melted
 
-	Melted(BitArray *set, State *state);
+	Melted(BitArray *oldStates, State *newState);
 };
 
 

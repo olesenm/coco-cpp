@@ -45,7 +45,7 @@ public:
 	void* Value;
 	SortedEntry* next;
 
-	SortedEntry(Symbol* Key, void* Value);
+	SortedEntry(Symbol* key, void* value);
 	virtual ~SortedEntry();
 };
 

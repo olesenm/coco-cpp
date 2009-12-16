@@ -106,7 +106,7 @@ public:
 int id;
 	int str;
 
-	FILE* trace;           //<! other Coco objects referenced in this ATG
+	FILE* trace;            //<! other Coco objects referenced in this ATG
 	Tab *tab;
 	DFA *dfa;
 	ParserGen *pgen;

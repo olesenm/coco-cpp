@@ -29,7 +29,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_NODE_H__
 #define COCO_NODE_H__
 
-#include <stdio.h>
 #include "Position.h"
 #include "State.h"
 #include "Scanner.h"

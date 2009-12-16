@@ -29,8 +29,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_CHARSET_H__
 #define COCO_CHARSET_H__
 
-#include <stdio.h>
-
 namespace Coco {
 
 /*---------------------------------------------------------------------------*\
@@ -43,14 +41,14 @@ public:
 		int from;
 		int to;
 		Range *next;
-		Range(int from, int to) {
-                    this->from = from; this->to = to; next = NULL;
-                }
+		Range(int fromValue, int toValue) :
+			from(fromValue), to(toValue), next(0)
+		{}
 	};
 
 	Range *head;
 
-	CharSet() { head = NULL; };
+	CharSet() : head(0) {}
 	virtual ~CharSet();
 
 	bool Get(int i) const;

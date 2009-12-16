@@ -42,23 +42,9 @@ public:
 	Node *l;   //!< left end of graph = head
 	Node *r;   //!< right end of graph = list of nodes to be linked to successor graph
 
-	Graph()
-	:
-		l(NULL),
-		r(NULL)
-	{}
-
-	Graph(Node *left, Node *right)
-	:
-		l(left),
-		r(right)
-	{}
-
-	Graph(Node *p)
-	:
-		l(p),
-		r(p)
-	{}
+	Graph() : l(0), r(0) {}
+	Graph(Node *p) : l(p), r(p) {}
+	Graph(Node *left, Node *right) : l(left), r(right) {}
 
 	virtual ~Graph()
 	{}

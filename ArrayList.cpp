@@ -31,11 +31,11 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 namespace Coco {
 
-ArrayList::ArrayList() {
-	Count = 0;
-	Capacity = 10;
-	Data = new void*[ Capacity ];
-}
+ArrayList::ArrayList() :
+	Count(0),
+	Capacity(10),
+	Data(new void*[ Capacity ])
+{}
 
 ArrayList::~ArrayList() {
 	delete [] Data;
@@ -49,7 +49,7 @@ void ArrayList::Add(void *value) {
 		Capacity *= 2;
 		void** newData = new void*[Capacity];
 		for (int i=0; i<Count; i++) {
-			newData[i] = Data[i];		// copy
+			newData[i] = Data[i];   // copy
 		}
 		newData[Count] = value;
 		Count++;
@@ -71,9 +71,10 @@ void ArrayList::Remove(void *value) {
 
 void* ArrayList::operator[]( int index )
 {
-	if (0 <= index && index<Count)
+	if (0 <= index && index < Count)
 		return Data[index];
-	return NULL;
+	else
+		return NULL;
 }
 
 

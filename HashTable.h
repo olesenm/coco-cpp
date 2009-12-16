@@ -87,11 +87,11 @@ private:
 		virtual DictionaryEntry* Next();
 	};
 
-	Obj* Get0(wchar_t *key) const;
-	Obj **data;
 	int size;
-};
+	Obj **data;
+	Obj* GetObj(wchar_t *key) const;
 
+};
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

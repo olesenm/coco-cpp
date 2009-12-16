@@ -34,22 +34,21 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-SortedEntry::SortedEntry(Symbol* Key, void* Value) {
-	this->Key   = Key;
-	this->Value = Value;
-	this->next = NULL;
-}
+SortedEntry::SortedEntry(Symbol* k, void* v) :
+	Key(k),
+	Value(v),
+	next(0)
+{}
 
-SortedEntry::~SortedEntry() {
-}
+SortedEntry::~SortedEntry() {}
 
-SortedList::SortedList() {
-	Count = 0;
-	Data = NULL;
-}
+SortedList::SortedList() :
+	Count(0),
+	Data(0)
+{}
 
-SortedList::~SortedList() {
-}
+SortedList::~SortedList()
+{}
 
 int SortedList::Compare(Symbol *x, Symbol *y) {
 	return coco_string_compareto(x->name, y->name);
@@ -69,12 +68,12 @@ void SortedList::Set(Symbol *key, void *value) {
 	if (!Find(key)) {
 		// new entry
 		SortedEntry* pSortedEntry = Data;
-		SortedEntry* pSortedEntryPrev = NULL;
+		SortedEntry* pSortedEntryPrev = 0;
 		SortedEntry* newSortedEntry = new SortedEntry(key, value);
 		if (pSortedEntry) {
 			// insert
 
-			if (Compare(pSortedEntry->Key, key) > 0) {	// before the first
+			if (Compare(pSortedEntry->Key, key) > 0) {  // before the first
 				newSortedEntry->next = Data;
 				Data = newSortedEntry;
 			} else {
@@ -90,7 +89,7 @@ void SortedList::Set(Symbol *key, void *value) {
 				newSortedEntry->next = pSortedEntry;
 			}
 		} else {
-			Data = newSortedEntry;			// first entry
+			Data = newSortedEntry;             // first entry
 		}
 		Count++;
 	} else {

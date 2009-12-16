@@ -32,12 +32,12 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Position::Position(int beg, int end, int col, int line) {
-	this->beg = beg;
-	this->end = end;
-	this->col = col;
-	this->line = line;
-}
+Position::Position(int begPos, int endPos, int colNr, int lineNr) :
+	beg(begPos),
+	end(endPos),
+	col(colNr),
+	line(lineNr)
+{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

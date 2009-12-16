@@ -381,6 +381,8 @@ int Buffer::Peek() {
 }
 
 
+// Note: we could gain some efficiency here by writing directly
+// into the result
 wchar_t* Buffer::GetString(int beg, int end) {
 	int len = 0;
 	wchar_t *buf = new wchar_t[end - beg];

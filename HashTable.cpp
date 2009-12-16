@@ -35,37 +35,40 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-HashTable::HashTable(int size) {
-	this->size = size;
-	data = new Obj*[size];
+HashTable::HashTable(int sz) :
+	size(sz), data(new Obj*[sz])
+{
 	memset(data, 0, size * sizeof(Obj*));
 }
 
 HashTable::~HashTable() {
 	for (int i = 0; i < size; ++i) {
 		Obj *o = data[i];
-		while (o != NULL) {
+		while (o) {
 			Obj *del = o;
 			o = o->next;
 			delete del;
 		}
 	}
 	delete[] data;
-	data = NULL;
+	data = 0;
 };
 
-HashTable::Obj* HashTable::Get0(wchar_t *key) const {
+HashTable::Obj* HashTable::GetObj(wchar_t *key) const {
 	int k = coco_string_hash(key) % size;
 	HashTable::Obj *o = data[k];
-	while (o != NULL && !coco_string_equal(key, o->key)) {
+	while (o && !coco_string_equal(key, o->key)) {
 		o = o->next;
 	}
 	return o;
 }
 
 void HashTable::Set(wchar_t *key, void *val) {
-	HashTable::Obj *o = Get0(key);
-	if (o == NULL) {
+	HashTable::Obj *o = GetObj(key);
+	if (o) {
+		// exist entry - overwrite
+		o->val = val;
+	} else {
 		// new entry
 		int k = coco_string_hash(key) % size;
 		o = new Obj();
@@ -73,32 +76,26 @@ void HashTable::Set(wchar_t *key, void *val) {
 		o->val = val;
 		o->next = data[k];
 		data[k] = o;
-	} else {
-		// exist entry - overwrite
-		o->val = val;
 	}
 }
 
 void* HashTable::Get(wchar_t *key) const {
-	HashTable::Obj *o = Get0(key);
-	if (o != NULL) {
-		return o->val;
-	}
-	return NULL;
+	HashTable::Obj *o = GetObj(key);
+	return o ? o->val : NULL;
 }
 
 Iterator* HashTable::GetIterator() {
 	return new HashTable::Iter(this);
 }
 
-HashTable::Iter::Iter(HashTable *ht) {
-	this->ht = ht;
-	this->pos = 0;
-	this->cur = NULL;
-}
+HashTable::Iter::Iter(HashTable *htbl) :
+	ht(htbl),
+	pos(0),
+	cur(0)
+{}
 
 bool HashTable::Iter::HasNext() {
-	while (cur == NULL && pos < ht->size) {
+	while (!cur && pos < ht->size) {
 		cur = ht->data[pos];
 		++pos;
 	}

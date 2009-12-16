@@ -36,18 +36,20 @@ namespace Coco {
 State::State()
 :
 	nr(0),
-	firstAction(NULL),
-	endOf(NULL),
-	ctx(NULL),
-	next(NULL)
+	firstAction(0),
+	endOf(0),
+	ctx(false),
+	next(0)
 {}
 
 void State::AddAction(Action *act) {
-	Action *lasta = NULL, *a = firstAction;
-	while (a != NULL && act->typ >= a->typ) {lasta = a; a = a->next;}
+	Action *lasta = 0;
+	Action *a = firstAction;
+
+	while (a && act->typ >= a->typ) { lasta = a; a = a->next; }
 	// collecting classes at the beginning gives better performance
 	act->next = a;
-	if (a==firstAction) {
+	if (a == firstAction) {
 		firstAction = act;
 	}
 	else {
@@ -56,9 +58,10 @@ void State::AddAction(Action *act) {
 }
 
 void State::DetachAction(Action *act) {
-	Action *lasta = NULL, *a = firstAction;
-	while (a != NULL && a != act) {lasta = a; a = a->next;}
-	if (a != NULL) {
+	Action *lasta = 0;
+	Action *a = firstAction;
+	while (a && a != act) { lasta = a; a = a->next; }
+	if (a) {
 		if (a == firstAction) {
 			firstAction = a->next;
 		}

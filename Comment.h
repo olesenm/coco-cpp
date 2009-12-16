@@ -46,7 +46,8 @@ public:
 	bool nested;    //!< Can comments be nested?
 	Comment *next;
 
-	Comment(wchar_t* start, wchar_t* stop, bool nested);
+	//! Construct from components - default to unnested comments
+	Comment(wchar_t* startStr, wchar_t* stopStr, bool isNested = false);
 	virtual ~Comment();
 
 };

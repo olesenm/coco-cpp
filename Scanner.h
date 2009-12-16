@@ -237,24 +237,24 @@ private:
 	public:
 		int key, val;
 		Elem *next;
-		Elem(int key, int val) {
-			this->key = key;
-			this->val = val;
-			next = NULL;
-		}
+		Elem(int k, int v) :
+			key(k), val(v), next(0)
+		{}
 	};
 
 	Elem **tab;
 
 public:
-	StartStates() {
-		tab = new Elem*[128];
+	StartStates() :
+		tab(new Elem*[128])
+	{
 		memset(tab, 0, 128 * sizeof(Elem*));
 	}
+
 	virtual ~StartStates() {
 		for (int i = 0; i < 128; ++i) {
 			Elem *e = tab[i];
-			while (e != NULL) {
+			while (e) {
 				Elem *next = e->next;
 				delete e;
 				e = next;
@@ -272,8 +272,8 @@ public:
 
 	int state(int key) {
 		Elem *e = tab[unsigned(key) % 128];
-		while (e != NULL && e->key != key) e = e->next;
-		return e == NULL ? 0 : e->val;
+		while (e && e->key != key) e = e->next;
+		return e ? e->val : 0;
 	}
 };
 
@@ -289,11 +289,9 @@ private:
 		wchar_t *key;
 		int val;
 		Elem *next;
-		Elem(const wchar_t *key, int val) {
-			this->key = coco_string_create(key);
-			this->val = val;
-			next = NULL;
-		}
+		Elem(const wchar_t *k, int v) :
+			key(coco_string_create(k)), val(v), next(0)
+		{}
 		virtual ~Elem() {
 			coco_string_delete(key);
 		}
@@ -302,14 +300,16 @@ private:
 	Elem **tab;
 
 public:
-	KeywordMap() {
-		tab = new Elem*[128];
+	KeywordMap() :
+		tab(new Elem*[128])
+	{
 		memset(tab, 0, 128 * sizeof(Elem*));
 	}
+
 	virtual ~KeywordMap() {
 		for (int i = 0; i < 128; ++i) {
 			Elem *e = tab[i];
-			while (e != NULL) {
+			while (e) {
 				Elem *next = e->next;
 				delete e;
 				e = next;
@@ -326,8 +326,8 @@ public:
 
 	int get(const wchar_t *key, int defaultVal) {
 		Elem *e = tab[coco_string_hash(key) % 128];
-		while (e != NULL && !coco_string_equal(e->key, key)) e = e->next;
-		return e == NULL ? defaultVal : e->val;
+		while (e && !coco_string_equal(e->key, key)) e = e->next;
+		return e ? e->val : defaultVal;
 	}
 };
 
@@ -368,7 +368,7 @@ private:
 	Token* CreateToken();
 	void AppendVal(Token*);
 
-	void Init();
+	void Init();      //!< complete the initialization for the constructors
 	void NextCh();
 	void AddCh();
 	bool Comment0();

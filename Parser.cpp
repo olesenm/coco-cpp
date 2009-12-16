@@ -120,7 +120,7 @@ bool Parser::WeakSeparator(int n, int syFol, int repFol) {
 
 
 void Parser::Coco() {
-		Symbol *sym; Graph *g, *g1, *g2; wchar_t* gramName = NULL; CharSet *s; 
+		Symbol *sym; Graph *g, *g1, *g2; wchar_t* gramName = NULL; CharSet *s;
 		InitDeclarations(); 
 		int beg = la->pos; int line = la->line; 
 		while (StartOf(1)) {
@@ -131,7 +131,7 @@ void Parser::Coco() {
 		}
 		
 		Expect(6);
-		genScanner = true; 
+		genScanner = true;
 		tab->ignored = new CharSet(); 
 		Expect(1);
 		gramName = coco_string_create(t->val);
@@ -195,8 +195,8 @@ void Parser::Coco() {
 			else {
 			  if (sym->typ == Node::nt) {
 			    if (sym->graph != NULL) SemErr(L"name declared twice");
-				 } else SemErr(L"this symbol kind not allowed on left side of production");
-				 sym->line = t->line;
+			  } else SemErr(L"this symbol kind not allowed on left side of production");
+			  sym->line = t->line;
 			}
 			bool noAttrs = (sym->attrPos == NULL);
 			sym->attrPos = NULL;
@@ -411,17 +411,17 @@ void Parser::SimSet(CharSet* &s) {
 			wchar_t *subName2 = coco_string_create(t->val, 1, coco_string_length(t->val)-2);
 			wchar_t *name = tab->Unescape(subName2);
 			coco_string_delete(subName2);
-			                        wchar_t ch;
-			                        int len = coco_string_length(name);
-			                        for(int i=0; i < len; i++) {
-			                          ch = name[i];
-			                          if (dfa->ignoreCase) {
-			                            if ((L'A' <= ch) && (ch <= L'Z')) ch = ch - (L'A' - L'a'); // ch.ToLower()
-			                          }
-			                          s->Set(ch);
-			                        }
+			wchar_t ch;
+			int len = coco_string_length(name);
+			for (int i=0; i < len; i++) {
+			  ch = name[i];
+			  if (dfa->ignoreCase) {
+			    if ((L'A' <= ch) && (ch <= L'Z')) ch = ch - (L'A' - L'a'); // ch.ToLower()
+			  }
+			  s->Set(ch);
+			}
 			coco_string_delete(name);
-			                     
+			
 		} else if (la->kind == 5) {
 			Char(n1);
 			s->Set(n1); 
@@ -443,12 +443,13 @@ void Parser::Char(int &n) {
 		wchar_t* name = tab->Unescape(subName);
 		coco_string_delete(subName);
 		
-		// "<= 1" instead of "== 1" to allow the escape sequence '\0' in c++
-		if (coco_string_length(name) <= 1) n = name[0];
-		else SemErr(L"unacceptable character value");
-		coco_string_delete(name);
-		if (dfa->ignoreCase && (((wchar_t) n) >= 'A') && (((wchar_t) n) <= 'Z')) n += 32;
-		                      
+		                                   // "<= 1" instead of "== 1" to allow the escape sequence '\0' in c++
+		                                   if (coco_string_length(name) <= 1) n = name[0];
+		                                   else SemErr(L"unacceptable character value");
+		                                   coco_string_delete(name);
+		                                   // n is int, we can create lowercase directly
+		                                   if (dfa->ignoreCase && (n >= 'A') && (n <= 'Z')) n += 32;
+		                                 
 }
 
 void Parser::Sym(wchar_t* &name, int &kind) {
@@ -463,20 +464,20 @@ void Parser::Sym(wchar_t* &name, int &kind) {
 			} else {
 				Get();
 				wchar_t *subName = coco_string_create(t->val, 1, coco_string_length(t->val)-2);
-				coco_string_delete(name); 
+				coco_string_delete(name);
 				name = coco_string_create_append(L"\"", subName);
 				coco_string_delete(subName);
-				coco_string_merge(name, L"\""); 
+				coco_string_merge(name, L"\"");
 				
 			}
 			kind = str;
 			if (dfa->ignoreCase) {
-			wchar_t *oldName = name;
-			name = coco_string_create_lower(name);
-			coco_string_delete(oldName);
-			 }
-			                         if (coco_string_indexof(name, ' ') >= 0)
-			                           SemErr(L"literal tokens must not contain blanks"); 
+			  wchar_t *oldName = name;
+			  name = coco_string_create_lower(name);
+			  coco_string_delete(oldName);
+			}
+			if (coco_string_indexof(name, ' ') >= 0)
+			  SemErr(L"literal tokens must not contain blanks"); 
 		} else SynErr(47);
 }
 
@@ -511,7 +512,7 @@ void Parser::Resolver(Position* &pos) {
 }
 
 void Parser::Factor(Graph* &g) {
-		wchar_t* name = NULL; int kind; Position *pos; bool weak = false; 
+		wchar_t* name = NULL; int kind; Position *pos; bool weak = false;
 		 g = NULL;
 		
 		switch (la->kind) {
@@ -528,7 +529,7 @@ void Parser::Factor(Graph* &g) {
 			 if (undef) {
 			   if (kind == id)
 			     sym = tab->NewSym(Node::nt, name, 0);  // forward nt
-			   else if (genScanner) { 
+			   else if (genScanner) {
 			     sym = tab->NewSym(Node::t, name, t->line);
 			     dfa->MatchLiteral(sym->name, sym);
 			   } else {  // undefined string in production

@@ -204,7 +204,7 @@ wchar_t* coco_string_create(const char* str) {
 	int len = str ? strlen(str) : 0;
 	wchar_t* dest = new wchar_t[len + 1];
 	for (int i = 0; i < len; ++i) {
-		dest[i] = (wchar_t) str[i];
+		dest[i] = wchar_t(str[i]);
 	}
 	dest[len] = 0;
 	return dest;
@@ -214,7 +214,7 @@ wchar_t* coco_string_create(const char* str, int index, int length) {
 	int len = str ? length : 0;
 	wchar_t* dest = new wchar_t[len + 1];
 	for (int i = 0; i < len; ++i) {
-		dest[i] = (wchar_t) str[index + i];
+		dest[i] = wchar_t(str[index + i]);
 	}
 	dest[len] = 0;
 	return dest;
@@ -226,7 +226,7 @@ char* coco_string_create_char(const wchar_t* str) {
 	char *dest = new char[len + 1];
 	for (int i = 0; i < len; ++i)
 	{
-		dest[i] = (char) str[i];
+		dest[i] = char(str[i]);
 	}
 	dest[len] = 0;
 	return dest;
@@ -239,7 +239,7 @@ char* coco_string_create_char(const wchar_t* str, int index, int length) {
 	}
 	char *dest = new char[len + 1];
 	for (int i = 0; i < len; ++i) {
-		dest[i] = (char) str[index + i];
+		dest[i] = char(str[index + i]);
 	}
 	dest[len] = 0;
 	return dest;
@@ -386,7 +386,9 @@ wchar_t* Buffer::GetString(int beg, int end) {
 	wchar_t *buf = new wchar_t[end - beg];
 	int oldPos = GetPos();
 	SetPos(beg);
-	while (GetPos() < end) buf[len++] = (wchar_t) Read();
+	while (GetPos() < end) {
+		buf[len++] = wchar_t(Read());
+	}
 	SetPos(oldPos);
 	wchar_t *res = coco_string_create(buf, 0, len);
 	coco_string_delete(buf);

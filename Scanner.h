@@ -265,13 +265,13 @@ public:
 
 	void set(int key, int val) {
 		Elem *e = new Elem(key, val);
-		int k = ((unsigned int) key) % 128;
+		int k = unsigned(key) % 128;
 		e->next = tab[k];
 		tab[k] = e;
 	}
 
 	int state(int key) {
-		Elem *e = tab[((unsigned int) key) % 128];
+		Elem *e = tab[unsigned(key) % 128];
 		while (e != NULL && e->key != key) e = e->next;
 		return e == NULL ? 0 : e->val;
 	}

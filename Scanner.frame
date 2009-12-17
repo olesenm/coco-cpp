@@ -334,16 +334,15 @@ public:
 //! A Coco/R Scanner
 class Scanner {
 private:
-	static const unsigned char EOL = '\n';   // end-of-line character
+-->constantsheader
 	static const int eofSym = 0;             // end-of-file token id
+	static const unsigned char EOL = '\n';   // end-of-line character
 
 	void *firstHeap;
 	void *heap;
 	void *heapTop;
 	void **heapEnd;
 
-	int noSym;        //!< noSym gets highest number, set in Parser
-	int maxT;
 	int charSetSize;  //!< unused?
 	StartStates start;
 	KeywordMap keywords;

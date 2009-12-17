@@ -500,7 +500,7 @@ void ParserGen::WriteParser () {
 
 	CopyFramePart(L"-->constantsheader");
 	GenTokensHeader();  /* ML 2002/09/07 write the token kinds */
-	fwprintf(gen, L"\tint maxT;\n");
+	fwprintf(gen, L"\tstatic const int maxT = %d;\n", tab->terminals->Count-1);
 	CopyFramePart(L"-->declarations"); CopySourcePart(tab->semDeclPos, 0);
 	CopyFramePart(L"-->productionsheader"); GenProductionsHeader();
 	CopyFramePart(L"-->namespace_close");
@@ -531,7 +531,6 @@ void ParserGen::WriteParser () {
 	CopyFramePart(L"-->productions"); GenProductions();
 	CopyFramePart(L"-->parseRoot"); fwprintf(gen, L"\t%ls();\n", tab->gramSy->name);
 	CopyFramePart(L"-->constants");
-	fwprintf(gen, L"\tmaxT = %d;\n", tab->terminals->Count-1);
 	CopyFramePart(L"-->initialization"); InitSets();
 	CopyFramePart(L"-->errors"); fwprintf(gen, L"%ls", err);
 	CopyFramePart(L"-->namespace_close");

@@ -863,6 +863,10 @@ void DFA::WriteScanner() {
 	CopyFramePart(L"-->namespace_open");
 	int nrOfNs = GenNamespaceOpen(tab->nsName);
 
+	CopyFramePart(L"-->constantsheader");
+	fwprintf(gen, L"\tstatic const int maxT = %d;\n", tab->terminals->Count-1);
+	fwprintf(gen, L"\tstatic const int noSym = %d;\n", tab->noSym->n);
+
 	CopyFramePart(L"-->casing0");
 	if (ignoreCase) {
 		fwprintf(gen, L"\twchar_t valCh;       // current input character (for token.val)\n");
@@ -901,8 +905,6 @@ void DFA::WriteScanner() {
 	nrOfNs = GenNamespaceOpen(tab->nsName);
 
 	CopyFramePart(L"-->declarations");
-	fwprintf(gen, L"\tmaxT = %d;\n", tab->terminals->Count - 1);
-	fwprintf(gen, L"\tnoSym = %d;\n", tab->noSym->n);
 	WriteStartTab();
 	GenLiterals();
 

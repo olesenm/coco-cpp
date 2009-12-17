@@ -82,57 +82,6 @@ void printUsage(const char* message)
 }
 
 
-//
-// reduce multiple '::' -> ':', skip initial ':'
-// does not handle trailing ':' very well, but that is really
-// beyond the C++ specifications
-//
-// This routine is quite C-like at the moment.
-//
-void cleanseNamespace(wchar_t *nsName)
-{
-    if (nsName == NULL || coco_string_length(nsName) == 0)
-    {
-        return;
-    }
-
-    wchar_t *dst, *src, ch;
-
-    dst = src = nsName;
-
-    // skip leading ':'
-    while ((ch = *src++) != 0)
-    {
-        if (ch == COCO_CPP_NAMESPACE_SEPARATOR)
-        {
-            while (*src == COCO_CPP_NAMESPACE_SEPARATOR)
-            {
-                src++;
-            }
-        }
-        else
-        {
-            *dst++ = ch;
-            break;
-        }
-    }
-
-    // copy string, but reduce multiple ':' to a single one
-    while ((ch = *src++) != 0)
-    {
-        *dst++ = ch;
-        if (ch == COCO_CPP_NAMESPACE_SEPARATOR)
-        {
-            while (*src == COCO_CPP_NAMESPACE_SEPARATOR)
-            {
-                src++;
-            }
-        }
-    }
-
-    *dst = 0;
-}
-
 
 #ifdef _WIN32
 int wmain(int argc, wchar_t *argv[]) {
@@ -162,7 +111,6 @@ int main(int argc, char *argv_[]) {
 				return 1;
 			}
 			nsName = coco_string_create(argv[i]);
-			cleanseNamespace(nsName);
 		}
 		else if (coco_string_equal(argv[i], L"-prefix")) {
 			if (++i == argc) {

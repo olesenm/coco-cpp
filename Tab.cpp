@@ -1235,22 +1235,37 @@ void Tab::SetDDT(const wchar_t* s) {
 
 // * * * * * * * * * * * * *  Misc Output Methods  * * * * * * * * * * * * * //
 
+//
+// reduce multiple '::' -> ':', skip initial ':'
+//
 int Tab::GenNamespaceOpen(FILE* ostr, const wchar_t *nsName) {
 	if (nsName == NULL || coco_string_length(nsName) == 0) {
 		return 0;
 	}
 	const int len = coco_string_length(nsName);
-	int startPos = 0;
 	int nrOfNs = 0;
-	do {
-		int curLen = coco_string_indexof(nsName + startPos, COCO_CPP_NAMESPACE_SEPARATOR);
-		if (curLen == -1) { curLen = len - startPos; }
-		wchar_t *curNs = coco_string_create(nsName, startPos, curLen);
-		fwprintf(ostr, L"namespace %ls {\n", curNs);
-		coco_string_delete(curNs);
-		startPos = startPos + curLen + 1;
-		++nrOfNs;
-	} while (startPos < len);
+
+	for (int startPos = 0; startPos < len; ++startPos)
+	{
+		// skip leading and multiple ':'
+		while (nsName[startPos] == L':')
+		{
+			++startPos;
+		}
+
+		int curLen = coco_string_indexof(nsName + startPos, L':');
+		if (curLen == -1) {
+			curLen = len - startPos;
+		}
+		if (curLen) {
+			wchar_t *curNs = coco_string_create(nsName, startPos, curLen);
+			fwprintf(ostr, L"namespace %ls {\n", curNs);
+			coco_string_delete(curNs);
+			++nrOfNs;
+		}
+		startPos += curLen;
+	}
+
 	return nrOfNs;
 }
 

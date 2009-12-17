@@ -43,8 +43,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "CharClass.h"
 
 
-#define COCO_CPP_NAMESPACE_SEPARATOR L':'
-
 namespace Coco {
 
 // forward declarations

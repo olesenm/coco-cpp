@@ -30,11 +30,11 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_$PREFIX$SCANNER_H__
 #define COCO_$PREFIX$SCANNER_H__
 
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <wchar.h>
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cwchar>
 
 // io.h and fcntl are used to ensure binary read from streams on windows
 #if _MSC_VER >= 1300

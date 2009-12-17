@@ -39,7 +39,6 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-bool DFA::makeBackup = false;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -206,7 +205,7 @@ void DFA::NumberNodes(Node *p, State *state, bool renumIter) {
 	}
 }
 
-void DFA::FindTrans (Node *p, bool start, BitArray *marked) {
+void DFA::FindTrans(Node *p, bool start, BitArray *marked) {
 	if (p == NULL || (*marked)[p->n]) return;
 	marked->Set(p->n, true);
 	if (start) {
@@ -577,67 +576,15 @@ void DFA::GenComment(Comment *com, int i) {
 
 
 void DFA::CopyFramePart(const wchar_t* stop) {
-	wchar_t startCh = stop[0];
-	int endOfStopString = coco_string_length(stop)-1;
-
-	const wchar_t* prefixMacro = tab->prefixMacro;
-	int endOfPrefixMacro = coco_string_length(prefixMacro)-1;
-	wchar_t startPrefixCh = prefixMacro[0];
-	int isPrefixSet = coco_string_length(tab->prefixName);
-
-	wchar_t ch = 0;
-	fwscanf(fram, L"%lc", &ch); //	fram.ReadByte();
-	while (!feof(fram)) // ch != EOF
-	{
-		if (ch == startCh) {
-			int i = 0;
-			do {
-				if (i == endOfStopString) return; // stop[0..i] found
-				fwscanf(fram, L"%lc", &ch);
-				i++;
-			} while (ch == stop[i]);
-			// stop[0..i-1] found; continue with last read character
-			for (int subI = 0; subI < i; ++subI) {
-				fwprintf(gen, L"%lc", stop[subI]);
-			}
-		}
-		else if (ch == startPrefixCh) {
-			bool found = false;
-			int i = 0;
-			do {
-				if (i == endOfPrefixMacro) {
-					found = true;
-					break;
-				}
-				fwscanf(fram, L"%lc", &ch);
-				i++;
-			} while (ch == prefixMacro[i]);
-			// prefixMacro[0..i-1] found; continue with last read character
-			if (found)
-			{
-				if (isPrefixSet) {
-					fwprintf(gen, L"%ls", tab->prefixName);
-				}
-				fwscanf(fram, L"%lc", &ch);
-			}
-			else
-			{
-				for (int subI = 0; subI < i; ++subI) {
-					fwprintf(gen, L"%lc", prefixMacro[subI]);
-				}
-			}
-		}
-		else {
-			fwprintf(gen, L"%lc", ch);
-			fwscanf(fram, L"%lc", &ch);
-		}
+	bool ok = tab->CopyFramePart(gen, fram, stop);
+	if (!ok) {
+		errors->Exception(L" -- incomplete or corrupt parser frame file");
 	}
-	errors->Exception(L" -- incomplete or corrupt scanner frame file");
 }
 
 wchar_t* DFA::SymName(Symbol *sym) { // real name value is stored in Tab.literals
-	if (('a'<=sym->name[0] && sym->name[0]<='z') ||
-		('A'<=sym->name[0] && sym->name[0]<='Z')) { //Char::IsLetter(sym->name[0])
+	if (('a' <= sym->name[0] && sym->name[0] <= 'z') ||
+		('A' <= sym->name[0] && sym->name[0] <= 'Z')) { //Char::IsLetter(sym->name[0])
 
 		Iterator *iter = tab->literals->GetIterator();
 		while (iter->HasNext()) {
@@ -648,7 +595,7 @@ wchar_t* DFA::SymName(Symbol *sym) { // real name value is stored in Tab.literal
 	return sym->name;
 }
 
-void DFA::GenLiterals () {
+void DFA::GenLiterals() {
 	Symbol *sym;
 
 	ArrayList *ts[2];
@@ -681,42 +628,14 @@ void DFA::GenLiterals () {
 	}
 }
 
-int DFA::GenNamespaceOpen(const wchar_t *nsName) {
-	if (nsName == NULL || coco_string_length(nsName) == 0) {
-		return 0;
-	}
-	const int len = coco_string_length(nsName);
-	int startPos = 0;
-	int nrOfNs = 0;
-	do {
-		int curLen = coco_string_indexof(nsName + startPos, COCO_CPP_NAMESPACE_SEPARATOR);
-		if (curLen == -1) { curLen = len - startPos; }
-		wchar_t *curNs = coco_string_create(nsName, startPos, curLen);
-		fwprintf(gen, L"namespace %ls {\n", curNs);
-		coco_string_delete(curNs);
-		startPos = startPos + curLen + 1;
-		++nrOfNs;
-	} while (startPos < len);
-	return nrOfNs;
-}
-
-void DFA::GenNamespaceClose(int nrOfNs) {
-	for (int i = 0; i < nrOfNs; ++i) {
-		fwprintf(gen, L"} // namespace\n");
-	}
-}
 
 void DFA::CheckLabels() {
-	int i;
-	State *state;
-	Action *action;
-
-	for (i=0; i < lastStateNr+1; i++) {
+	for (int i=0; i < lastStateNr+1; i++) {
 		existLabel[i] = false;
 	}
 
-	for (state = firstState->next; state != NULL; state = state->next) {
-		for (action = state->firstAction; action != NULL; action = action->next) {
+	for (State* state = firstState->next; state; state = state->next) {
+		for (Action* action = state->firstAction; action; action = action->next) {
 			existLabel[action->target->state->nr] = true;
 		}
 	}
@@ -775,13 +694,13 @@ void DFA::WriteState(State *state) {
 
 void DFA::WriteStartTab() {
 	bool firstRange = true;
-	for (Action *action = firstState->firstAction; action != NULL; action = action->next) {
+	for (Action *action = firstState->firstAction; action; action = action->next) {
 		int targetState = action->target->state->nr;
 		if (action->typ == Node::chr) {
 			fwprintf(gen, L"\tstart.set(%d, %d);\n", action->sym, targetState);
 		} else {
 			CharSet *s = tab->CharClassSet(action->sym);
-			for (CharSet::Range *r = s->head; r != NULL; r = r->next) {
+			for (CharSet::Range *r = s->head; r; r = r->next) {
 				if (firstRange) {
 					firstRange = false;
 					fwprintf(gen, L"\tint i;\n");
@@ -794,22 +713,10 @@ void DFA::WriteStartTab() {
 }
 
 void DFA::OpenGen(const wchar_t *genName, bool backUp) { /* pdt */
-	wchar_t *fn = coco_string_create_append(tab->outDir, genName); /* pdt */
-	char *chFn = coco_string_create_char(fn);
-	FILE* tmp;
-	if (backUp && ((tmp = fopen(chFn, "r")) != NULL)) {
-		fclose(tmp);
-		wchar_t *oldName = coco_string_create_append(fn, L".bak");
-		char *chOldName = coco_string_create_char(oldName);
-		remove(chOldName); rename(chFn, chOldName); // copy with overwrite
-		coco_string_delete(chOldName);
-		coco_string_delete(oldName);
-	}
-	if ((gen = fopen(chFn, "w")) == NULL) {
+	gen = tab->OpenGen(tab->outDir, genName, backUp);
+	if (gen == NULL) {
 		errors->Exception(L"-- Cannot generate scanner file");
 	}
-	coco_string_delete(chFn);
-	coco_string_delete(fn);
 }
 
 void DFA::WriteScanner() {
@@ -844,24 +751,30 @@ void DFA::WriteScanner() {
 
 	if (dirtyDFA) MakeDeterministic();
 
+	// keep copyright in frame when processing coco grammar
+	const bool keepCopyright = tab->checkIsCocoAtg(tab->srcName);
+
 	//
 	// Header
 	//
 	wchar_t* outputFileName =
 		coco_string_create_append(tab->prefixName, L"Scanner.h");
 
-	OpenGen(outputFileName, makeBackup); /* pdt */
+	OpenGen(outputFileName, tab->makeBackup); /* pdt */
 
 	CopyFramePart(L"-->begin");
-	wchar_t* res = coco_string_create_lower(tab->srcName);
-	if (!coco_string_endswith(res, L"coco.atg")) {
+	if (!keepCopyright) {
 		fclose(gen);
 		OpenGen(outputFileName, false); /* pdt */
 	}
-	coco_string_delete(res);
+	coco_string_delete(outputFileName);
 
 	CopyFramePart(L"-->namespace_open");
-	int nrOfNs = GenNamespaceOpen(tab->nsName);
+	int nrOfNs = tab->GenNamespaceOpen(gen, tab->nsName);
+
+	CopyFramePart(L"-->constantsheader");
+	fwprintf(gen, L"\tstatic const int maxT = %d;\n", tab->terminals->Count-1);
+	fwprintf(gen, L"\tstatic const int noSym = %d;\n", tab->noSym->n);
 
 	CopyFramePart(L"-->casing0");
 	if (ignoreCase) {
@@ -875,11 +788,9 @@ void DFA::WriteScanner() {
 	}
 
 	CopyFramePart(L"-->namespace_close");
-	GenNamespaceClose(nrOfNs);
-
+	tab->GenNamespaceClose(gen, nrOfNs);
 	CopyFramePart(L"-->implementation");
 	fclose(gen);
-	coco_string_delete(outputFileName);
 
 	//
 	// Source
@@ -887,22 +798,19 @@ void DFA::WriteScanner() {
 	outputFileName =
 		coco_string_create_append(tab->prefixName, L"Scanner.cpp");
 
-	OpenGen(outputFileName, makeBackup); /* pdt */
+	OpenGen(outputFileName, tab->makeBackup); /* pdt */
 	CopyFramePart(L"-->begin");
 
-	res = coco_string_create_lower(tab->srcName);
-	if (!coco_string_endswith(res, L"coco.atg")) {
+	if (!keepCopyright) {
 		fclose(gen);
 		OpenGen(outputFileName, false); /* pdt */
 	}
-	coco_string_delete(res);
+	coco_string_delete(outputFileName);
 
 	CopyFramePart(L"-->namespace_open");
-	nrOfNs = GenNamespaceOpen(tab->nsName);
+	nrOfNs = tab->GenNamespaceOpen(gen, tab->nsName);
 
 	CopyFramePart(L"-->declarations");
-	fwprintf(gen, L"\tmaxT = %d;\n", tab->terminals->Count - 1);
-	fwprintf(gen, L"\tnoSym = %d;\n", tab->noSym->n);
 	WriteStartTab();
 	GenLiterals();
 
@@ -953,11 +861,10 @@ void DFA::WriteScanner() {
 	delete [] existLabel;
 
 	CopyFramePart(L"-->namespace_close");
-	GenNamespaceClose(nrOfNs);
+	tab->GenNamespaceClose(gen, nrOfNs);
 
 	CopyFramePart(L"$$$");
 	fclose(gen);
-	coco_string_delete(outputFileName);
 }
 
 

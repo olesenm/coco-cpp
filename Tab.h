@@ -82,6 +82,7 @@ public:
 	wchar_t* frameDir;      //!< directory containing the frame files
 	wchar_t* outDir;        //!< directory for generated files
 	bool emitLines;         //!< emit line directives in generated parser
+	bool makeBackup;        //!< create .bak files for generated parser/scanner
 	BitArray *visited;      //!< mark list for graph traversals
 	Symbol *curSy;          //!< current symbol in computation of sets
 	Parser *parser;         //!< other Coco objects
@@ -160,7 +161,7 @@ public:
 
 	wchar_t* Ch(const wchar_t ch);
 	void WriteCharSet(CharSet *s);
-	void WriteCharClasses ();
+	void WriteCharClasses();
 
 	//---------------------------------------------------------------------
 	//  Symbol set computations
@@ -207,7 +208,7 @@ public:
 	class CNode {
 	public:
 		Symbol *left, *right;
-		CNode (Symbol *l, Symbol *r) : left(l), right(r) {}
+		CNode(Symbol *l, Symbol *r) : left(l), right(r) {}
 	};
 
 	void GetSingles(Node *p, ArrayList *singles);
@@ -248,6 +249,24 @@ public:
 	void XRef();
 	void SetDDT(const wchar_t* s);
 
+	//---------------------------------------------------------------------
+	//  Output file generation, common to DFA and ParserGen
+	//---------------------------------------------------------------------
+
+	//! Generate begin of namespace enclosure
+	static int GenNamespaceOpen(FILE*, const wchar_t *nsName);
+	//! Generate end of namespace enclosure
+	static void GenNamespaceClose(FILE*, int nrOfNs);
+
+	//! Check if Grammar file name appears to be Coco itself
+	static bool checkIsCocoAtg(const wchar_t* srcName);
+
+	//! Open a generated file, return NULL on failure
+	FILE* OpenGen(const wchar_t* dir, const wchar_t* name, bool backUp);
+
+	//! Copy frame part from istr, to ostr until stop mark is seen
+	//  Return true on success
+	bool CopyFramePart(FILE* ostr, FILE* istr, const wchar_t* stop);
 };
 
 

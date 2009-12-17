@@ -725,14 +725,12 @@ Parser::Parser(Scanner* scan, Errors* err)
 :
 	dummyToken(NULL),
 	deleteErrorsDestruct_(!err),
-	minErrDist(2),
 	errDist(minErrDist),
 	scanner(scan),
 	errors(err),
 	t(NULL),
 	la(NULL)
 {
-	maxT = 41;
 
 	if (!errors) {   // add in default error handling
 		errors = new Errors();

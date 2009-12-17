@@ -70,9 +70,10 @@ public:
 class Parser {
 private:
 -->constantsheader
+	static const int minErrDist = 2; //!< min. distance before reporting errors
+
 	Token *dummyToken;
 	bool deleteErrorsDestruct_; //!< delete the 'errors' member in destructor
-	int  minErrDist;
 	int  errDist;
 
 	void SynErr(int n);         //!< Handle syntax error 'n'
@@ -245,7 +246,6 @@ Parser::Parser(Scanner* scan, Errors* err)
 :
 	dummyToken(NULL),
 	deleteErrorsDestruct_(!err),
-	minErrDist(2),
 	errDist(minErrDist),
 	scanner(scan),
 	errors(err),

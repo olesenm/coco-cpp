@@ -52,9 +52,6 @@ class BitArray;
 class DFA
 {
 public:
-	//! control if backup files (.bak) are generated. default: false
-	static bool makeBackup;
-
 	static const int eoF = -1;  //!< End-of-file? ... unused?
 
 	int maxStates;
@@ -95,7 +92,7 @@ public:
 	State* TheState(Node *p);
 	void Step(State *from, Node *p, BitArray *stepped);
 	void NumberNodes(Node *p, State *state, bool renumIter);
-	void FindTrans (Node *p, bool start, BitArray *marked);
+	void FindTrans(Node *p, bool start, BitArray *marked);
 	void ConvertToStates(Node *p, Symbol *sym);
 
 	// match string against current automaton; store it either as a fixedToken or as a litToken
@@ -128,9 +125,7 @@ public:
 	void GenComment(Comment *com, int i);
 	void CopyFramePart(const wchar_t* stop);
 	wchar_t* SymName(Symbol *sym); //!< real name value is stored in Tab.literals
-	void GenLiterals ();
-	int GenNamespaceOpen(const wchar_t* nsName);
-	void GenNamespaceClose(int nrOfNs);
+	void GenLiterals();
 	void WriteState(State *state);
 	void WriteStartTab();
 	void OpenGen(const wchar_t* genName, bool backUp); /* pdt */

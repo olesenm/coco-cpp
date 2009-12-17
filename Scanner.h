@@ -30,11 +30,11 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_SCANNER_H__
 #define COCO_SCANNER_H__
 
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <wchar.h>
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cwchar>
 
 // io.h and fcntl are used to ensure binary read from streams on windows
 #if _MSC_VER >= 1300
@@ -335,16 +335,17 @@ public:
 //! A Coco/R Scanner
 class Scanner {
 private:
-	static const unsigned char EOL = '\n';   // end-of-line character
+	static const int maxT = 41;
+	static const int noSym = 41;
+
 	static const int eofSym = 0;             // end-of-file token id
+	static const unsigned char EOL = '\n';   // end-of-line character
 
 	void *firstHeap;
 	void *heap;
 	void *heapTop;
 	void **heapEnd;
 
-	int noSym;        //!< noSym gets highest number, set in Parser
-	int maxT;
 	int charSetSize;  //!< unused?
 	StartStates start;
 	KeywordMap keywords;

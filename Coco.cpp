@@ -146,13 +146,14 @@ int main(int argc, char *argv_[]) {
 #error unknown compiler!
 #endif
 
-	wprintf(L"Coco/R (16 Dec 2009)\n");
+	wprintf(L"Coco/R C++ (17 Dec 2009)\n");
 
 	wchar_t *srcName = NULL, *nsName = NULL, *prefixName = NULL;
 	wchar_t *frameDir = NULL, *outDir = NULL;
 	wchar_t *ddtString = NULL, *traceFileName = NULL;
 	char *chTrFileName = NULL;
 	bool emitLines = false;
+	bool makeBackup = false;
 
 	for (int i = 1; i < argc; i++) {
 		if (coco_string_equal(argv[i], L"-namespace")) {
@@ -195,7 +196,7 @@ int main(int argc, char *argv_[]) {
 			emitLines = true;
 		}
 		else if (coco_string_equal(argv[i], L"-bak")) {
-			Coco::DFA::makeBackup = Coco::ParserGen::makeBackup = true;
+			makeBackup = true;
 		}
 		else if (coco_string_equal(argv[i], L"-help"))
 		{
@@ -242,6 +243,7 @@ int main(int argc, char *argv_[]) {
 		parser->tab->frameDir = coco_string_create(frameDir);
 		parser->tab->outDir   = coco_string_create(outDir != NULL ? outDir : srcDir);
 		parser->tab->emitLines = emitLines;
+		parser->tab->makeBackup = makeBackup;
 
 		if (ddtString != NULL) parser->tab->SetDDT(ddtString);
 

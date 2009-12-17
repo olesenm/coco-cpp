@@ -539,8 +539,6 @@ Scanner::~Scanner() {
 
 
 void Scanner::Init() {
-	maxT = 41;
-	noSym = 41;
 	int i;
 	for (i = 65; i <= 90; ++i) start.set(i, 1);
 	for (i = 95; i <= 95; ++i) start.set(i, 1);

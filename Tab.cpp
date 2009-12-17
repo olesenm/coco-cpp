@@ -456,7 +456,7 @@ void Tab::WriteCharSet(CharSet *s) {
 	}
 }
 
-void Tab::WriteCharClasses () {
+void Tab::WriteCharClasses() {
 	CharClass *c;
 	for (int i=0; i<classes->Count; i++) {
 		c = (CharClass*)((*classes)[i]);
@@ -812,7 +812,7 @@ wchar_t* Tab::Char2Hex(const wchar_t ch) {
 	return format;
 }
 
-wchar_t* Tab::Unescape (const wchar_t* s) {
+wchar_t* Tab::Unescape(const wchar_t* s) {
 	/* replaces escape sequences in s by their Unicode values. */
 	StringBuilder buf = StringBuilder();
 	int i = 0;
@@ -854,7 +854,7 @@ wchar_t* Tab::Unescape (const wchar_t* s) {
 }
 
 
-wchar_t* Tab::Escape (const wchar_t* s) {
+wchar_t* Tab::Escape(const wchar_t* s) {
 	StringBuilder buf = StringBuilder();
 	wchar_t ch;
 	int len = coco_string_length(s);
@@ -1232,6 +1232,127 @@ void Tab::SetDDT(const wchar_t* s) {
 	}
 	coco_string_delete(st);
 }
+
+// * * * * * * * * * * * * *  Misc Output Methods  * * * * * * * * * * * * * //
+
+int Tab::GenNamespaceOpen(FILE* ostr, const wchar_t *nsName) {
+	if (nsName == NULL || coco_string_length(nsName) == 0) {
+		return 0;
+	}
+	const int len = coco_string_length(nsName);
+	int startPos = 0;
+	int nrOfNs = 0;
+	do {
+		int curLen = coco_string_indexof(nsName + startPos, COCO_CPP_NAMESPACE_SEPARATOR);
+		if (curLen == -1) { curLen = len - startPos; }
+		wchar_t *curNs = coco_string_create(nsName, startPos, curLen);
+		fwprintf(ostr, L"namespace %ls {\n", curNs);
+		coco_string_delete(curNs);
+		startPos = startPos + curLen + 1;
+		++nrOfNs;
+	} while (startPos < len);
+	return nrOfNs;
+}
+
+
+void Tab::GenNamespaceClose(FILE* ostr, int nrOfNs) {
+	for (int i = 0; i < nrOfNs; ++i) {
+		fwprintf(ostr, L"} // namespace\n");
+	}
+}
+
+
+bool Tab::checkIsCocoAtg(const wchar_t* srcName) {
+	wchar_t *lowerCaseName = coco_string_create_lower(srcName);
+	bool isCoco = coco_string_endswith(lowerCaseName, L"coco.atg");
+	coco_string_delete(lowerCaseName);
+	return isCoco;
+}
+
+
+FILE* Tab::OpenGen(const wchar_t* dir, const wchar_t* name, bool backUp) {
+	wchar_t* fn = coco_string_create_append(dir, name);
+	char* chFn = coco_string_create_char(fn);
+
+	FILE* ostr;
+	if (backUp && ((ostr = fopen(chFn, "r")) != NULL)) {
+		fclose(ostr);
+		wchar_t* oldName = coco_string_create_append(fn, L".bak");
+		char* chOldName = coco_string_create_char(oldName);
+		remove(chOldName);
+		rename(chFn, chOldName); // copy with overwrite
+		coco_string_delete(chOldName);
+		coco_string_delete(oldName);
+	}
+
+	ostr = fopen(chFn, "w");
+	coco_string_delete(chFn);
+	coco_string_delete(fn);
+
+	return ostr;
+}
+
+
+bool Tab::CopyFramePart(FILE* ostr, FILE* istr, const wchar_t* stop) {
+	wchar_t startCh = stop[0];
+	int endOfStopString = coco_string_length(stop)-1;
+
+	int endOfPrefixMacro = coco_string_length(this->prefixMacro)-1;
+	wchar_t startPrefixCh = this->prefixMacro[0];
+	int isPrefixSet = coco_string_length(this->prefixName);
+
+	wchar_t ch = 0;
+	fwscanf(istr, L"%lc", &ch); //	istr.ReadByte();
+	while (!feof(istr)) // ch != EOF
+	{
+		if (ch == startCh) {
+			int i = 0;
+			do {
+				if (i == endOfStopString)
+					return true; // stop[0..i] found
+				fwscanf(istr, L"%lc", &ch);
+				i++;
+			} while (ch == stop[i]);
+			// stop[0..i-1] found; continue with last read character
+			for (int subI = 0; subI < i; ++subI) {
+				fwprintf(ostr, L"%lc", stop[subI]);
+			}
+		}
+		else if (ch == startPrefixCh) {
+			bool found = false;
+			int i = 0;
+			do {
+				if (i == endOfPrefixMacro) {
+					found = true;
+					break;
+				}
+				fwscanf(istr, L"%lc", &ch);
+				i++;
+			} while (ch == this->prefixMacro[i]);
+			// prefixMacro[0..i-1] found; continue with last read character
+			if (found)
+			{
+				if (isPrefixSet) {
+					fwprintf(ostr, L"%ls", this->prefixName);
+				}
+				fwscanf(istr, L"%lc", &ch);
+			}
+			else
+			{
+				for (int subI = 0; subI < i; ++subI) {
+					fwprintf(ostr, L"%lc", this->prefixMacro[subI]);
+				}
+			}
+		}
+		else {
+			fwprintf(ostr, L"%lc", ch);
+			fwscanf(istr, L"%lc", &ch);
+		}
+	}
+
+	return false; // error
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

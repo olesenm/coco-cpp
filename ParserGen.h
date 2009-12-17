@@ -51,8 +51,6 @@ class BitArray;
 class ParserGen
 {
 public:
-	//! control if backup files (.bak) are generated. default: false
-	static bool makeBackup;
 	static const char CR = '\r';    //!< carriage-return character
 	static const char LF = '\n';    //!< line-feed character
 
@@ -84,8 +82,6 @@ public:
 	bool UseSwitch(Node *p);
 	void CopyFramePart(const wchar_t* stop);
 	void CopySourcePart(Position *pos, int indent);
-	int GenNamespaceOpen(const wchar_t* nsName);
-	void GenNamespaceClose(int nrOfNs);
 	void GenErrorMsg(int errTyp, Symbol *sym);
 	int  NewCondSet(BitArray *s);
 	void GenCond(BitArray *s, Node *p);
@@ -100,8 +96,8 @@ public:
 	void GenProductionsHeader();
 	void InitSets();
 	void OpenGen(const wchar_t* genName, bool backUp);
-	void WriteParser ();
-	void WriteStatistics ();
+	void WriteParser();
+	void WriteStatistics();
 
 	ParserGen (Parser *parser);
 

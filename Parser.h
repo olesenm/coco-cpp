@@ -104,15 +104,9 @@ public:
 	Token *t;                   //!< last recognized token
 	Token *la;                  //!< lookahead token
 
-int id;
+private:
+	int id;
 	int str;
-
-	FILE* trace;            //<! other Coco objects referenced in this ATG
-	Tab *tab;
-	DFA *dfa;
-	ParserGen *pgen;
-
-	bool genScanner;
 	wchar_t* tokenString;   //!< used in declarations of literal tokens
 	wchar_t* noString;      //!< used in declarations of literal tokens
 
@@ -122,6 +116,13 @@ int id;
 		tokenString = NULL;
 		noString = coco_string_create(L"-none-");
 	}
+
+public:
+	FILE* trace;           //!< trace file
+	Tab *tab;              //!< other Coco objects referenced in this ATG
+	DFA *dfa;
+	ParserGen *pgen;
+	bool genScanner;
 
 /*-------------------------------------------------------------------------*/
 

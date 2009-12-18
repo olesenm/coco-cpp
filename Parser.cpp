@@ -1,5 +1,5 @@
 
-/*----------------------------------------------------------------------
+/*-------------------------------*- C++ -*---------------------------------
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -896,6 +896,10 @@ void Errors::Exception(const wchar_t* msg) {
 	::exit(1);
 }
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 } // namespace
 
 
+// ************************************************************************* //

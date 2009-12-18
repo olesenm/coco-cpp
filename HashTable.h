@@ -36,7 +36,7 @@ namespace Coco {
 /*---------------------------------------------------------------------------*\
                        Class DictionaryEntry Declaration
 \*---------------------------------------------------------------------------*/
-
+//! An entry for the HashTable
 class DictionaryEntry {
 public:
 	wchar_t *key;
@@ -47,6 +47,7 @@ public:
 /*---------------------------------------------------------------------------*\
                           Class Iterator Declaration
 \*---------------------------------------------------------------------------*/
+//! An iterator for the HashTable
 class Iterator {
 public:
 	virtual bool HasNext() = 0;
@@ -58,6 +59,7 @@ public:
 /*---------------------------------------------------------------------------*\
                           Class HashTable Declaration
 \*---------------------------------------------------------------------------*/
+//! A simple HashTable implementation
 class HashTable
 {
 public:

@@ -174,7 +174,7 @@ public:
 	Token *next;    //!< Peek tokens are kept in linked list
 
 	Token();        //!< Construct null
-	~Token();       //!< Destructor - cleanup allocated val
+	~Token();       //!< Destructor - cleanup allocated val??
 };
 
 
@@ -199,18 +199,28 @@ private:
 	int ReadNextStreamChunk();
 	bool CanSeek();     //!< true if stream can be seeked otherwise false
 
+protected:
+	Buffer(Buffer*);    //!< for the UTF8Buffer
+
 public:
 	static const int EoF = COCO_WCHAR_MAX + 1;
 
+	//! Attach buffer to a stdio stream.
+	//! User streams are not closed in the destructor
 	Buffer(FILE*, bool isUserStream);
+
+	//! Copy buffer contents from constant character string
 	Buffer(const unsigned char* buf, int len);
+	//! Copy buffer contents from constant character string
 	Buffer(const char* buf, int len);
-	Buffer(Buffer*);
+
+	//! Close stream (but not user streams) and free buf (if any)
 	virtual ~Buffer();
 
-	virtual void Close();
-	virtual int Read();
-	virtual int Peek();
+	virtual void Close();   //!< Close stream (but not user streams)
+	virtual int Read();     //!< Get character from stream or buffer
+	virtual int Peek();     //!< Peek character from stream or buffer
+
 	virtual wchar_t* GetString(int beg, int end);
 	virtual int GetPos();
 	virtual void SetPos(int value);
@@ -376,7 +386,7 @@ private:
 	Token* NextToken();  //!< get the next token
 
 public:
-	//! scanner buffer
+	//! The scanner buffer
 	Buffer *buffer;
 
 	//! Attach scanner to an existing character buffer
@@ -387,7 +397,7 @@ public:
 	Scanner(const wchar_t* fileName);
 	//! Using an existing open file handle for the scanner
 	Scanner(FILE* s);
-	~Scanner();
+	~Scanner();        //!< free heap and allocated memory
 	Token* Scan();     //!< get the next token (possibly a token already seen during peeking)
 	Token* Peek();     //!< peek for the next token, ignore pragmas
 	void ResetPeek();  //!< make sure that peeking starts at the current scan position

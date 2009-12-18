@@ -1,5 +1,5 @@
 
-/*-------------------------------------------------------------------------
+/*-------------------------------*- C++ -*---------------------------------
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -284,6 +284,8 @@ Token::Token()
 {}
 
 
+// Note: this delete may not be correct if the token was actually
+// allocated by the internal heap mechanism
 Token::~Token() {
 	coco_string_delete(val);
 }
@@ -315,8 +317,8 @@ Buffer::Buffer(FILE* s, bool isUserStream) {
 
 Buffer::Buffer(Buffer* b) {
 	buf = b->buf;
-	bufCapacity = b->bufCapacity;
 	b->buf = NULL;
+	bufCapacity = b->bufCapacity;
 	bufStart = b->bufStart;
 	bufLen = b->bufLen;
 	fileLen = b->fileLen;
@@ -359,7 +361,7 @@ Buffer::~Buffer() {
 
 
 void Buffer::Close() {
-	if (!isUserStream && stream != NULL) {
+	if (stream != NULL && !isUserStream) {
 		fclose(stream);
 		stream = NULL;
 	}
@@ -924,6 +926,9 @@ void Scanner::ResetPeek() {
 }
 
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 } // namespace
 
 
+// ************************************************************************* //

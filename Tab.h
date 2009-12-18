@@ -53,7 +53,7 @@ class BitArray;
 /*---------------------------------------------------------------------------*\
                              Class Tab Declaration
 \*---------------------------------------------------------------------------*/
-
+//! Symbol Table Management
 class Tab {
 public:
 	//! String representations for the node types (in Node class)

@@ -539,11 +539,10 @@ Scanner::~Scanner() {
 
 
 void Scanner::Init() {
-	int i;
-	for (i = 65; i <= 90; ++i) start.set(i, 1);
-	for (i = 95; i <= 95; ++i) start.set(i, 1);
-	for (i = 97; i <= 122; ++i) start.set(i, 1);
-	for (i = 48; i <= 57; ++i) start.set(i, 2);
+	for (int i = 65; i <= 90; ++i) start.set(i, 1);
+	for (int i = 95; i <= 95; ++i) start.set(i, 1);
+	for (int i = 97; i <= 122; ++i) start.set(i, 1);
+	for (int i = 48; i <= 57; ++i) start.set(i, 2);
 	start.set(34, 11);
 	start.set(39, 5);
 	start.set(36, 10);
@@ -560,7 +559,8 @@ void Scanner::Init() {
 	start.set(93, 23);
 	start.set(123, 24);
 	start.set(125, 25);
-		start.set(Buffer::EoF, -1);
+	start.set(Buffer::EoF, -1);
+
 	keywords.set(L"COMPILER", 6);
 	keywords.set(L"IGNORECASE", 7);
 	keywords.set(L"CHARACTERS", 8);
@@ -696,9 +696,9 @@ bool Scanner::Comment1() {
 
 
 void Scanner::CreateHeapBlock() {
-	void* newHeap;
 	char* cur = (char*) firstHeap;
 
+	// release unused blocks
 	while (((char*) tokens < cur) || ((char*) tokens > (cur + HEAP_BLOCK_SIZE))) {
 		cur = *((char**) (cur + HEAP_BLOCK_SIZE));
 		free(firstHeap);
@@ -706,7 +706,7 @@ void Scanner::CreateHeapBlock() {
 	}
 
 	// HEAP_BLOCK_SIZE byte heap + pointer to next heap block
-	newHeap = malloc(HEAP_BLOCK_SIZE + sizeof(void*));
+	void* newHeap = malloc(HEAP_BLOCK_SIZE + sizeof(void*));
 	*heapEnd = newHeap;
 	heapEnd = (void**) (((char*) newHeap) + HEAP_BLOCK_SIZE);
 	*heapEnd = 0;
@@ -716,13 +716,14 @@ void Scanner::CreateHeapBlock() {
 
 
 Token* Scanner::CreateToken() {
-	Token *t;
 	if (((char*) heapTop + (int) sizeof(Token)) >= (char*) heapEnd) {
 		CreateHeapBlock();
 	}
-	t = (Token*) heapTop;
+	// token 'occupies' heap starting at heapTop
+	Token *t = (Token*) heapTop;
+	// mark this part of heap as being used
 	heapTop = (void*) ((char*) heapTop + sizeof(Token));
-	t->val = NULL;
+	t->val  = NULL;
 	t->next = NULL;
 	return t;
 }
@@ -737,7 +738,10 @@ void Scanner::AppendVal(Token *t) {
 		}
 		CreateHeapBlock();
 	}
+
+	// add text value from heap
 	t->val = (wchar_t*) heapTop;
+	// mark this part of heap as being used
 	heapTop = (void*) ((char*) heapTop + reqMem);
 
 	wcsncpy(t->val, tval, tlen);

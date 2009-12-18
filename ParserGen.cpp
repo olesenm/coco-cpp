@@ -42,7 +42,7 @@ namespace Coco {
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void ParserGen::Indent(int n) {
-	for (int i = 0; i < n; ++i) fwprintf(gen, L"\t");
+	for (int i=0; i < n; ++i) fwprintf(gen, L"\t");
 }
 
 // AW: use a switch if more than 5 alternatives and none starts with a resolver
@@ -320,7 +320,7 @@ void ParserGen::GenProductions() {
 void ParserGen::InitSets() {
 	fwprintf(gen, L"\tstatic bool set[%d][%d] = {\n", symSet->Count, tab->terminals->Count+1);
 
-	for (int i = 0; i < symSet->Count; i++) {
+	for (int i=0; i < symSet->Count; i++) {
 		BitArray *s = (BitArray*)(*symSet)[i];
 		fwprintf(gen, L"\t\t{");
 		int j = 0;

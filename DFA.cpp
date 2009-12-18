@@ -693,7 +693,6 @@ void DFA::WriteState(State *state) {
 }
 
 void DFA::WriteStartTab() {
-	bool firstRange = true;
 	for (Action *action = firstState->firstAction; action; action = action->next) {
 		int targetState = action->target->state->nr;
 		if (action->typ == Node::chr) {
@@ -701,15 +700,11 @@ void DFA::WriteStartTab() {
 		} else {
 			CharSet *s = tab->CharClassSet(action->sym);
 			for (CharSet::Range *r = s->head; r; r = r->next) {
-				if (firstRange) {
-					firstRange = false;
-					fwprintf(gen, L"\tint i;\n");
-				}
-				fwprintf(gen, L"\tfor (i = %d; i <= %d; ++i) start.set(i, %d);\n", r->from, r->to, targetState);
+				fwprintf(gen, L"\tfor (int i = %d; i <= %d; ++i) start.set(i, %d);\n", r->from, r->to, targetState);
 			}
 		}
 	}
-	fwprintf(gen, L"\t\tstart.set(Buffer::EoF, -1);\n");
+	fwprintf(gen, L"\tstart.set(Buffer::EoF, -1);\n\n");
 }
 
 void DFA::OpenGen(const wchar_t *genName, bool backUp) { /* pdt */
@@ -780,11 +775,11 @@ void DFA::WriteScanner() {
 	if (ignoreCase) {
 		fwprintf(gen, L"\twchar_t valCh;       // current input character (for token.val)\n");
 	}
+
 	CopyFramePart(L"-->commentsheader");
-	Comment *com = firstComment; i = 0;
-	while (com != NULL) {
+	Comment *com = firstComment;
+	for (i=0; com; com = com->next, ++i) {
 		GenCommentHeader(com, i);
-		com = com->next; i++;
 	}
 
 	CopyFramePart(L"-->namespace_close");
@@ -825,10 +820,9 @@ void DFA::WriteScanner() {
 	if (ignoreCase) fwprintf(gen, L"valCh;"); else fwprintf(gen, L"ch;");
 
 	CopyFramePart(L"-->comments");
-	com = firstComment; i = 0;
-	while (com != NULL) {
+	com = firstComment;
+	for (i=0; com; com = com->next, ++i) {
 		GenComment(com, i);
-		com = com->next; i++;
 	}
 
 	CopyFramePart(L"-->scan1");
@@ -836,17 +830,16 @@ void DFA::WriteScanner() {
 	if (tab->ignored->Elements() > 0) { PutRange(tab->ignored); } else { fwprintf(gen, L"false"); }
 
 	CopyFramePart(L"-->scan2");
-	if (firstComment != NULL) {
+	if (firstComment) {
 		fwprintf(gen, L"\tif (");
-		com = firstComment; i = 0;
-		while (com != NULL) {
+		com = firstComment;
+		for (i=0; com; com = com->next, ++i) {
 			wchar_t* res = ChCond(com->start[0]);
 			fwprintf(gen, L"(%ls && Comment%d())", res, i);
 			delete [] res;
 			if (com->next != NULL) {
 				fwprintf(gen, L" || ");
 			}
-			com = com->next; i++;
 		}
 		fwprintf(gen, L") return NextToken();");
 	}
@@ -873,9 +866,12 @@ DFA::DFA(Parser *parser) {
 	tab = parser->tab;
 	errors = parser->errors;
 	trace = parser->trace;
-	firstState = NULL; lastState = NULL; lastStateNr = -1;
+	firstState = NULL;
+	lastState = NULL;
+	lastStateNr = -1;
 	firstState = NewState();
-	firstMelted = NULL; firstComment = NULL;
+	firstMelted = NULL;
+	firstComment = NULL;
 	ignoreCase = false;
 	dirtyDFA = false;
 	hasCtxMoves = false;

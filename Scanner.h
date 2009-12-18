@@ -51,10 +51,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #define coco_swprintf swprintf
 #endif
 
+
 #define COCO_WCHAR_MAX    65535
-#define MIN_BUFFER_LENGTH 1024
-#define MAX_BUFFER_LENGTH (64*MIN_BUFFER_LENGTH)
-#define HEAP_BLOCK_SIZE   (64*1024)
 
 
 namespace Coco {
@@ -347,7 +345,6 @@ private:
 	void *heapTop;    //!< the top of the heap
 	void **heapEnd;   //!< the end of the last heap block
 
-	int charSetSize;  //!< unused?
 	StartStates start;   //!< A map of start states for particular characters
 	KeywordMap keywords; //!< A hash of keyword literals to token kind
 

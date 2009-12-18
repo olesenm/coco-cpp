@@ -32,6 +32,13 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include <string.h>
 #include "Scanner.h"
 
+// values for the file stream buffering
+#define MIN_BUFFER_LENGTH 1024        // 1KB
+#define MAX_BUFFER_LENGTH (64*MIN_BUFFER_LENGTH)   // 64KB
+// value for the heap management
+#define HEAP_BLOCK_SIZE   (64*1024)   // 64KB
+
+
 namespace Coco {
 
 

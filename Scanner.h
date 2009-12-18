@@ -71,12 +71,6 @@ wchar_t* coco_string_create(const wchar_t* str);
 //! Create a substring of str starting at index and length characters long
 wchar_t* coco_string_create(const wchar_t* str, int index, int length);
 
-//! Create an uppercase string from str
-wchar_t* coco_string_create_upper(const wchar_t* str);
-
-//! Create an uppercase substring from str starting at index and length characters long
-wchar_t* coco_string_create_upper(const wchar_t* str, int index, int length);
-
 //! Create a lowercase string from str
 wchar_t* coco_string_create_lower(const wchar_t* str);
 

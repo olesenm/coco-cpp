@@ -69,29 +69,6 @@ wchar_t* coco_string_create(const wchar_t* str, int index, int length) {
 	return dest;
 }
 
-wchar_t* coco_string_create_upper(const wchar_t* str) {
-	if (!str) { return NULL; }
-	return coco_string_create_upper(str, 0, wcslen(str));
-}
-
-
-wchar_t* coco_string_create_upper(const wchar_t* str, int index, int len) {
-	if (!str) { return NULL; }
-	wchar_t* dest = new wchar_t[len + 1];
-
-	for (int i = 0; i < len; i++) {
-		const wchar_t ch = str[index + i];
-		if ((L'a' <= ch) && (ch <= L'z')) {
-			dest[i] = ch + (L'A' - L'a');
-		}
-		else {
-			dest[i] = ch;
-		}
-	}
-	dest[len] = L'\0';
-	return dest;
-}
-
 
 wchar_t* coco_string_create_lower(const wchar_t* str) {
 	if (!str) { return NULL; }

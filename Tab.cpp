@@ -1212,21 +1212,21 @@ void Tab::XRef() {
 }
 
 void Tab::SetDDT(const wchar_t* s) {
-	wchar_t* st = coco_string_create_upper(s);
+	wchar_t* st = coco_string_create_lower(s);
 	wchar_t ch;
 	int len = coco_string_length(st);
 	for (int i = 0; i < len; i++) {
 		ch = st[i];
 		if (L'0' <= ch && ch <= L'9') ddt[ch - L'0'] = true;
 		else switch (ch) {
-			case L'A' : ddt[0] = true; break; // trace automaton
-			case L'F' : ddt[1] = true; break; // list first/follow sets
-			case L'G' : ddt[2] = true; break; // print syntax graph
-			case L'I' : ddt[3] = true; break; // trace computation of first sets
-			case L'J' : ddt[4] = true; break; // print ANY and SYNC sets
-			case L'P' : ddt[8] = true; break; // print statistics
-			case L'S' : ddt[6] = true; break; // list symbol table
-			case L'X' : ddt[7] = true; break; // list cross reference table
+			case L'a' : ddt[0] = true; break; // trace automaton
+			case L'f' : ddt[1] = true; break; // list first/follow sets
+			case L'g' : ddt[2] = true; break; // print syntax graph
+			case L'i' : ddt[3] = true; break; // trace computation of first sets
+			case L'j' : ddt[4] = true; break; // print ANY and SYNC sets
+			case L'p' : ddt[8] = true; break; // print statistics
+			case L's' : ddt[6] = true; break; // list symbol table
+			case L'x' : ddt[7] = true; break; // list cross reference table
 			default : break;
 		}
 	}

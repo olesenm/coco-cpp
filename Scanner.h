@@ -230,7 +230,7 @@ public:
 //------------------------------------------------------------------------------
 // StartStates
 //------------------------------------------------------------------------------
-//! maps characters to start states of tokens
+//! maps characters (integers) to start states of tokens
 class StartStates {
 private:
 	class Elem {
@@ -320,8 +320,9 @@ public:
 
 	void set(const wchar_t *key, int val) {
 		Elem *e = new Elem(key, val);
-		int k = coco_string_hash(key) % 128;
-		e->next = tab[k]; tab[k] = e;
+		const int k = coco_string_hash(key) % 128;
+		e->next = tab[k];
+		tab[k] = e;
 	}
 
 	int get(const wchar_t *key, int defaultVal) {
@@ -341,19 +342,19 @@ private:
 	static const int eofSym = 0;             // end-of-file token id
 	static const unsigned char EOL = '\n';   // end-of-line character
 
-	void *firstHeap;
-	void *heap;
-	void *heapTop;
-	void **heapEnd;
+	void *firstHeap;  //!< the start of the heap management
+	void *heap;       //!< the currently active block
+	void *heapTop;    //!< the top of the heap
+	void **heapEnd;   //!< the end of the last heap block
 
 	int charSetSize;  //!< unused?
-	StartStates start;
-	KeywordMap keywords;
+	StartStates start;   //!< A map of start states for particular characters
+	KeywordMap keywords; //!< A hash of keyword literals to token kind
 
 	Token *t;         //!< current token
 	wchar_t *tval;    //!< text of current token
-	int tvalLength;   //!< length of text of current token
-	int tlen;         //!< length of current token
+	int tvalLength;   //!< maximum capacity (length) for tval
+	int tlen;         //!< length of tval
 
 	Token *tokens;    //!< list of tokens already peeked (first token is a dummy)
 	Token *pt;        //!< current peek token
@@ -365,17 +366,17 @@ private:
 	int col;          //!< column number of current character
 	int oldEols;      //!< EOLs that appeared in a comment;
 
-	void CreateHeapBlock();
-	Token* CreateToken();
-	void AppendVal(Token*);
+	void CreateHeapBlock();       //!< add a heap block, freeing unused ones
+	Token* CreateToken();         //!< fit token on the heap
+	void AppendVal(Token* tok);   //!< adjust tok->val to point to the heap and copy tval into it
 
 	void Init();      //!< complete the initialization for the constructors
-	void NextCh();
-	void AddCh();
+	void NextCh();    //!< get the next input character into ch
+	void AddCh();     //!< append the character ch to tval
 	bool Comment0();
 	bool Comment1();
 
-	Token* NextToken();
+	Token* NextToken();  //!< get the next token
 
 public:
 	//! scanner buffer
@@ -390,9 +391,9 @@ public:
 	//! Using an existing open file handle for the scanner
 	Scanner(FILE* s);
 	~Scanner();
-	Token* Scan();
-	Token* Peek();
-	void ResetPeek();
+	Token* Scan();     //!< get the next token (possibly a token already seen during peeking)
+	Token* Peek();     //!< peek for the next token, ignore pragmas
+	void ResetPeek();  //!< make sure that peeking starts at the current scan position
 
 }; // end Scanner
 

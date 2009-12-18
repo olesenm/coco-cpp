@@ -766,6 +766,7 @@ void Scanner::AppendVal(Token* tok) {
 		reinterpret_cast<void*>
 		(reinterpret_cast<char*>(heapTop) + reqMem);
 
+	// copy the currently parsed tval into the token
 	wcsncpy(tok->val, tval, tlen);
 	tok->val[tlen] = L'\0';
 }

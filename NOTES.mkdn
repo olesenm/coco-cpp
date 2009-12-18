@@ -1,0 +1,94 @@
+### Miscellaneous Implementation Notes
+
+---------------
+
+#### Scanner memory allocation
+
+To avoid repeated allocation/deallocation for each token, an internal
+heap management is used. The memory for the tokens and their contents
+are allocation from the internal heap.
+
+Each memory block is allocated with an addressable size plus extra space
+at the end to contain a pointer to the next memory block.
+
+Layout:
+
+    block0
+    +-----------------------------------------------------------------+------+
+    |  addressable block size                                         | next |
+    +-----------------------------------------------------------------+------+
+
+The memory heap can be destroyed by walking through the linked memory
+blocks.
+
+When a new object (eg, a new token) is needed, it checks if the object
+will fit in the remaining addressable space. If needed, a new memory
+block is allocated and linked to the end of the current block. The
+memory for a new object taken from the current position of the *heap
+top*, which is subsequently incremented by the sizeof the object (to
+where the next free place will be).
+
+
+There are only two methods that get their memory from the internal heap:
+
+1. CreateToken() : return a Token pointer to the next available space
+   on the heap. The Token *val* and *next* pointers are set to NULL.
+
+2. AppendVal(Token* tok) : adjusts tok->val to point to the heap and
+   copy tval into it.
+
+
+Since both methods are always called together - eg, in the NextToken()
+method - the heap allocatation will generally be contiguous. The only
+execption to this rule is the initial (dummy) token. For this one, no
+AppendVal() is used, so its *val* will continue to point to NULL.
+
+With several tokens on the heap, this is how the heap looks.
+
+    firstHeap -> block0
+    +-----------------------------------------------------------------+------+
+    |tok0tok<valtoken>tok<valtoken>tok<valtoken>xxxxxxxxxxxxxxxxxxxxxx| next |
+    +-------------------------------------------^TOP------------------+------+
+
+where the *tok0* token is the only one without a value. The 'x' represents
+the unused heap above the ^TOP marker. After more tokens have been seen, the
+heap might resemble this:
+
+    firstHeap -> block0
+    +-----------------------------------------------------------------+------+
+    |tok0tok<valtoken>tok<valtoken>tok<valtoken>tok<valtoken>tokxxxxxx| next |
+    +-----------------------------------------------------------------+------+
+    block1
+    +-----------------------------------------------------------------+------+
+    |<valtoken>tok<valtoken>tok<valtoken>tok<valtoken>tok<valtoken>tok| next |
+    +-----------------------^tokens-----------------------------------+------+
+    block2
+    +-----------------------------------------------------------------+------+
+    |<valtoken>tok<valtoken>tok<valtoken>tok<valtoken>xxxxxxxxxxxxxxxx| next |
+    +-------------------------------------------------^TOP------------+------+
+
+The Scanner member *tokens*, which is set in the Scan() method, always points
+to the current input position on the tokens list. When the next large token
+value comes that cannot fit on the remaining heap, the CreateHeapBlock()
+method is called. In this case, it can free any memory blocks that don't have
+memory addresses corresponding to *tokens*. And then allocate a new block
+which as chained on to the end of the block corresponding to the TOP.
+For example,
+
+    firstHeap -> block1 and free block0
+    +-----------------------------------------------------------------+------+
+    |<valtoken>tok<valtoken>tok<valtoken>tok<valtoken>tok<valtoken>tok| next |
+    +-----------------------^tokens-----------------------------------+------+
+    block2
+    +-----------------------------------------------------------------+------+
+    |<valtoken>tok<valtoken>tok<valtoken>tok<valtoken>xxxxxxxxxxxxxxxx| next |
+    +-----------------------------------------------------------------+------+
+    block3
+    +-----------------------------------------------------------------+------+
+    |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx| next |
+    +^TOP-------------------------------------------------------------+------+
+
+
+A further optimization would be possible if the old memory block were simply
+reused instead of freed.
+

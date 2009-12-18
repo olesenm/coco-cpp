@@ -42,8 +42,20 @@ done
 
 echo "compile Coco executable"
 echo "~~~~~~~~~~~~~~~~~~~~~~~"
-set -x
+echo "g++ *.cpp -o Coco -g -Wall $warn"
+echo
 
 g++ *.cpp -o Coco -g -Wall $warn
+
+if [ $? -eq 0 ]
+then
+    echo
+    echo "done"
+    echo
+else
+    echo
+    echo "errors detected in compilation"
+    echo
+fi
 
 # ----------------------------------------------------------------- end-of-file

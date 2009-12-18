@@ -526,10 +526,10 @@ Scanner::Scanner(FILE* s) {
 
 
 Scanner::~Scanner() {
-	char* cur = (char*) firstHeap;
+	char* cur = reinterpret_cast<char*>(firstHeap);
 
 	while (cur != NULL) {
-		cur = *(char**) (cur + HEAP_BLOCK_SIZE);
+		cur = *(reinterpret_cast<char**>(cur + HEAP_BLOCK_SIZE));
 		free(firstHeap);
 		firstHeap = cur;
 	}
@@ -586,7 +586,9 @@ void Scanner::Init() {
 	// HEAP_BLOCK_SIZE byte heap + pointer to next heap block
 	heap = malloc(HEAP_BLOCK_SIZE + sizeof(void*));
 	firstHeap = heap;
-	heapEnd = (void**) (((char*) heap) + HEAP_BLOCK_SIZE);
+	heapEnd =
+		reinterpret_cast<void**>
+		(reinterpret_cast<char*>(heap) + HEAP_BLOCK_SIZE);
 	*heapEnd = 0;
 	heapTop = heap;
 	if (sizeof(Token) > HEAP_BLOCK_SIZE) {
@@ -696,11 +698,15 @@ bool Scanner::Comment1() {
 
 
 void Scanner::CreateHeapBlock() {
-	char* cur = (char*) firstHeap;
+	char* cur = reinterpret_cast<char*>(firstHeap);
 
 	// release unused blocks
-	while (((char*) tokens < cur) || ((char*) tokens > (cur + HEAP_BLOCK_SIZE))) {
-		cur = *((char**) (cur + HEAP_BLOCK_SIZE));
+	while
+	(
+            (reinterpret_cast<char*>(tokens) < cur)
+         || (reinterpret_cast<char*>(tokens) > (cur + HEAP_BLOCK_SIZE))
+        ) {
+		cur = *(reinterpret_cast<char**>(cur + HEAP_BLOCK_SIZE));
 		free(firstHeap);
 		firstHeap = cur;
 	}
@@ -708,7 +714,9 @@ void Scanner::CreateHeapBlock() {
 	// HEAP_BLOCK_SIZE byte heap + pointer to next heap block
 	void* newHeap = malloc(HEAP_BLOCK_SIZE + sizeof(void*));
 	*heapEnd = newHeap;
-	heapEnd = (void**) (((char*) newHeap) + HEAP_BLOCK_SIZE);
+	heapEnd =
+		reinterpret_cast<void**>
+		(reinterpret_cast<char*>(newHeap) + HEAP_BLOCK_SIZE);
 	*heapEnd = 0;
 	heap = newHeap;
 	heapTop = heap;
@@ -716,22 +724,33 @@ void Scanner::CreateHeapBlock() {
 
 
 Token* Scanner::CreateToken() {
-	if (((char*) heapTop + (int) sizeof(Token)) >= (char*) heapEnd) {
+	const int reqMem = sizeof(Token);
+	if
+	(
+	    (reinterpret_cast<char*>(heapTop) + reqMem)
+	 >= reinterpret_cast<char*>(heapEnd)
+	) {
 		CreateHeapBlock();
 	}
 	// token 'occupies' heap starting at heapTop
-	Token *t = (Token*) heapTop;
-	// mark this part of heap as being used
-	heapTop = (void*) ((char*) heapTop + sizeof(Token));
-	t->val  = NULL;
-	t->next = NULL;
-	return t;
+	Token* tok = reinterpret_cast<Token*>(heapTop);
+	// increment past this part of the heap, which is now used
+	heapTop =
+		reinterpret_cast<void*>
+		(reinterpret_cast<char*>(heapTop) + reqMem);
+	tok->val  = NULL;
+	tok->next = NULL;
+	return tok;
 }
 
 
-void Scanner::AppendVal(Token *t) {
-	int reqMem = (tlen + 1) * sizeof(wchar_t);
-	if (((char*) heapTop + reqMem) >= (char*) heapEnd) {
+void Scanner::AppendVal(Token* tok) {
+	const int reqMem = (tlen + 1) * sizeof(wchar_t);
+	if
+	(
+	    (reinterpret_cast<char*>(heapTop) + reqMem)
+	 >= reinterpret_cast<char*>(heapEnd)
+	) {
 		if (reqMem > HEAP_BLOCK_SIZE) {
 			wprintf(L"--- Too long token value\n");
 			::exit(1);
@@ -740,12 +759,15 @@ void Scanner::AppendVal(Token *t) {
 	}
 
 	// add text value from heap
-	t->val = (wchar_t*) heapTop;
-	// mark this part of heap as being used
-	heapTop = (void*) ((char*) heapTop + reqMem);
+	tok->val = reinterpret_cast<wchar_t*>(heapTop);
 
-	wcsncpy(t->val, tval, tlen);
-	t->val[tlen] = L'\0';
+	// increment past this part of the heap, which is now used
+	heapTop =
+		reinterpret_cast<void*>
+		(reinterpret_cast<char*>(heapTop) + reqMem);
+
+	wcsncpy(tok->val, tval, tlen);
+	tok->val[tlen] = L'\0';
 }
 
 

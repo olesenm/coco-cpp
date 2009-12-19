@@ -183,15 +183,15 @@ class Buffer {
 private:
 	unsigned char *buf; //!< input buffer
 	int bufCapacity;    //!< capacity of buf
-	int bufStart;       //!< position of first byte in buffer relative to input stream
 	int bufLen;         //!< length of buffer
-	int fileLen;        //!< length of input stream (may change if the stream is no file)
 	int bufPos;         //!< current position in buffer
+	int bufStart;       //!< position of first byte in buffer relative to input stream
+	int fileLen;        //!< length of input stream (may change if the stream is no file)
 	FILE* stream;       //!< input stream (seekable)
 	bool isUserStream;  //!< was the stream opened by the user?
 
 	int ReadNextStreamChunk();
-	bool CanSeek();     //!< true if stream can be seeked otherwise false
+	bool CanSeek() const; //!< true if stream can be seeked otherwise false
 
 protected:
 	Buffer(Buffer*);    //!< for the UTF8Buffer
@@ -201,7 +201,7 @@ public:
 
 	//! Attach buffer to a stdio stream.
 	//! User streams are not closed in the destructor
-	Buffer(FILE*, bool isUserStream);
+	Buffer(FILE*, bool isUserStream = true);
 
 	//! Copy buffer contents from constant character string
 	Buffer(const unsigned char* buf, int len);
@@ -215,8 +215,7 @@ public:
 	virtual int Read();     //!< Get character from stream or buffer
 	virtual int Peek();     //!< Peek character from stream or buffer
 
-	virtual wchar_t* GetString(int beg, int end);
-	virtual int GetPos();
+	virtual int GetPos() const;
 	virtual void SetPos(int value);
 };
 
@@ -341,8 +340,8 @@ private:
 	static const int maxT = 41;
 	static const int noSym = 41;
 
-	static const int eofSym = 0;             // end-of-file token id
-	static const unsigned char EOL = '\n';   // end-of-line character
+	static const int eofSym = 0;    //!< end-of-file token id
+	static const char EOL = '\n';   //!< end-of-line character
 
 	void *firstHeap;  //!< the start of the heap management
 	void *heap;       //!< the currently active block
@@ -365,7 +364,7 @@ private:
 	int pos;          //!< byte position of current character
 	int line;         //!< line number of current character
 	int col;          //!< column number of current character
-	int oldEols;      //!< EOLs that appeared in a comment;
+	int oldEols;      //!< the number of EOLs that appeared in a comment
 
 	void CreateHeapBlock();       //!< add a heap block, freeing unused ones
 	Token* CreateToken();         //!< fit token on the heap

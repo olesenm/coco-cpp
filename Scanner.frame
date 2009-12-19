@@ -182,15 +182,15 @@ class Buffer {
 private:
 	unsigned char *buf; //!< input buffer
 	int bufCapacity;    //!< capacity of buf
-	int bufStart;       //!< position of first byte in buffer relative to input stream
 	int bufLen;         //!< length of buffer
-	int fileLen;        //!< length of input stream (may change if the stream is no file)
 	int bufPos;         //!< current position in buffer
+	int bufStart;       //!< position of first byte in buffer relative to input stream
+	int fileLen;        //!< length of input stream (may change if the stream is no file)
 	FILE* stream;       //!< input stream (seekable)
 	bool isUserStream;  //!< was the stream opened by the user?
 
 	int ReadNextStreamChunk();
-	bool CanSeek();     //!< true if stream can be seeked otherwise false
+	bool CanSeek() const; //!< true if stream can be seeked otherwise false
 
 protected:
 	Buffer(Buffer*);    //!< for the UTF8Buffer
@@ -200,7 +200,7 @@ public:
 
 	//! Attach buffer to a stdio stream.
 	//! User streams are not closed in the destructor
-	Buffer(FILE*, bool isUserStream);
+	Buffer(FILE*, bool isUserStream = true);
 
 	//! Copy buffer contents from constant character string
 	Buffer(const unsigned char* buf, int len);
@@ -214,8 +214,7 @@ public:
 	virtual int Read();     //!< Get character from stream or buffer
 	virtual int Peek();     //!< Peek character from stream or buffer
 
-	virtual wchar_t* GetString(int beg, int end);
-	virtual int GetPos();
+	virtual int GetPos() const;
 	virtual void SetPos(int value);
 };
 
@@ -338,8 +337,8 @@ public:
 class Scanner {
 private:
 -->constantsheader
-	static const int eofSym = 0;             // end-of-file token id
-	static const unsigned char EOL = '\n';   // end-of-line character
+	static const int eofSym = 0;    //!< end-of-file token id
+	static const char EOL = '\n';   //!< end-of-line character
 
 	void *firstHeap;  //!< the start of the heap management
 	void *heap;       //!< the currently active block
@@ -362,7 +361,7 @@ private:
 	int pos;          //!< byte position of current character
 	int line;         //!< line number of current character
 	int col;          //!< column number of current character
-	int oldEols;      //!< EOLs that appeared in a comment;
+	int oldEols;      //!< the number of EOLs that appeared in a comment
 
 	void CreateHeapBlock();       //!< add a heap block, freeing unused ones
 	Token* CreateToken();         //!< fit token on the heap
@@ -706,7 +705,7 @@ Buffer::Buffer(Buffer* b) {
 
 Buffer::Buffer(const unsigned char* buf, int len) {
 	this->buf = new unsigned char[len];
-	memcpy(this->buf, buf, len*sizeof(unsigned char));
+	memcpy(this->buf, buf, len*sizeof(char));
 	bufStart = 0;
 	bufCapacity = bufLen = len;
 	fileLen = len;
@@ -717,7 +716,7 @@ Buffer::Buffer(const unsigned char* buf, int len) {
 
 Buffer::Buffer(const char* buf, int len) {
 	this->buf = new unsigned char[len];
-	memcpy(this->buf, buf, len*sizeof(unsigned char));
+	memcpy(this->buf, buf, len*sizeof(char));
 	bufStart = 0;
 	bufCapacity = bufLen = len;
 	fileLen = len;
@@ -757,95 +756,6 @@ int Buffer::Read() {
 }
 
 
-int Buffer::Peek() {
-	int curPos = GetPos();
-	int ch = Read();
-	SetPos(curPos);
-	return ch;
-}
-
-
-// Note: we could gain some efficiency here by writing directly
-// into the result
-wchar_t* Buffer::GetString(int beg, int end) {
-	int len = 0;
-	wchar_t *buf = new wchar_t[end - beg];
-	int oldPos = GetPos();
-	SetPos(beg);
-	while (GetPos() < end) {
-		buf[len++] = wchar_t(Read());
-	}
-	SetPos(oldPos);
-	wchar_t *res = coco_string_create(buf, 0, len);
-	coco_string_delete(buf);
-	return res;
-}
-
-
-int Buffer::GetPos() {
-	return bufPos + bufStart;
-}
-
-
-void Buffer::SetPos(int value) {
-	if ((value >= fileLen) && (stream != NULL) && !CanSeek()) {
-		// Wanted position is after buffer and the stream
-		// is not seek-able e.g. network or console,
-		// thus we have to read the stream manually till
-		// the wanted position is in sight.
-		while ((value >= fileLen) && (ReadNextStreamChunk() > 0))
-		{}
-	}
-
-	if ((value < 0) || (value > fileLen)) {
-		wprintf(L"--- buffer out of bounds access, position: %d\n", value);
-		::exit(1);
-	}
-
-	if ((value >= bufStart) && (value < (bufStart + bufLen))) { // already in buffer
-		bufPos = value - bufStart;
-	} else if (stream != NULL) { // must be swapped in
-		fseek(stream, value, SEEK_SET);
-		bufLen = fread(buf, sizeof(unsigned char), bufCapacity, stream);
-		bufStart = value; bufPos = 0;
-	} else {
-		bufPos = fileLen - bufStart; // make Pos return fileLen
-	}
-}
-
-
-// Read the next chunk of bytes from the stream, increases the buffer
-// if needed and updates the fields fileLen and bufLen.
-// Returns the number of bytes read.
-int Buffer::ReadNextStreamChunk() {
-	int freeLen = bufCapacity - bufLen;
-	if (freeLen == 0) {
-		// in the case of a growing input stream
-		// we can neither seek in the stream, nor can we
-		// foresee the maximum length, thus we must adapt
-		// the buffer size on demand.
-		bufCapacity = bufLen * 2;
-		unsigned char *newBuf = new unsigned char[bufCapacity];
-		memcpy(newBuf, buf, bufLen*sizeof(unsigned char));
-		delete [] buf;
-		buf = newBuf;
-		freeLen = bufLen;
-	}
-	int read = fread(buf + bufLen, sizeof(unsigned char), freeLen, stream);
-	if (read > 0) {
-		fileLen = bufLen = (bufLen + read);
-		return read;
-	}
-	// end of stream reached
-	return 0;
-}
-
-
-bool Buffer::CanSeek() {
-	return (stream != NULL) && (ftell(stream) != -1);
-}
-
-
 int UTF8Buffer::Read() {
 	int ch;
 	do {
@@ -875,6 +785,78 @@ int UTF8Buffer::Read() {
 		ch = (c1 << 6) | c2;
 	}
 	return ch;
+}
+
+
+int Buffer::Peek() {
+	int curPos = GetPos();
+	int ch = Read();
+	SetPos(curPos);
+	return ch;
+}
+
+
+int Buffer::GetPos() const {
+	return bufPos + bufStart;
+}
+
+
+void Buffer::SetPos(int value) {
+	if ((value >= fileLen) && (stream != NULL) && !CanSeek()) {
+		// Wanted position is after buffer and the stream
+		// is not seek-able e.g. network or console,
+		// thus we have to read the stream manually till
+		// the wanted position is in sight.
+		while ((value >= fileLen) && (ReadNextStreamChunk() > 0))
+		{}
+	}
+
+	if ((value < 0) || (value > fileLen)) {
+		wprintf(L"--- buffer out of bounds access, position: %d\n", value);
+		::exit(1);
+	}
+
+	if ((value >= bufStart) && (value < (bufStart + bufLen))) { // already in buffer
+		bufPos = value - bufStart;
+	} else if (stream != NULL) { // must be swapped in
+		fseek(stream, value, SEEK_SET);
+		bufLen = fread(buf, sizeof(char), bufCapacity, stream);
+		bufStart = value; bufPos = 0;
+	} else {
+		bufPos = fileLen - bufStart; // make Pos return fileLen
+	}
+}
+
+
+// Read the next chunk of bytes from the stream, increases the buffer
+// if needed and updates the fields fileLen and bufLen.
+// Returns the number of bytes read.
+int Buffer::ReadNextStreamChunk() {
+	int freeLen = bufCapacity - bufLen;
+	if (freeLen == 0) {
+		// in the case of a growing input stream
+		// we can neither seek in the stream, nor can we
+		// foresee the maximum length, thus we must adapt
+		// the buffer size on demand.
+		bufCapacity = bufLen * 2;
+		unsigned char *newBuf = new unsigned char[bufCapacity];
+		memcpy(newBuf, buf, bufLen*sizeof(char));
+		delete [] buf;
+		buf = newBuf;
+		freeLen = bufLen;
+	}
+	int read = fread(buf + bufLen, sizeof(char), freeLen, stream);
+	if (read > 0) {
+		fileLen = bufLen = (bufLen + read);
+		return read;
+	}
+	// end of stream reached
+	return 0;
+}
+
+
+bool Buffer::CanSeek() const {
+	return (stream != NULL) && (ftell(stream) != -1);
 }
 
 
@@ -912,7 +894,7 @@ Scanner::Scanner(FILE* istr) {
 Scanner::~Scanner() {
 	char* cur = reinterpret_cast<char*>(firstHeap);
 
-	while (cur != NULL) {
+	while (cur) {
 		cur = *(reinterpret_cast<char**>(cur + HEAP_BLOCK_SIZE));
 		free(firstHeap);
 		firstHeap = cur;

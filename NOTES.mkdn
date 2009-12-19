@@ -92,3 +92,32 @@ For example,
 A further optimization would be possible if the old memory block were simply
 reused instead of freed.
 
+---------------
+
+#### Stdio file buffering
+
+In many cases an entire file is scanned and parsed. In this case if
+can more efficient to avoid the stdio functions fseek() and ftell()
+for repositioning the FILE stream (eg, when peeking values) and instead use
+an internal buffer.
+
+This buffer is characterized by the following parameters:
+
+- bufCapacity : The maximum storage capacity of the input buffer
+- bufLen : the current addressable length of the input buffer
+- bufPos : the current position within the buffer
+- bufStart : the position of first byte in buffer relative to the input stream
+
+Smaller files can be read entirely into the internal buffer. For
+somewhat larger files (>64kB), the buffer is used to avoid multiple
+ftell() and fseek() calls. If the sought position is not currently
+covered by the internal buffer, the next chunk is fetched and
+*bufStart* reflects that position.
+
+Additionally, for some type of FILE streams (eg, sockets), the ftell()
+function may not work appropriately. In this case, the buffer is also
+necessary.
+
+Note that the current implementation may have problems dealing with
+previously opened FILE streams that don't start at position zero.
+

@@ -245,7 +245,7 @@ public:
 	//---------------------------------------------------------------------
 
 	void XRef();
-	void SetDDT(const wchar_t* s);
+	void SetDDT(const wchar_t* str);
 
 	//---------------------------------------------------------------------
 	//  Output file generation, common to DFA and ParserGen

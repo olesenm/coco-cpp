@@ -61,7 +61,7 @@ Tab::Tab(Parser *parser) {
 	nonterminals = new ArrayList();
 	nodes = new ArrayList();
 	dummyNode = NULL;
-	classes= new ArrayList();
+	classes = new ArrayList();
 	dummyName = 'A';
 
 	this->parser = parser;
@@ -1211,26 +1211,26 @@ void Tab::XRef() {
 	fwprintf(trace, L"\n\n");
 }
 
-void Tab::SetDDT(const wchar_t* s) {
-	wchar_t* st = coco_string_create_lower(s);
-	wchar_t ch;
-	int len = coco_string_length(st);
+
+void Tab::SetDDT(const wchar_t* str) {
+	const int len = coco_string_length(str);
 	for (int i = 0; i < len; i++) {
-		ch = st[i];
-		if (L'0' <= ch && ch <= L'9') ddt[ch - L'0'] = true;
+		char ch = str[i];
+		if ('0' <= ch && ch <= '9') {
+			ddt[ch - '0'] = true;
+		}
 		else switch (ch) {
-			case L'a' : ddt[0] = true; break; // trace automaton
-			case L'f' : ddt[1] = true; break; // list first/follow sets
-			case L'g' : ddt[2] = true; break; // print syntax graph
-			case L'i' : ddt[3] = true; break; // trace computation of first sets
-			case L'j' : ddt[4] = true; break; // print ANY and SYNC sets
-			case L'p' : ddt[8] = true; break; // print statistics
-			case L's' : ddt[6] = true; break; // list symbol table
-			case L'x' : ddt[7] = true; break; // list cross reference table
-			default : break;
+			case 'A': case 'a': ddt[0] = true; break; // trace automaton
+			case 'F': case 'f': ddt[1] = true; break; // list first/follow sets
+			case 'G': case 'g': ddt[2] = true; break; // print syntax graph
+			case 'I': case 'i': ddt[3] = true; break; // trace computation of first sets
+			case 'J': case 'j': ddt[4] = true; break; // print ANY and SYNC sets
+			case 'P': case 'p': ddt[8] = true; break; // print statistics
+			case 'S': case 's': ddt[6] = true; break; // list symbol table
+			case 'X': case 'x': ddt[7] = true; break; // list cross reference table
+			default: break;
 		}
 	}
-	coco_string_delete(st);
 }
 
 // * * * * * * * * * * * * *  Misc Output Methods  * * * * * * * * * * * * * //

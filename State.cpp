@@ -73,9 +73,8 @@ void State::DetachAction(Action *act) {
 
 
 void State::MeltWith(State *s) { // copy actions of s to state
-	Action *a;
-	for (Action *action = s->firstAction; action != NULL; action = action->next) {
-		a = new Action(action->typ, action->sym, action->tc);
+	for (Action *action = s->firstAction; action; action = action->next) {
+		Action *a = new Action(action->typ, action->sym, action->tc);
 		a->AddTargets(action);
 		AddAction(a);
 	}

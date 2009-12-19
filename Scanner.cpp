@@ -268,16 +268,16 @@ Token::~Token() {
 }
 
 
-Buffer::Buffer(FILE* s, bool isUserStream) {
+Buffer::Buffer(FILE* istr, bool isUserStream) {
 // ensure binary read on windows
 #if _MSC_VER >= 1300
-	_setmode(_fileno(s), _O_BINARY);
+	_setmode(_fileno(istr), _O_BINARY);
 #endif
-	stream = s; this->isUserStream = isUserStream;
+	stream = istr; this->isUserStream = isUserStream;
 	if (CanSeek()) {
-		fseek(s, 0, SEEK_END);
-		fileLen = ftell(s);
-		fseek(s, 0, SEEK_SET);
+		fseek(istr, 0, SEEK_END);
+		fileLen = ftell(istr);
+		fseek(istr, 0, SEEK_SET);
 		bufLen = (fileLen < MAX_BUFFER_LENGTH) ? fileLen : MAX_BUFFER_LENGTH;
 		bufStart = INT_MAX; // nothing in the buffer so far
 	}
@@ -493,20 +493,20 @@ Scanner::Scanner(const char* buf, int len) {
 
 
 Scanner::Scanner(const wchar_t* fileName) {
-	FILE* stream;
+	FILE* istr;
 	char *chFileName = coco_string_create_char(fileName);
-	if ((stream = fopen(chFileName, "rb")) == NULL) {
+	if ((istr = fopen(chFileName, "rb")) == NULL) {
 		wprintf(L"--- Cannot open file %ls\n", fileName);
 		::exit(1);
 	}
 	coco_string_delete(chFileName);
-	buffer = new Buffer(stream, false);
+	buffer = new Buffer(istr, false);
 	Init();
 }
 
 
-Scanner::Scanner(FILE* s) {
-	buffer = new Buffer(s, true);
+Scanner::Scanner(FILE* istr) {
+	buffer = new Buffer(istr, true);
 	Init();
 }
 

@@ -390,7 +390,7 @@ public:
 	//! Open a file for reading and attach scanner
 	Scanner(const wchar_t* fileName);
 	//! Using an existing open file handle for the scanner
-	Scanner(FILE* s);
+	Scanner(FILE*);
 	~Scanner();        //!< free heap and allocated memory
 	Token* Scan();     //!< get the next token (possibly a token already seen during peeking)
 	Token* Peek();     //!< peek for the next token, ignore pragmas

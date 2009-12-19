@@ -77,8 +77,10 @@ void printUsage(const char* message)
 	wprintf(L"  P  print statistics\n");
 	wprintf(L"  S  list symbol table\n");
 	wprintf(L"  X  list cross reference table\n");
-	wprintf(L"Scanner.frame and Parser.frame must be in atg directory\n");
-	wprintf(L"or in a directory specified in the -frames option.\n");
+	wprintf(L"Scanner.frame and Parser.frame must be located in one of these directories:\n");
+	wprintf(L"  1. In the specified -frames directory.\n");
+	wprintf(L"  2. The current directory.\n");
+	wprintf(L"  3. The same directory as the atg grammar.\n\n");
 }
 
 
@@ -95,7 +97,7 @@ int main(int argc, char *argv_[]) {
 #error unknown compiler!
 #endif
 
-	wprintf(L"Coco/R C++ (18 Dec 2009)\n");
+	wprintf(L"Coco/R C++ (19 Dec 2009)\n");
 
 	wchar_t *srcName = NULL, *nsName = NULL, *prefixName = NULL;
 	wchar_t *frameDir = NULL, *outDir = NULL;
@@ -151,6 +153,15 @@ int main(int argc, char *argv_[]) {
 			printUsage(NULL);
 			return 0;
 		}
+		else if (argv[i][0] == L'-') {
+			wprintf(L"\nError: unknown option: '%ls'\n\n", argv[i]);
+			printUsage(NULL);
+			return 1;
+		}
+		else if (srcName != NULL) {
+			printUsage("grammar can only be specified once");
+			return 1;
+		}
 		else {
 			srcName = coco_string_create(argv[i]);
 		}
@@ -176,7 +187,7 @@ int main(int argc, char *argv_[]) {
 		chTrFileName = coco_string_create_char(traceFileName);
 
 		if ((parser->trace = fopen(chTrFileName, "w")) == NULL) {
-			wprintf(L"-- cannot write trace file to %ls\n", chTrFileName);
+			wprintf(L"-- cannot write trace file to %ls\n", traceFileName);
 			return 1;
 		}
 
@@ -207,7 +218,7 @@ int main(int argc, char *argv_[]) {
 		if (fileSize == 0)
 			remove(chTrFileName);
 		else
-			wprintf(L"trace output is in %ls\n", chTrFileName);
+			wprintf(L"trace output is in %ls\n", traceFileName);
 
 		wprintf(L"%d errors detected\n", parser->errors->count);
 		if (parser->errors->count != 0) {

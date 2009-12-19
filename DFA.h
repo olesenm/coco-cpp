@@ -124,12 +124,11 @@ public:
 	void GenComBody(Comment *com);
 	void GenCommentHeader(Comment *com, int i);
 	void GenComment(Comment *com, int i);
-	void CopyFramePart(const wchar_t* stop);
+	void CopyFramePart(const wchar_t* stop, const bool doOutput = true);
 	wchar_t* SymName(Symbol *sym); //!< real name value is stored in Tab.literals
 	void GenLiterals();
 	void WriteState(State *state);
 	void WriteStartTab();
-	void OpenGen(const wchar_t* genName, bool backUp); /* pdt */
 	void WriteScanner();
 	DFA(Parser *parser);
 };

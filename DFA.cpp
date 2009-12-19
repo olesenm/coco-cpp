@@ -52,6 +52,7 @@ wchar_t* DFA::Ch(wchar_t ch) {
 	return format;
 }
 
+
 wchar_t* DFA::ChCond(wchar_t ch) {
 	wchar_t* format = new wchar_t[20];
 	wchar_t* res = Ch(ch);
@@ -59,6 +60,7 @@ wchar_t* DFA::ChCond(wchar_t ch) {
 	delete [] res;
 	return format;
 }
+
 
 void DFA::PutRange(CharSet *s) {
 	for (CharSet::Range *r = s->head; r != NULL; r = r->next) {
@@ -91,12 +93,14 @@ State* DFA::NewState() {
 	return s;
 }
 
+
 void DFA::NewTransition(State *from, State *to, int typ, int sym, int tc) {
 	Target *t = new Target(to);
 	Action *a = new Action(typ, sym, tc); a->target = t;
 	from->AddAction(a);
 	if (typ == Node::clas) curSy->tokenKind = Symbol::classToken;
 }
+
 
 void DFA::CombineShifts() {
 	State *state;
@@ -116,12 +120,14 @@ void DFA::CombineShifts() {
 	}
 }
 
+
 void DFA::FindUsedStates(State *state, BitArray *used) {
 	if ((*used)[state->nr]) return;
 	used->Set(state->nr, true);
 	for (Action *a = state->firstAction; a != NULL; a = a->next)
 		FindUsedStates(a->target->state, used);
 }
+
 
 void DFA::DeleteRedundantStates() {
 	//State *newState = new State[State::lastNr + 1];
@@ -151,11 +157,13 @@ void DFA::DeleteRedundantStates() {
 	delete used;
 }
 
+
 State* DFA::TheState(Node *p) {
 	State *state;
 	if (p == NULL) {state = NewState(); state->endOf = curSy; return state;}
 	else return p->state;
 }
+
 
 void DFA::Step(State *from, Node *p, BitArray *stepped) {
 	if (p == NULL) return;
@@ -175,6 +183,7 @@ void DFA::Step(State *from, Node *p, BitArray *stepped) {
 		}
 	}
 }
+
 
 // Assigns a state n.state to every node n. There will be a transition from
 // n.state to n.next.state triggered by n.val. All nodes in an alternative
@@ -205,6 +214,7 @@ void DFA::NumberNodes(Node *p, State *state, bool renumIter) {
 	}
 }
 
+
 void DFA::FindTrans(Node *p, bool start, BitArray *marked) {
 	if (p == NULL || (*marked)[p->n]) return;
 	marked->Set(p->n, true);
@@ -225,6 +235,7 @@ void DFA::FindTrans(Node *p, bool start, BitArray *marked) {
 	}
 }
 
+
 void DFA::ConvertToStates(Node *p, Symbol *sym) {
 	curGraph = p; curSy = sym;
 	if (tab->DelGraph(curGraph)) parser->SemErr(L"token might be empty");
@@ -236,6 +247,7 @@ void DFA::ConvertToStates(Node *p, Symbol *sym) {
 		delete stepped;
 	}
 }
+
 
 // match string against current automaton; store it either as a fixedToken or as a litToken
 void DFA::MatchLiteral(wchar_t* s, Symbol *sym) {
@@ -275,6 +287,7 @@ void DFA::MatchLiteral(wchar_t* s, Symbol *sym) {
 	}
 }
 
+
 void DFA::SplitActions(State *state, Action *a, Action *b) {
 	Action *c; CharSet *seta, *setb, *setc;
 	seta = a->Symbols(tab); setb = b->Symbols(tab);
@@ -303,6 +316,7 @@ void DFA::SplitActions(State *state, Action *a, Action *b) {
 	}
 }
 
+
 bool DFA::Overlap(Action *a, Action *b) {
 	CharSet *seta, *setb;
 	if (a->typ == Node::chr)
@@ -315,6 +329,7 @@ bool DFA::Overlap(Action *a, Action *b) {
 	}
 }
 
+
 bool DFA::MakeUnique(State *state) { // return true if actions were split
 	bool changed = false;
 	for (Action *a = state->firstAction; a != NULL; a = a->next)
@@ -325,6 +340,7 @@ bool DFA::MakeUnique(State *state) { // return true if actions were split
 			}
 	return changed;
 }
+
 
 void DFA::MeltStates(State *state) {
 	bool changed, ctx;
@@ -347,11 +363,13 @@ void DFA::MeltStates(State *state) {
 	}
 }
 
+
 void DFA::FindCtxStates() {
 	for (State *state = firstState; state != NULL; state = state->next)
 		for (Action *a = state->firstAction; a != NULL; a = a->next)
 			if (a->tc == Node::contextTrans) a->target->state->ctx = true;
 }
+
 
 void DFA::MakeDeterministic() {
 	State *state;
@@ -366,6 +384,7 @@ void DFA::MakeDeterministic() {
 	DeleteRedundantStates();
 	CombineShifts();
 }
+
 
 void DFA::PrintStates() {
 	fwprintf(trace, L"\n");
@@ -394,6 +413,7 @@ void DFA::PrintStates() {
 	fwprintf(trace, L"\n---------- character classes ----------\n");
 	tab->WriteCharClasses();
 }
+
 
 //---------------------------- actions --------------------------------
 
@@ -448,8 +468,8 @@ Melted* DFA::NewMelted(BitArray *set, State *state) {
 	Melted *m = new Melted(set, state);
 	m->next = firstMelted; firstMelted = m;
 	return m;
-
 }
+
 
 BitArray* DFA::MeltedSet(int nr) {
 	Melted *m = firstMelted;
@@ -460,6 +480,7 @@ BitArray* DFA::MeltedSet(int nr) {
 	//throw new Exception("-- compiler error in Melted::Set");
 	return NULL;
 }
+
 
 Melted* DFA::StateWithSet(BitArray *s) {
 	for (Melted *m = firstMelted; m != NULL; m = m->next)
@@ -544,9 +565,11 @@ void DFA::GenComBody(Comment *com) {
 	fwprintf(gen, L"\t\t}\n");
 }
 
+
 void DFA::GenCommentHeader(Comment *com, int i) {
 	fwprintf(gen, L"\tbool Comment%d();\n", i);
 }
+
 
 void DFA::GenComment(Comment *com, int i) {
 	fwprintf(gen, L"\n");
@@ -575,12 +598,13 @@ void DFA::GenComment(Comment *com, int i) {
 }
 
 
-void DFA::CopyFramePart(const wchar_t* stop) {
-	bool ok = tab->CopyFramePart(gen, fram, stop);
+void DFA::CopyFramePart(const wchar_t* stop, const bool doOutput) {
+	bool ok = tab->CopyFramePart(gen, fram, stop, doOutput);
 	if (!ok) {
 		errors->Exception(L" -- incomplete or corrupt parser frame file");
 	}
 }
+
 
 wchar_t* DFA::SymName(Symbol *sym) { // real name value is stored in Tab.literals
 	if (('a' <= sym->name[0] && sym->name[0] <= 'z') ||
@@ -594,6 +618,7 @@ wchar_t* DFA::SymName(Symbol *sym) { // real name value is stored in Tab.literal
 	}
 	return sym->name;
 }
+
 
 void DFA::GenLiterals() {
 	Symbol *sym;
@@ -640,6 +665,7 @@ void DFA::CheckLabels() {
 		}
 	}
 }
+
 
 void DFA::WriteState(State *state) {
 	Symbol *endOf = state->endOf;
@@ -692,6 +718,7 @@ void DFA::WriteState(State *state) {
 	}
 }
 
+
 void DFA::WriteStartTab() {
 	for (Action *action = firstState->firstAction; action; action = action->next) {
 		int targetState = action->target->state->nr;
@@ -707,63 +734,28 @@ void DFA::WriteStartTab() {
 	fwprintf(gen, L"\tstart.set(Buffer::EoF, -1);\n\n");
 }
 
-void DFA::OpenGen(const wchar_t *genName, bool backUp) { /* pdt */
-	gen = tab->OpenGen(tab->outDir, genName, backUp);
-	if (gen == NULL) {
-		errors->Exception(L"-- Cannot generate scanner file");
-	}
-}
 
 void DFA::WriteScanner() {
-	int i;
-	wchar_t *fr = coco_string_create_append(tab->srcDir, L"Scanner.frame");  /* pdt */
-	char *chFr = coco_string_create_char(fr);
+	// keep copyright in frame when processing coco grammar
+	const bool keepCopyright = tab->checkIsCocoAtg();
 
-	FILE* tmp;
-	if ((tmp = fopen(chFr, "r")) == NULL) {
-		if (coco_string_length(tab->frameDir) != 0) {
-			coco_string_delete(fr);
-			fr = coco_string_create(tab->frameDir);
-			coco_string_merge(fr, L"/");
-			coco_string_merge(fr, L"Scanner.frame");
-		}
-		coco_string_delete(chFr);
-		chFr = coco_string_create_char(fr);
-		if ((tmp = fopen(chFr, "r")) == NULL) {
-			errors->Exception(L"-- Cannot find Scanner.frame\n");
-		} else {
-			fclose(tmp);
-		}
-	} else {
-		fclose(tmp);
-	}
-	if ((fram = fopen(chFr, "r")) == NULL) {
+	fram = tab->OpenFrameFile(L"Scanner.frame");
+	if (fram == NULL) {
 		errors->Exception(L"-- Cannot open Scanner.frame.\n");
 	}
-	coco_string_delete(chFr);
-	coco_string_delete(fr);
 
 
 	if (dirtyDFA) MakeDeterministic();
 
-	// keep copyright in frame when processing coco grammar
-	const bool keepCopyright = tab->checkIsCocoAtg(tab->srcName);
-
 	//
 	// Header
 	//
-	wchar_t* outputFileName =
-		coco_string_create_append(tab->prefixName, L"Scanner.h");
-
-	OpenGen(outputFileName, tab->makeBackup); /* pdt */
-
-	CopyFramePart(L"-->begin");
-	if (!keepCopyright) {
-		fclose(gen);
-		OpenGen(outputFileName, false); /* pdt */
+	gen = tab->OpenGenFile(L"Scanner.h");
+	if (gen == NULL) {
+		errors->Exception(L"-- Cannot generate scanner header");
 	}
-	coco_string_delete(outputFileName);
 
+	CopyFramePart(L"-->begin", keepCopyright);
 	CopyFramePart(L"-->namespace_open");
 	int nrOfNs = tab->GenNamespaceOpen(gen, tab->nsName);
 
@@ -778,7 +770,7 @@ void DFA::WriteScanner() {
 
 	CopyFramePart(L"-->commentsheader");
 	Comment *com = firstComment;
-	for (i=0; com; com = com->next, ++i) {
+	for (int i=0; com; com = com->next, ++i) {
 		GenCommentHeader(com, i);
 	}
 
@@ -790,18 +782,12 @@ void DFA::WriteScanner() {
 	//
 	// Source
 	//
-	outputFileName =
-		coco_string_create_append(tab->prefixName, L"Scanner.cpp");
-
-	OpenGen(outputFileName, tab->makeBackup); /* pdt */
-	CopyFramePart(L"-->begin");
-
-	if (!keepCopyright) {
-		fclose(gen);
-		OpenGen(outputFileName, false); /* pdt */
+	gen = tab->OpenGenFile(L"Scanner.cpp");
+	if (gen == NULL) {
+		errors->Exception(L"-- Cannot generate scanner source");
 	}
-	coco_string_delete(outputFileName);
 
+	CopyFramePart(L"-->begin", keepCopyright);
 	CopyFramePart(L"-->namespace_open");
 	nrOfNs = tab->GenNamespaceOpen(gen, tab->nsName);
 
@@ -821,7 +807,7 @@ void DFA::WriteScanner() {
 
 	CopyFramePart(L"-->comments");
 	com = firstComment;
-	for (i=0; com; com = com->next, ++i) {
+	for (int i=0; com; com = com->next, ++i) {
 		GenComment(com, i);
 	}
 
@@ -833,7 +819,7 @@ void DFA::WriteScanner() {
 	if (firstComment) {
 		fwprintf(gen, L"\tif (");
 		com = firstComment;
-		for (i=0; com; com = com->next, ++i) {
+		for (int i=0; com; com = com->next, ++i) {
 			wchar_t* res = ChCond(com->start[0]);
 			fwprintf(gen, L"(%ls && Comment%d())", res, i);
 			delete [] res;

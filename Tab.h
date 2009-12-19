@@ -257,14 +257,23 @@ public:
 	static void GenNamespaceClose(FILE*, int nrOfNs);
 
 	//! Check if Grammar file name appears to be Coco itself
-	static bool checkIsCocoAtg(const wchar_t* srcName);
+	bool checkIsCocoAtg() const;
 
-	//! Open a generated file, return NULL on failure
-	FILE* OpenGen(const wchar_t* dir, const wchar_t* name, bool backUp);
+	//! Open a frame file for reading, return NULL on failure
+	FILE* OpenFrameFile(const wchar_t* frameName) const;
+
+	//! Open a generated file (.h or .cpp), return NULL on failure
+	FILE* OpenGenFile(const wchar_t* genName) const;
 
 	//! Copy frame part from istr, to ostr until stop mark is seen
-	//  Return true on success
-	bool CopyFramePart(FILE* ostr, FILE* istr, const wchar_t* stop);
+	//  Return true on success. Optionally possible to suppress output.
+	bool CopyFramePart
+	(
+		FILE* ostr,
+		FILE* istr,
+		const wchar_t* stop,
+		const bool doOutput = true
+	) const;
 };
 
 

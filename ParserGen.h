@@ -80,7 +80,7 @@ public:
 	void Indent(int n);     //!< indent with tabs to the specified level
 
 	bool UseSwitch(Node *p);
-	void CopyFramePart(const wchar_t* stop);
+	void CopyFramePart(const wchar_t* stop, const bool doOutput = true);
 	void CopySourcePart(Position *pos, int indent);
 	void GenErrorMsg(int errTyp, Symbol *sym);
 	int  NewCondSet(BitArray *s);
@@ -95,7 +95,6 @@ public:
 	void GenProductions();
 	void GenProductionsHeader();
 	void InitSets();
-	void OpenGen(const wchar_t* genName, bool backUp);
 	void WriteParser();
 	void WriteStatistics();
 

@@ -58,8 +58,9 @@ bool ParserGen::UseSwitch(Node *p) {
 	return nAlts > 5;
 }
 
-void ParserGen::CopyFramePart(const wchar_t* stop) {
-	bool ok = tab->CopyFramePart(gen, fram, stop);
+
+void ParserGen::CopyFramePart(const wchar_t* stop, const bool doOutput) {
+	bool ok = tab->CopyFramePart(gen, fram, stop, doOutput);
 	if (!ok) {
 		errors->Exception(L" -- incomplete or corrupt parser frame file");
 	}
@@ -85,15 +86,16 @@ void ParserGen::CopySourcePart(Position *pos, int indent) {
 					ch = buffer->Read();
 				}
 				if (i <= pos->col) pos->col = i - 1; // heading TABs => not enough blanks
-				if (buffer->GetPos() > pos->end) goto done;
+				if (buffer->GetPos() > pos->end) goto Done;
 			}
 			fwprintf(gen, L"%lc", ch);
 			ch = buffer->Read();
 		}
-		done:
+		Done:
 		if (indent > 0) fwprintf(gen, L"\n");
 	}
 }
+
 
 void ParserGen::GenErrorMsg(int errTyp, Symbol *sym) {
 	errorNr++;
@@ -120,12 +122,14 @@ void ParserGen::GenErrorMsg(int errTyp, Symbol *sym) {
 	coco_string_merge(err, format);
 }
 
+
 int ParserGen::NewCondSet(BitArray *s) {
 	for (int i = 1; i < symSet->Count; i++) // skip symSet[0] (reserved for union of SYNC sets)
 		if (Sets::Equals(s, (BitArray*)(*symSet)[i])) return i;
 	symSet->Add(s->Clone());
 	return symSet->Count - 1;
 }
+
 
 void ParserGen::GenCond(BitArray *s, Node *p) {
 	if (p->typ == Node::rslv) CopySourcePart(p->pos, 0);
@@ -147,6 +151,7 @@ void ParserGen::GenCond(BitArray *s, Node *p) {
 	}
 }
 
+
 void ParserGen::PutCaseLabels(BitArray *s) {
 	Symbol *sym;
 	for (int i=0; i<tab->terminals->Count; i++) {
@@ -154,6 +159,7 @@ void ParserGen::PutCaseLabels(BitArray *s) {
 		if ((*s)[sym->n]) fwprintf(gen, L"case %d: ", sym->n);
 	}
 }
+
 
 void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked) {
 	Node *p2;
@@ -186,8 +192,8 @@ void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked) {
 					fwprintf(gen, L"if ("); GenCond(p->set, p); fwprintf(gen, L") Get(); else SynErr(%d);\n", errorNr);
 				} else fwprintf(gen, L"SynErr(%d); // ANY node that matches no symbol\n", errorNr);
 			}
-		} if (p->typ == Node::eps) {	// nothing
-		} if (p->typ == Node::rslv) {	// nothing
+		} if (p->typ == Node::eps) {    // nothing
+		} if (p->typ == Node::rslv) {   // nothing
 		} if (p->typ == Node::sem) {
 			CopySourcePart(p->pos, indent);
 		} if (p->typ == Node::sync) {
@@ -285,6 +291,7 @@ void ParserGen::GenTokensHeader() {
 	fwprintf(gen, L"\t};\n");
 }
 
+
 void ParserGen::GenCodePragmas() {
 	for (int i=0; i<tab->pragmas->Count; i++) {
 		Symbol* sym = (Symbol*)((*(tab->pragmas))[i]);
@@ -293,6 +300,7 @@ void ParserGen::GenCodePragmas() {
 		fwprintf(gen, L"\t\t}\n");
 	}
 }
+
 
 void ParserGen::GenProductionsHeader() {
 	for (int i=0; i<tab->nonterminals->Count; i++) {
@@ -317,6 +325,7 @@ void ParserGen::GenProductions() {
 	}
 }
 
+
 void ParserGen::InitSets() {
 	fwprintf(gen, L"\tstatic bool set[%d][%d] = {\n", symSet->Count, tab->terminals->Count+1);
 
@@ -336,54 +345,26 @@ void ParserGen::InitSets() {
 	fwprintf(gen, L"\t};\n\n");
 }
 
-void ParserGen::OpenGen(const wchar_t* genName, bool backUp) { /* pdt */
-	gen = tab->OpenGen(tab->outDir, genName, backUp);
-	if (gen == NULL) {
-		errors->Exception(L"-- Cannot generate scanner file");
-	}
-}
 
 void ParserGen::WriteParser() {
+	// keep copyright in frame when processing coco grammar
+	const bool keepCopyright = tab->checkIsCocoAtg();
+
 	int oldPos = buffer->GetPos();  // Pos is modified by CopySourcePart
 	symSet->Add(tab->allSyncSets);
-	wchar_t *fr = coco_string_create_append(tab->srcDir, L"Parser.frame");
-	char *chFr = coco_string_create_char(fr);
 
-	FILE* tmp;
-	if ((tmp = fopen(chFr, "r")) == NULL) {
-		if (coco_string_length(tab->frameDir) != 0) {
-			coco_string_delete(fr);
-			fr = coco_string_create(tab->frameDir);
-			coco_string_merge(fr, L"/");
-			coco_string_merge(fr, L"Parser.frame");
-		}
-		coco_string_delete(chFr);
-		chFr = coco_string_create_char(fr);
-		if ((tmp = fopen(chFr, "r")) == NULL) {
-			errors->Exception(L"-- Cannot find Parser.frame\n");
-		} else {
-			fclose(tmp);
-		}
-	} else {
-		fclose(tmp);
-	}
-
-	if ((fram = fopen(chFr, "r")) == NULL) {
+	fram = tab->OpenFrameFile(L"Parser.frame");
+	if (fram == NULL) {
 		errors->Exception(L"-- Cannot open Parser.frame.\n");
 	}
-	coco_string_delete(chFr);
-	coco_string_delete(fr);
-
-	// keep copyright in frame when processing coco grammar
-	const bool keepCopyright = tab->checkIsCocoAtg(tab->srcName);
 
 	//
 	// Header
 	//
-	wchar_t* outputFileName =
-		coco_string_create_append(tab->prefixName, L"Parser.h");
-
-	OpenGen(outputFileName, tab->makeBackup);
+	gen = tab->OpenGenFile(L"Parser.h");
+	if (gen == NULL) {
+		errors->Exception(L"-- Cannot generate Parser header\n");
+	}
 
 	Symbol *sym;
 	for (int i=0; i<tab->terminals->Count; i++) {
@@ -391,14 +372,7 @@ void ParserGen::WriteParser() {
 		GenErrorMsg(tErr, sym);
 	}
 
-	CopyFramePart(L"-->begin");
-
-	if (!keepCopyright) {
-		fclose(gen);
-		OpenGen(outputFileName, false); /* pdt */
-	}
-	coco_string_delete(outputFileName);
-
+	CopyFramePart(L"-->begin", keepCopyright);
 	CopyFramePart(L"-->headerdef");
 
 	if (usingPos != NULL) {CopySourcePart(usingPos, 0); fwprintf(gen, L"\n");}
@@ -419,18 +393,12 @@ void ParserGen::WriteParser() {
 	//
 	// Source
 	//
-	outputFileName =
-		coco_string_create_append(tab->prefixName, L"Parser.cpp");
-
-	OpenGen(outputFileName, tab->makeBackup); /* pdt */
-
-	CopyFramePart(L"-->begin");
-	if (!keepCopyright) {
-		fclose(gen);
-		OpenGen(outputFileName, false); /* pdt */
+	gen = tab->OpenGenFile(L"Parser.cpp");
+	if (gen == NULL) {
+		errors->Exception(L"-- Cannot generate Parser source\n");
 	}
-	coco_string_delete(outputFileName);
 
+	CopyFramePart(L"-->begin", keepCopyright);
 	CopyFramePart(L"-->namespace_open");
 	nrOfNs = tab->GenNamespaceOpen(gen, tab->nsName);
 

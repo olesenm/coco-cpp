@@ -1245,7 +1245,7 @@ void Tab::GenNamespaceClose(FILE* ostr, int nrOfNs) {
 }
 
 
-bool Tab::checkIsCocoAtg(const wchar_t* srcName) {
+bool Tab::checkIsCocoAtg() const {
 	wchar_t *lowerCaseName = coco_string_create_lower(srcName);
 	bool isCoco = coco_string_endswith(lowerCaseName, L"coco.atg");
 	coco_string_delete(lowerCaseName);
@@ -1253,12 +1253,62 @@ bool Tab::checkIsCocoAtg(const wchar_t* srcName) {
 }
 
 
-FILE* Tab::OpenGen(const wchar_t* dir, const wchar_t* name, bool backUp) {
-	wchar_t* fn = coco_string_create_append(dir, name);
+FILE* Tab::OpenFrameFile(const wchar_t* frameName) const {
+	FILE* istr;
+
+	wchar_t *fr = coco_string_create(frameName);
+	char * chFr = coco_string_create_char(fr);
+
+	// 1: look in specified frameDir
+	if (coco_string_length(frameDir) != 0) {
+		coco_string_delete(chFr);
+		coco_string_delete(fr);
+		fr = coco_string_create(frameDir);
+		coco_string_merge(fr, L"/");
+		coco_string_merge(fr, frameName);
+		chFr = coco_string_create_char(fr);
+
+		if ((istr = fopen(chFr, "r")) != NULL) {
+			goto Done;
+		}
+	}
+
+	// 2: look in local directory
+	coco_string_delete(chFr);
+	coco_string_delete(fr);
+	fr = coco_string_create(frameName);
+	chFr = coco_string_create_char(fr);
+	if ((istr = fopen(chFr, "r")) != NULL) {
+		goto Done;
+	}
+
+	// 3: look in srcDir
+	coco_string_delete(chFr);
+	coco_string_delete(fr);
+	fr = coco_string_create_append(srcDir, frameName);
+	chFr = coco_string_create_char(fr);
+	if ((istr = fopen(chFr, "r")) != NULL) {
+		goto Done;
+	}
+
+
+	Done:
+	coco_string_delete(chFr);
+	coco_string_delete(fr);
+
+	return istr;
+}
+
+
+FILE* Tab::OpenGenFile(const wchar_t* genName) const {
+	FILE* ostr;
+
+	wchar_t* fn = coco_string_create_append(outDir, prefixName);
+	coco_string_merge(fn, genName);
+
 	char* chFn = coco_string_create_char(fn);
 
-	FILE* ostr;
-	if (backUp && ((ostr = fopen(chFn, "r")) != NULL)) {
+	if (makeBackup && ((ostr = fopen(chFn, "r")) != NULL)) {
 		fclose(ostr);
 		wchar_t* oldName = coco_string_create_append(fn, L".bak");
 		char* chOldName = coco_string_create_char(oldName);
@@ -1276,7 +1326,14 @@ FILE* Tab::OpenGen(const wchar_t* dir, const wchar_t* name, bool backUp) {
 }
 
 
-bool Tab::CopyFramePart(FILE* ostr, FILE* istr, const wchar_t* stop) {
+bool Tab::CopyFramePart
+(
+	FILE* ostr,
+	FILE* istr,
+	const wchar_t* stop,
+	const bool doOutput
+) const
+{
 	wchar_t startCh = stop[0];
 	int endOfStopString = coco_string_length(stop)-1;
 
@@ -1297,8 +1354,10 @@ bool Tab::CopyFramePart(FILE* ostr, FILE* istr, const wchar_t* stop) {
 				i++;
 			} while (ch == stop[i]);
 			// stop[0..i-1] found; continue with last read character
-			for (int subI = 0; subI < i; ++subI) {
-				fwprintf(ostr, L"%lc", stop[subI]);
+			if (doOutput) {
+				for (int subI = 0; subI < i; ++subI) {
+					fwprintf(ostr, L"%lc", stop[subI]);
+				}
 			}
 		}
 		else if (ch == startPrefixCh) {
@@ -1315,20 +1374,24 @@ bool Tab::CopyFramePart(FILE* ostr, FILE* istr, const wchar_t* stop) {
 			// prefixMacro[0..i-1] found; continue with last read character
 			if (found)
 			{
-				if (isPrefixSet) {
-					fwprintf(ostr, L"%ls", this->prefixName);
+				if (doOutput && isPrefixSet) {
+						fwprintf(ostr, L"%ls", this->prefixName);
 				}
 				fwscanf(istr, L"%lc", &ch);
 			}
 			else
 			{
-				for (int subI = 0; subI < i; ++subI) {
-					fwprintf(ostr, L"%lc", this->prefixMacro[subI]);
+				if (doOutput) {
+					for (int subI = 0; subI < i; ++subI) {
+						fwprintf(ostr, L"%lc", this->prefixMacro[subI]);
+					}
 				}
 			}
 		}
 		else {
-			fwprintf(ostr, L"%lc", ch);
+			if (doOutput) {
+				fwprintf(ostr, L"%lc", ch);
+			}
 			fwscanf(istr, L"%lc", &ch);
 		}
 	}

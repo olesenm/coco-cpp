@@ -32,7 +32,7 @@ Thus the grammar definitions
 
 
 would generate the scanner/parser files in the respective namespaces,
-but with theses names:
+but with these names:
 
     GramAParser.{h,cpp}
     GramAScanner.{h,cpp}

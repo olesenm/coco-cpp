@@ -757,7 +757,7 @@ void DFA::WriteScanner() {
 
 	CopyFramePart(L"-->begin", keepCopyright);
 	CopyFramePart(L"-->namespace_open");
-	int nrOfNs = tab->GenNamespaceOpen(gen, tab->nsName);
+	int nrOfNs = tab->GenNamespaceOpen(gen);
 
 	CopyFramePart(L"-->constantsheader");
 	fwprintf(gen, L"\tstatic const int maxT = %d;\n", tab->terminals->Count-1);
@@ -789,7 +789,7 @@ void DFA::WriteScanner() {
 
 	CopyFramePart(L"-->begin", keepCopyright);
 	CopyFramePart(L"-->namespace_open");
-	nrOfNs = tab->GenNamespaceOpen(gen, tab->nsName);
+	nrOfNs = tab->GenNamespaceOpen(gen);
 
 	CopyFramePart(L"-->declarations");
 	WriteStartTab();

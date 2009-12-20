@@ -1180,8 +1180,56 @@ void Tab::XRef() {
 }
 
 
+void Tab::DispatchPragma(const wchar_t* str)
+{
+	const int len1 = coco_string_indexof(str, L'=');
+	const int len2 = coco_string_length(str) - len1 - 1;
+
+	if (len1 < 0 || len2 < 1)
+	{
+		return;
+	}
+
+	wchar_t* name = coco_string_create(str, 0, len1);
+
+	if (coco_string_equal(name, L"namespace"))
+	{
+		// set namespace if not already set
+		const int oldLen = coco_string_length(nsName);
+		if (!oldLen)
+		{
+			coco_string_delete(nsName);
+			nsName = coco_string_create(str, len1+1, len2);
+		}
+		wprintf(L"using namespace: '%ls'\n", nsName);
+	}
+	else if (coco_string_equal(name, L"prefix"))
+	{
+		// set prefix if not already set
+		const int oldLen = coco_string_length(prefixName);
+		if (!oldLen)
+		{
+			coco_string_delete(prefixName);
+			prefixName = coco_string_create(str, len1+1, len2);
+		}
+		wprintf(L"using prefix: '%ls'\n", prefixName);
+	}
+	else if (coco_string_equal(name, L"trace"))
+	{
+		SetDDT(str + len1+1);
+	}
+	else
+	{
+		wprintf(L"ignoring unknown pragma: '%ls'\n", name);
+	}
+
+	coco_string_delete(name);
+}
+
+
 void Tab::SetDDT(const wchar_t* str) {
 	const int len = coco_string_length(str);
+
 	for (int i = 0; i < len; i++) {
 		char ch = str[i];
 		if ('0' <= ch && ch <= '9') {
@@ -1201,12 +1249,13 @@ void Tab::SetDDT(const wchar_t* str) {
 	}
 }
 
+
 // * * * * * * * * * * * * *  Misc Output Methods  * * * * * * * * * * * * * //
 
 //
 // reduce multiple '::' -> ':', skip initial ':'
 //
-int Tab::GenNamespaceOpen(FILE* ostr, const wchar_t *nsName) {
+int Tab::GenNamespaceOpen(FILE* ostr) const {
 	if (nsName == NULL || coco_string_length(nsName) == 0) {
 		return 0;
 	}
@@ -1257,7 +1306,7 @@ FILE* Tab::OpenFrameFile(const wchar_t* frameName) const {
 	FILE* istr;
 
 	wchar_t *fr = coco_string_create(frameName);
-	char * chFr = coco_string_create_char(fr);
+	char* chFr = coco_string_create_char(fr);
 
 	// 1: look in specified frameDir
 	if (coco_string_length(frameDir) != 0) {

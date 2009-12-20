@@ -245,6 +245,11 @@ public:
 	//---------------------------------------------------------------------
 
 	void XRef();
+
+	//! Dispatch a pragma of the type name=value
+	void DispatchPragma(const wchar_t* str);
+
+	//! Set trace flags
 	void SetDDT(const wchar_t* str);
 
 	//---------------------------------------------------------------------
@@ -252,7 +257,7 @@ public:
 	//---------------------------------------------------------------------
 
 	//! Generate begin of namespace enclosure
-	static int GenNamespaceOpen(FILE*, const wchar_t *nsName);
+	int GenNamespaceOpen(FILE*) const;
 	//! Generate end of namespace enclosure
 	static void GenNamespaceClose(FILE*, int nrOfNs);
 

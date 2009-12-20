@@ -377,7 +377,7 @@ void ParserGen::WriteParser() {
 
 	if (usingPos != NULL) {CopySourcePart(usingPos, 0); fwprintf(gen, L"\n");}
 	CopyFramePart(L"-->namespace_open");
-	int nrOfNs = tab->GenNamespaceOpen(gen, tab->nsName);
+	int nrOfNs = tab->GenNamespaceOpen(gen);
 
 	CopyFramePart(L"-->constantsheader");
 	GenTokensHeader();  /* ML 2002/09/07 write the token kinds */
@@ -400,7 +400,7 @@ void ParserGen::WriteParser() {
 
 	CopyFramePart(L"-->begin", keepCopyright);
 	CopyFramePart(L"-->namespace_open");
-	nrOfNs = tab->GenNamespaceOpen(gen, tab->nsName);
+	nrOfNs = tab->GenNamespaceOpen(gen);
 
 	CopyFramePart(L"-->pragmas"); GenCodePragmas();
 	CopyFramePart(L"-->productions"); GenProductions();

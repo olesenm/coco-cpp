@@ -28,8 +28,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 -------------------------------------------------------------------------*/
 
 
-#include <memory.h>
-#include <string.h>
+#include <sstream>
+
 #include "Scanner.h"
 
 // values for the file stream buffering
@@ -268,22 +268,54 @@ Token::~Token() {
 }
 
 
-Buffer::Buffer(FILE* istr, bool isUserStream) {
+// ----------------------------------------------------------------------------
+// Buffer Implementation
+// ----------------------------------------------------------------------------
+
+Buffer::Buffer(Buffer* b)
+:
+	buf(b->buf),
+	bufCapacity(b->bufCapacity),
+	bufLen(b->bufLen),
+	bufPos(b->bufPos),
+	bufStart(b->bufStart),
+	fileLen(b->fileLen),
+	cStream(b->cStream),
+	stdStream(b->stdStream),
+	isUserStream_(b->isUserStream_)
+{
+	// avoid accidental deletion on any of these members
+	b->buf = NULL;
+	b->cStream = NULL;
+	b->stdStream = NULL;
+}
+
+
+Buffer::Buffer(FILE* istr, bool isUserStream)
+:
+	buf(NULL),
+	bufCapacity(0),
+	bufLen(0),
+	bufPos(0),
+	bufStart(0),
+	fileLen(0),
+	cStream(istr),
+	stdStream(NULL),
+	isUserStream_(isUserStream)
+{
 // ensure binary read on windows
 #if _MSC_VER >= 1300
-	_setmode(_fileno(istr), _O_BINARY);
+	_setmode(_fileno(cStream), _O_BINARY);
 #endif
-	stream = istr; this->isUserStream = isUserStream;
+
 	if (CanSeek()) {
-		fseek(istr, 0, SEEK_END);
-		fileLen = ftell(istr);
-		fseek(istr, 0, SEEK_SET);
+		fseek(cStream, 0, SEEK_END);
+		fileLen = ftell(cStream);
+		fseek(cStream, 0, SEEK_SET);
 		bufLen = (fileLen < MAX_BUFFER_LENGTH) ? fileLen : MAX_BUFFER_LENGTH;
 		bufStart = INT_MAX; // nothing in the buffer so far
 	}
-	else {
-		fileLen = bufLen = bufStart = 0;
-	}
+
 	bufCapacity = (bufLen > 0) ? bufLen : MIN_BUFFER_LENGTH;
 	buf = new unsigned char[bufCapacity];
 	if (fileLen > 0) SetPos(0);          // setup buffer to position 0 (start)
@@ -292,45 +324,74 @@ Buffer::Buffer(FILE* istr, bool isUserStream) {
 }
 
 
-Buffer::Buffer(Buffer* b) {
-	buf = b->buf;
-	b->buf = NULL;
-	bufCapacity = b->bufCapacity;
-	bufStart = b->bufStart;
-	bufLen = b->bufLen;
-	fileLen = b->fileLen;
-	bufPos = b->bufPos;
-	stream = b->stream;
-	b->stream = NULL;
-	isUserStream = b->isUserStream;
+Buffer::Buffer(std::istream* istr, bool isUserStream)
+:
+	buf(NULL),
+	bufCapacity(0),
+	bufLen(0),
+	bufPos(0),
+	bufStart(0),
+	fileLen(0),
+	cStream(NULL),
+	stdStream(istr),
+	isUserStream_(isUserStream)
+{
+	// ensure binary read on windows
+#if _MSC_VER >= 1300
+	// TODO
+#endif
 }
 
 
-Buffer::Buffer(const unsigned char* buf, int len) {
-	this->buf = new unsigned char[len];
-	memcpy(this->buf, buf, len*sizeof(char));
-	bufStart = 0;
-	bufCapacity = bufLen = len;
-	fileLen = len;
-	bufPos = 0;
-	stream = NULL;
+Buffer::Buffer(std::string& str)
+:
+	buf(NULL),
+	bufCapacity(0),
+	bufLen(0),
+	bufPos(0),
+	bufStart(0),
+	fileLen(0),
+	cStream(NULL),
+	stdStream(new std::istringstream(str)),
+	isUserStream_(false)
+{}
+
+
+Buffer::Buffer(const unsigned char* chars, int len)
+:
+	buf(new unsigned char[len]),
+	bufCapacity(len),
+	bufLen(len),
+	bufPos(0),
+	bufStart(0),
+	fileLen(len),
+	cStream(NULL),
+	stdStream(NULL),
+	isUserStream_(false)
+{
+	memcpy(this->buf, chars, len*sizeof(char));
 }
 
 
-Buffer::Buffer(const char* buf, int len) {
-	this->buf = new unsigned char[len];
-	memcpy(this->buf, buf, len*sizeof(char));
-	bufStart = 0;
-	bufCapacity = bufLen = len;
-	fileLen = len;
-	bufPos = 0;
-	stream = NULL;
+Buffer::Buffer(const char* chars, int len)
+:
+	buf(new unsigned char[len]),
+	bufCapacity(len),
+	bufLen(len),
+	bufPos(0),
+	bufStart(0),
+	fileLen(len),
+	cStream(NULL),
+	stdStream(NULL),
+	isUserStream_(false)
+{
+	memcpy(this->buf, chars, len*sizeof(char));
 }
 
 
 Buffer::~Buffer() {
 	Close();
-	if (buf != NULL) {
+	if (buf) {
 		delete [] buf;
 		buf = NULL;
 	}
@@ -338,20 +399,36 @@ Buffer::~Buffer() {
 
 
 void Buffer::Close() {
-	if (stream != NULL && !isUserStream) {
-		fclose(stream);
-		stream = NULL;
+	if (!isUserStream_) {
+		if (cStream) {
+			fclose(cStream);
+			cStream = NULL;
+		}
+		else if (stdStream) {
+			delete stdStream;
+			stdStream = 0;
+		}
 	}
 }
 
 
 int Buffer::Read() {
+	if (stdStream)
+	{
+		int ch = stdStream->get();
+		if (stdStream->eof())
+		{
+			return EoF;
+		}
+		return ch;
+	}
+
 	if (bufPos < bufLen) {
 		return buf[bufPos++];
 	} else if (GetPos() < fileLen) {
 		SetPos(GetPos()); // shift buffer start to Pos
 		return buf[bufPos++];
-	} else if ((stream != NULL) && !CanSeek() && (ReadNextStreamChunk() > 0)) {
+	} else if (cStream && !CanSeek() && (ReadNextStreamChunk() > 0)) {
 		return buf[bufPos++];
 	} else {
 		return EoF;
@@ -400,12 +477,23 @@ int Buffer::Peek() {
 
 
 int Buffer::GetPos() const {
+	if (stdStream)
+	{
+		return stdStream->tellg();
+	}
+
 	return bufPos + bufStart;
 }
 
 
 void Buffer::SetPos(int value) {
-	if ((value >= fileLen) && (stream != NULL) && !CanSeek()) {
+	if (stdStream)
+	{
+		stdStream->seekg(value, std::ios::beg);
+		return;
+	}
+
+	if ((value >= fileLen) && cStream && !CanSeek()) {
 		// Wanted position is after buffer and the stream
 		// is not seek-able e.g. network or console,
 		// thus we have to read the stream manually till
@@ -421,9 +509,9 @@ void Buffer::SetPos(int value) {
 
 	if ((value >= bufStart) && (value < (bufStart + bufLen))) { // already in buffer
 		bufPos = value - bufStart;
-	} else if (stream != NULL) { // must be swapped in
-		fseek(stream, value, SEEK_SET);
-		bufLen = fread(buf, sizeof(char), bufCapacity, stream);
+	} else if (cStream) { // must be swapped in
+		fseek(cStream, value, SEEK_SET);
+		bufLen = fread(buf, sizeof(char), bufCapacity, cStream);
 		bufStart = value; bufPos = 0;
 	} else {
 		bufPos = fileLen - bufStart; // make Pos return fileLen
@@ -448,7 +536,7 @@ int Buffer::ReadNextStreamChunk() {
 		buf = newBuf;
 		freeLen = bufLen;
 	}
-	int read = fread(buf + bufLen, sizeof(char), freeLen, stream);
+	int read = fread(buf + bufLen, sizeof(char), freeLen, cStream);
 	if (read > 0) {
 		fileLen = bufLen = (bufLen + read);
 		return read;
@@ -459,25 +547,33 @@ int Buffer::ReadNextStreamChunk() {
 
 
 bool Buffer::CanSeek() const {
-	return (stream != NULL) && (ftell(stream) != -1);
+	return cStream && (ftell(cStream) != -1);
 }
 
 
-Scanner::Scanner(const unsigned char* buf, int len) {
-	buffer = new Buffer(buf, len);
+// ----------------------------------------------------------------------------
+// Scanner Implementation
+// ----------------------------------------------------------------------------
+
+Scanner::Scanner(FILE* istr)
+:
+	buffer(new Buffer(istr, true))
+{
 	Init();
 }
 
 
-Scanner::Scanner(const char* buf, int len) {
-	buffer = new Buffer(buf, len);
+Scanner::Scanner(std::istream& istr)
+:
+	buffer(new Buffer(&istr, true))
+{
 	Init();
 }
 
 
 Scanner::Scanner(const wchar_t* fileName) {
-	FILE* istr;
 	char *chFileName = coco_string_create_char(fileName);
+	FILE* istr;
 	if ((istr = fopen(chFileName, "rb")) == NULL) {
 		wprintf(L"--- Cannot open file %ls\n", fileName);
 		::exit(1);
@@ -488,8 +584,18 @@ Scanner::Scanner(const wchar_t* fileName) {
 }
 
 
-Scanner::Scanner(FILE* istr) {
-	buffer = new Buffer(istr, true);
+Scanner::Scanner(const unsigned char* buf, int len)
+:
+	buffer(new Buffer(buf, len))
+{
+	Init();
+}
+
+
+Scanner::Scanner(const char* buf, int len)
+:
+	buffer(new Buffer(buf, len))
+{
 	Init();
 }
 

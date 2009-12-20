@@ -35,6 +35,9 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <string>
+#include <fstream>
+#include <iostream>
 
 // io.h and fcntl are used to ensure binary read from streams on windows
 #if _MSC_VER >= 1300
@@ -155,7 +158,6 @@ float coco_string_toFloat(const char* str);
 // * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
 
 
-
 //! Scanner Token
 class Token
 {
@@ -187,8 +189,9 @@ private:
 	int bufPos;         //!< current position in buffer
 	int bufStart;       //!< position of first byte in buffer relative to input stream
 	int fileLen;        //!< length of input stream (may change if the stream is no file)
-	FILE* stream;       //!< input stream (seekable)
-	bool isUserStream;  //!< was the stream opened by the user?
+	FILE* cStream;      //!< input stdio stream (normally seekable)
+	std::istream* stdStream;  //!< STL std stream (seekable)
+	bool isUserStream_;  //!< was the stream opened by the user?
 
 	int ReadNextStreamChunk();
 	bool CanSeek() const; //!< true if stream can be seeked otherwise false
@@ -203,10 +206,18 @@ public:
 	//! User streams are not closed in the destructor
 	Buffer(FILE*, bool isUserStream = true);
 
+	//! Attach buffer to an STL std stream
+	//! User streams are not closed in the destructor
+	explicit Buffer(std::istream*, bool isUserStream = true);
+
+	//! Copy buffer contents from constant string
+	//! Handled internally as an istringstream
+	explicit Buffer(std::string&);
+
 	//! Copy buffer contents from constant character string
-	Buffer(const unsigned char* buf, int len);
+	Buffer(const unsigned char* chars, int len);
 	//! Copy buffer contents from constant character string
-	Buffer(const char* buf, int len);
+	Buffer(const char* chars, int len);
 
 	//! Close stream (but not user streams) and free buf (if any)
 	virtual ~Buffer();
@@ -382,18 +393,24 @@ public:
 	//! The scanner buffer
 	Buffer *buffer;
 
-	//! Attach scanner to an existing character buffer
-	Scanner(const unsigned char* buf, int len);
-	//! Attach scanner to an existing character buffer
-	Scanner(const char* buf, int len);
-	//! Open a file for reading and attach scanner
-	Scanner(const wchar_t* fileName);
 	//! Using an existing open file handle for the scanner
 	Scanner(FILE*);
+
+	//! Using an existing open STL std stream
+	explicit Scanner(std::istream&);
+
+	//! Open a file for reading and attach scanner
+	explicit Scanner(const wchar_t* fileName);
+
+	//! Attach scanner to an existing character buffer
+	Scanner(const unsigned char* chars, int len);
+	//! Attach scanner to an existing character buffer
+	Scanner(const char* chars, int len);
+
 	~Scanner();        //!< free heap and allocated memory
 	Token* Scan();     //!< get the next token (possibly a token already seen during peeking)
 	Token* Peek();     //!< peek for the next token, ignore pragmas
-	void ResetPeek();  //!< make sure that peeking starts at the current scan position
+	void ResetPeek();  //!< ensure that peeking starts at the current scan position
 
 }; // end Scanner
 

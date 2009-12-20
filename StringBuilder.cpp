@@ -46,17 +46,16 @@ StringBuilder::StringBuilder(int capacity) {
 }
 
 StringBuilder::StringBuilder(const wchar_t *val) {
-	capacity = length = wcslen(val);
+	capacity = wcslen(val);
 	Init(capacity);
 	wcscpy(data, val);
+	length = capacity;
 }
 
 StringBuilder::~StringBuilder() {
-	if (data != NULL) {
+	if (data) {
 		delete [] data;
 		data = NULL;
-		length = 0;
-		capacity = 0;
 	}
 }
 

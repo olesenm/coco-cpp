@@ -37,6 +37,7 @@ namespace Coco {
                         Class StringBuilder Declaration
 \*---------------------------------------------------------------------------*/
 
+//! Mimic the StringBuilder class
 class StringBuilder
 {
 public:

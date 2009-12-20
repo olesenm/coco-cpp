@@ -2,6 +2,55 @@
 
 ---------------
 
+#### Extended pragma directives
+
+To improve the reliability of builds in complex environments, it is
+now possible to specify the desired namespace and/or file prefix as a
+pragma within the grammar. For example, the Coco.atg itself should be
+compiled within the 'Coco' namespace. There are two ways to do this.
+
+1. specify directly on the command-line:
+
+    Coco -namespace Coco Coco.atg
+
+2. specify within the Coco.atg file:
+
+    COMPILER Coco
+    $:namespace=Coco
+
+
+The *-prefix* command-line option receives similar treatment.
+Thus the grammar definitions
+
+    COMPILER GramA
+    $:namespace=MyProj:GramA
+    $:prefix=GramA
+
+    COMPILER GramB
+    $:namespace=MyProj:GramB
+    $:prefix=GramB
+
+
+would generate the scanner/parser files in the respective namespaces,
+but with theses names:
+
+    GramAParser.{h,cpp}
+    GramAScanner.{h,cpp}
+
+    GramBParser.{h,cpp}
+    GramBScanner.{h,cpp}
+
+
+The resulting scanner/parsers are separated not only in the C++
+namespace, but also on the filesystem. Even if the resulting files are
+to be located in separate directories, using a prefix can be useful to
+avoid confusion. For example, when the compiler -I includes both
+directories, an include "Parser.h" will only be able to address one of
+the parsers.
+
+
+---------------
+
 #### Scanner memory allocation
 
 To avoid repeated allocation/deallocation for each token, an internal

@@ -60,7 +60,10 @@ void Parser::Get() {
 			break;
 		}
 		if (la->kind == 42) {
-				tab->SetDDT(la->val); 
+				tab->SetDDT(la->val+1); 
+		}
+		if (la->kind == 43) {
+				tab->DispatchPragma(la->val+2); 
 		}
 
 		if (dummyToken != t) {

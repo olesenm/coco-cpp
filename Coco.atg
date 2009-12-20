@@ -36,6 +36,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "ParserGen.h"
 
 COMPILER Coco
+$:namespace=Coco
 
 private:
 	int id;
@@ -78,7 +79,10 @@ TOKENS
     char      = '\'' ( charCh | '\\' printable { hex } ) '\''.
 
 PRAGMAS
-    ddtSym    = '$' { digit | letter }.  (. tab->SetDDT(la->val); .)
+    ddtSym    = '$' { digit | letter }.  (. tab->SetDDT(la->val+1); .)
+    directive = "$:"
+        letter { letter } '=' { letter | digit | '-' | ':' } .
+                                (. tab->DispatchPragma(la->val+2); .)
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -118,7 +122,7 @@ Coco                            (. Symbol *sym; Graph *g, *g1, *g2; wchar_t* gra
     [ "NESTED"                  (. nested = true; .)
     ]                           (. dfa->NewComment(g1->l, g2->l, nested); .)
   }
-  { "IGNORE" Set<s>         (. tab->ignored->Or(s); .)
+  { "IGNORE" Set<s>             (. tab->ignored->Or(s); .)
   }
 
   SYNC

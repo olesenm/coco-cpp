@@ -618,22 +618,22 @@ void Scanner::Init() {
 	for (int i = 95; i <= 95; ++i) start.set(i, 1);
 	for (int i = 97; i <= 122; ++i) start.set(i, 1);
 	for (int i = 48; i <= 57; ++i) start.set(i, 2);
-	start.set(34, 11);
+	start.set(34, 14);
 	start.set(39, 5);
-	start.set(36, 10);
-	start.set(61, 13);
-	start.set(46, 28);
-	start.set(43, 14);
-	start.set(45, 15);
-	start.set(60, 29);
-	start.set(62, 17);
-	start.set(124, 20);
-	start.set(40, 30);
-	start.set(41, 21);
-	start.set(91, 22);
-	start.set(93, 23);
-	start.set(123, 24);
-	start.set(125, 25);
+	start.set(36, 15);
+	start.set(61, 17);
+	start.set(46, 32);
+	start.set(43, 18);
+	start.set(45, 19);
+	start.set(60, 33);
+	start.set(62, 21);
+	start.set(124, 24);
+	start.set(40, 34);
+	start.set(41, 25);
+	start.set(91, 26);
+	start.set(93, 27);
+	start.set(123, 28);
+	start.set(125, 29);
 	start.set(Buffer::EoF, -1);
 
 	keywords.set(L"COMPILER", 6);
@@ -900,60 +900,77 @@ Token* Scanner::NextToken() {
 			else {t->kind = 42; break;}
 		case 11:
 			case_11:
-			if (ch <= 9 || (ch >= 11 && ch <= 12) || (ch >= 14 && ch <= L'!') || (ch >= L'#' && ch <= L'[') || (ch >= L']' && ch <= 65535)) {AddCh(); goto case_11;}
-			else if (ch == 10 || ch == 13) {AddCh(); goto case_4;}
-			else if (ch == L'"') {AddCh(); goto case_3;}
-			else if (ch == 92) {AddCh(); goto case_12;}
+			if ((ch >= L'A' && ch <= L'Z') || ch == L'_' || (ch >= L'a' && ch <= L'z')) {AddCh(); goto case_12;}
 			else {t->kind = noSym; break;}
 		case 12:
 			case_12:
-			if ((ch >= L' ' && ch <= L'~')) {AddCh(); goto case_11;}
+			if ((ch >= L'A' && ch <= L'Z') || ch == L'_' || (ch >= L'a' && ch <= L'z')) {AddCh(); goto case_12;}
+			else if (ch == L'=') {AddCh(); goto case_13;}
 			else {t->kind = noSym; break;}
 		case 13:
-			{t->kind = 17; break;}
+			case_13:
+			if (ch == L'-' || (ch >= L'0' && ch <= L':') || (ch >= L'A' && ch <= L'Z') || ch == L'_' || (ch >= L'a' && ch <= L'z')) {AddCh(); goto case_13;}
+			else {t->kind = 43; break;}
 		case 14:
-			{t->kind = 20; break;}
+			case_14:
+			if (ch <= 9 || (ch >= 11 && ch <= 12) || (ch >= 14 && ch <= L'!') || (ch >= L'#' && ch <= L'[') || (ch >= L']' && ch <= 65535)) {AddCh(); goto case_14;}
+			else if (ch == 10 || ch == 13) {AddCh(); goto case_4;}
+			else if (ch == L'"') {AddCh(); goto case_3;}
+			else if (ch == 92) {AddCh(); goto case_16;}
+			else {t->kind = noSym; break;}
 		case 15:
-			{t->kind = 21; break;}
+			if ((ch >= L'0' && ch <= L'9') || (ch >= L'A' && ch <= L'Z') || ch == L'_' || (ch >= L'a' && ch <= L'z')) {AddCh(); goto case_10;}
+			else if (ch == L':') {AddCh(); goto case_11;}
+			else {t->kind = 42; break;}
 		case 16:
 			case_16:
-			{t->kind = 22; break;}
+			if ((ch >= L' ' && ch <= L'~')) {AddCh(); goto case_14;}
+			else {t->kind = noSym; break;}
 		case 17:
-			{t->kind = 25; break;}
+			{t->kind = 17; break;}
 		case 18:
-			case_18:
-			{t->kind = 26; break;}
+			{t->kind = 20; break;}
 		case 19:
-			case_19:
-			{t->kind = 27; break;}
+			{t->kind = 21; break;}
 		case 20:
-			{t->kind = 28; break;}
+			case_20:
+			{t->kind = 22; break;}
 		case 21:
-			{t->kind = 31; break;}
+			{t->kind = 25; break;}
 		case 22:
-			{t->kind = 32; break;}
+			case_22:
+			{t->kind = 26; break;}
 		case 23:
-			{t->kind = 33; break;}
+			case_23:
+			{t->kind = 27; break;}
 		case 24:
-			{t->kind = 34; break;}
+			{t->kind = 28; break;}
 		case 25:
-			{t->kind = 35; break;}
+			{t->kind = 31; break;}
 		case 26:
-			case_26:
-			{t->kind = 39; break;}
+			{t->kind = 32; break;}
 		case 27:
-			case_27:
-			{t->kind = 40; break;}
+			{t->kind = 33; break;}
 		case 28:
-			if (ch == L'.') {AddCh(); goto case_16;}
-			else if (ch == L'>') {AddCh(); goto case_19;}
-			else if (ch == L')') {AddCh(); goto case_27;}
-			else {t->kind = 18; break;}
+			{t->kind = 34; break;}
 		case 29:
-			if (ch == L'.') {AddCh(); goto case_18;}
-			else {t->kind = 24; break;}
+			{t->kind = 35; break;}
 		case 30:
-			if (ch == L'.') {AddCh(); goto case_26;}
+			case_30:
+			{t->kind = 39; break;}
+		case 31:
+			case_31:
+			{t->kind = 40; break;}
+		case 32:
+			if (ch == L'.') {AddCh(); goto case_20;}
+			else if (ch == L'>') {AddCh(); goto case_23;}
+			else if (ch == L')') {AddCh(); goto case_31;}
+			else {t->kind = 18; break;}
+		case 33:
+			if (ch == L'.') {AddCh(); goto case_22;}
+			else {t->kind = 24; break;}
+		case 34:
+			if (ch == L'.') {AddCh(); goto case_30;}
 			else {t->kind = 30; break;}
 
 	}

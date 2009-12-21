@@ -1,1 +1,1 @@
-jar -cfM CocoSourcesCPP.zip *.atg *.frame *.bat *.h *.cpp *.sh
+jar -cfM CocoSourcesCPP.zip *.atg *.frame *.bat *.h *.cpp *.sh *.mkdn

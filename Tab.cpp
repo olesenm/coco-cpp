@@ -53,16 +53,21 @@ const wchar_t* Tab::prefixMacro = L"$PREFIX$";
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Tab::Tab(Parser *parser) {
+Tab::Tab(Parser *parser)
+:
+	emitLines(false),
+	makeBackup(false),
+	explicitEof(false),
+	dummyNode(NULL),
+	dummyName('A')
+{
 	for (int i=0; i<10; i++) ddt[i] = false;
 
 	terminals = new ArrayList();
 	pragmas = new ArrayList();
 	nonterminals = new ArrayList();
 	nodes = new ArrayList();
-	dummyNode = NULL;
 	classes = new ArrayList();
-	dummyName = 'A';
 
 	this->parser = parser;
 	trace = parser->trace;
@@ -387,7 +392,7 @@ void Tab::PrintNodes() {
 CharClass* Tab::NewCharClass(const wchar_t* name, CharSet *s) {
 	CharClass *c;
 	if (coco_string_equal(name, L"#")) {
-		wchar_t* temp = coco_string_create_append(name, (wchar_t) dummyName++);
+		wchar_t* temp = coco_string_create_append(name, wchar_t(dummyName++));
 		c = new CharClass(temp, s);
 		coco_string_delete(temp);
 	} else {
@@ -781,7 +786,7 @@ wchar_t Tab::Hex2Char(const wchar_t* s) {
 	if (val >= COCO_WCHAR_MAX) {/* pdt */
 		parser->SemErr(L"bad escape sequence in string or character");
 	}
-	return (wchar_t) val;
+	return wchar_t(val);
 }
 
 wchar_t* Tab::Char2Hex(const wchar_t ch) {
@@ -1189,8 +1194,8 @@ void Tab::DispatchPragma(const wchar_t* str)
 	{
 		return;
 	}
-
 	wchar_t* name = coco_string_create(str, 0, len1);
+	const wchar_t* strval = (str + len1+1);
 
 	if (coco_string_equal(name, L"namespace"))
 	{
@@ -1199,7 +1204,7 @@ void Tab::DispatchPragma(const wchar_t* str)
 		if (!oldLen)
 		{
 			coco_string_delete(nsName);
-			nsName = coco_string_create(str, len1+1, len2);
+			nsName = coco_string_create(strval, 0, len2);
 		}
 		wprintf(L"using namespace: '%ls'\n", nsName);
 	}
@@ -1210,13 +1215,28 @@ void Tab::DispatchPragma(const wchar_t* str)
 		if (!oldLen)
 		{
 			coco_string_delete(prefixName);
-			prefixName = coco_string_create(str, len1+1, len2);
+			prefixName = coco_string_create(strval, 0, len2);
 		}
 		wprintf(L"using prefix: '%ls'\n", prefixName);
 	}
 	else if (coco_string_equal(name, L"trace"))
 	{
-		SetDDT(str + len1+1);
+		SetDDT(strval);
+	}
+	else if (coco_string_equal(name, L"eof"))
+	{
+		if (coco_string_equal(strval, L"true")) {
+			explicitEof = true;
+		} else if (coco_string_equal(strval, L"false")) {
+			explicitEof = false;
+		}
+		else {
+			wprintf
+			(
+				L"ignoring unknown bool value for pragma: '%ls' = '%ls'\n",
+				name, strval
+			);
+		}
 	}
 	else
 	{

@@ -404,7 +404,14 @@ void ParserGen::WriteParser() {
 
 	CopyFramePart(L"-->pragmas"); GenCodePragmas();
 	CopyFramePart(L"-->productions"); GenProductions();
-	CopyFramePart(L"-->parseRoot"); fwprintf(gen, L"\t%ls();\n", tab->gramSy->name);
+	CopyFramePart(L"-->parseRoot");
+	fwprintf(gen, L"\t%ls();\n", tab->gramSy->name);
+	if (tab->explicitEof) {
+		fwprintf(gen, L"\t// let grammar deal with end-of-file expectations\n");
+	}
+	else {
+		fwprintf(gen, L"\tExpect(0); // expect end-of-file automatically added\n");
+	}
 	CopyFramePart(L"-->constants");
 	CopyFramePart(L"-->initialization"); InitSets();
 	CopyFramePart(L"-->errors"); fwprintf(gen, L"%ls", err);

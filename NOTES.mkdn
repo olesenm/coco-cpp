@@ -57,6 +57,14 @@ with the same syntax. For example,
 
 
 
+For some grammars, it may be desirable to suppress the automatically
+added expectation that the parser content ends with the end-of-file.
+The pragma to do this:
+
+    COMPILER GramC
+    $eof=false
+
+
 ---------------
 
 #### Scanner memory allocation

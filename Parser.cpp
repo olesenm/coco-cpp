@@ -719,8 +719,8 @@ void Parser::Parse() {
 	la->val = coco_string_create(L"Dummy Token");
 	Get();
 	Coco();
+	Expect(0); // expect end-of-file automatically added
 
-	Expect(0);
 }
 
 

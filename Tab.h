@@ -65,9 +65,14 @@ public:
 	//! String for replacing the file prefix name
 	static const wchar_t* prefixMacro;
 
+	// miscellaneous generation controls
+	bool emitLines;         //!< emit line directives in generated parser
+	bool makeBackup;        //!< create .bak files for generated parser/scanner
+	bool explicitEof;       //!< user must explicitly add EOF in grammar
+	bool ddt[10];           //!< debug and test switches
+
 	Position *semDeclPos;   //!< position of global semantic declarations
 	CharSet *ignored;       //!< characters ignored by the scanner
-	bool ddt[10];           //!< debug and test switches
 	Symbol *gramSy;         //!< root nonterminal; filled by ATG
 	Symbol *eofSy;          //!< end of file symbol
 	Symbol *noSym;          //!< used in case of an error
@@ -79,8 +84,6 @@ public:
 	wchar_t* prefixName;    //!< prefix for generated files
 	wchar_t* frameDir;      //!< directory containing the frame files
 	wchar_t* outDir;        //!< directory for generated files
-	bool emitLines;         //!< emit line directives in generated parser
-	bool makeBackup;        //!< create .bak files for generated parser/scanner
 	BitArray *visited;      //!< mark list for graph traversals
 	Symbol *curSy;          //!< current symbol in computation of sets
 	Parser *parser;         //!< other Coco objects

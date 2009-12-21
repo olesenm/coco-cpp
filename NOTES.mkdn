@@ -16,19 +16,19 @@ compiled within the 'Coco' namespace. There are two ways to do this.
 2. specify within the Coco.atg file:
 
     COMPILER Coco
-    $:namespace=Coco
+    $namespace=Coco
 
 
 The *-prefix* command-line option receives similar treatment.
 Thus the grammar definitions
 
     COMPILER GramA
-    $:namespace=MyProj:GramA
-    $:prefix=GramA
+    $namespace=MyProj:GramA
+    $prefix=GramA
 
     COMPILER GramB
-    $:namespace=MyProj:GramB
-    $:prefix=GramB
+    $namespace=MyProj:GramB
+    $prefix=GramB
 
 
 would generate the scanner/parser files in the respective namespaces,
@@ -47,6 +47,14 @@ to be located in separate directories, using a prefix can be useful to
 avoid confusion. For example, when the compiler -I includes both
 directories, an include "Parser.h" will only be able to address one of
 the parsers.
+
+
+For completeness, it is also possible to add in trace string parameters
+with the same syntax. For example,
+
+    COMPILER GramC
+    $trace=ags
+
 
 
 ---------------

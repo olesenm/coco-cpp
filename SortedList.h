@@ -35,42 +35,35 @@ namespace Coco {
 class Symbol;
 
 /*---------------------------------------------------------------------------*\
-                         Class SortedEntry Declaration
-\*---------------------------------------------------------------------------*/
-
-class SortedEntry
-{
-public:
-	Symbol* Key;
-	void* Value;
-	SortedEntry* next;
-
-	SortedEntry(Symbol* key, void* value);
-	virtual ~SortedEntry();
-};
-
-
-/*---------------------------------------------------------------------------*\
                          Class SortedList Declaration
 \*---------------------------------------------------------------------------*/
 
 class SortedList
 {
+private:
+	struct Entry
+	{
+		Symbol* Key;
+		void* Value;
+		Entry* next;
+
+		Entry(Symbol* key, void* value);
+	};
+
 public:
 	SortedList();
 	virtual ~SortedList();
 
 	void Set(Symbol *key, void *value);
-	void* Get( Symbol* key ) const;      //!< return Value
-	void* GetKey( int index ) const ;    //!< return Key
-	SortedEntry* operator[]( int index ) const;
+	void* Get(Symbol* key) const;        //!< return Value
+	Symbol* GetKey(int index) const ;    //!< return Key
 
 	int Count;
 private:
 	static int Compare(Symbol* x, Symbol* y);
 	bool Find(Symbol* key);
 
-	SortedEntry *Data;
+	Entry *Data;
 
 };
 

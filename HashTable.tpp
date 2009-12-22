@@ -1,4 +1,4 @@
-/*-------------------------------------------------------------------------
+/*-----------------------------*- C++ -*-----------------------------------
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -35,43 +35,51 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-HashTable::HashTable(int sz) :
-	size(sz), data(new Obj*[sz])
+template<typename Type>
+HashTable<Type>::HashTable(int sz) :
+	size(sz), data(new Entry*[sz])
 {
-	memset(data, 0, size * sizeof(Obj*));
+	memset(data, 0, size * sizeof(Entry*));
 }
 
-HashTable::~HashTable() {
+
+template<typename Type>
+HashTable<Type>::~HashTable() {
 	for (int i = 0; i < size; ++i) {
-		Obj *o = data[i];
+		Entry *o = data[i];
 		while (o) {
-			Obj *del = o;
+			Entry *del = o;
 			o = o->next;
 			delete del;
 		}
 	}
 	delete[] data;
 	data = 0;
-};
+}
 
-HashTable::Obj* HashTable::GetObj(wchar_t *key) const {
+
+template<typename Type>
+DictionaryEntry<Type>*
+HashTable<Type>::GetObj(wchar_t *key) const {
 	int k = coco_string_hash(key) % size;
-	HashTable::Obj *o = data[k];
+	Entry *o = data[k];
 	while (o && !coco_string_equal(key, o->key)) {
 		o = o->next;
 	}
 	return o;
 }
 
-void HashTable::Set(wchar_t *key, void *val) {
-	HashTable::Obj *o = GetObj(key);
+
+template<typename Type>
+void HashTable<Type>::Set(wchar_t *key, Type *val) {
+	Entry *o = GetObj(key);
 	if (o) {
 		// exist entry - overwrite
 		o->val = val;
 	} else {
 		// new entry
 		int k = coco_string_hash(key) % size;
-		o = new Obj();
+		o = new Entry();
 		o->key = key;
 		o->val = val;
 		o->next = data[k];
@@ -79,22 +87,31 @@ void HashTable::Set(wchar_t *key, void *val) {
 	}
 }
 
-void* HashTable::Get(wchar_t *key) const {
-	HashTable::Obj *o = GetObj(key);
+
+template<typename Type>
+Type* HashTable<Type>::Get(wchar_t *key) const {
+	Entry *o = GetObj(key);
 	return o ? o->val : NULL;
 }
 
-Iterator* HashTable::GetIterator() {
-	return new HashTable::Iter(this);
+
+template<typename Type>
+typename HashTable<Type>::Iterator*
+HashTable<Type>::GetIterator() {
+	return new HashTable<Type>::Iterator(this);
 }
 
-HashTable::Iter::Iter(HashTable *htbl) :
+
+template<typename Type>
+HashTable<Type>::Iterator::Iterator(HashTable<Type> *htbl) :
 	ht(htbl),
 	pos(0),
 	cur(0)
 {}
 
-bool HashTable::Iter::HasNext() {
+
+template<typename Type>
+bool HashTable<Type>::Iterator::HasNext() {
 	while (!cur && pos < ht->size) {
 		cur = ht->data[pos];
 		++pos;
@@ -102,11 +119,14 @@ bool HashTable::Iter::HasNext() {
 	return cur != NULL;
 }
 
-DictionaryEntry* HashTable::Iter::Next() {
+
+template<typename Type>
+DictionaryEntry<Type>*
+HashTable<Type>::Iterator::Next() {
 	if (!HasNext()) {
 		return NULL;
 	}
-	Obj *next = cur;
+	DictionaryEntry<Type> *next = cur;
 	cur = cur->next;
 	return next;
 }

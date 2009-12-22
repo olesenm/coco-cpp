@@ -33,50 +33,60 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-SortedList::Entry::Entry(Symbol* k, void* v) :
+template<typename Type>
+SortedList<Type>::Entry::Entry(Symbol* k, Type* v) :
 	Key(k),
 	Value(v),
 	next(0)
 {}
 
 
-SortedList::SortedList() :
+template<typename Type>
+SortedList<Type>::SortedList() :
 	Count(0),
-	Data(0)
+	Data_(0)
 {}
 
-SortedList::~SortedList()
+
+template<typename Type>
+SortedList<Type>::~SortedList()
 {}
 
-int SortedList::Compare(Symbol *x, Symbol *y) {
+
+template<typename Type>
+int SortedList<Type>::Compare(Symbol *x, Symbol *y) {
 	return coco_string_compareto(x->name, y->name);
 }
 
-bool SortedList::Find(Symbol* key) {
-	Entry* curr = Data;
+
+template<typename Type>
+bool SortedList<Type>::Find(Symbol* key) {
+	Entry* curr = Data_;
 	while (curr) {
-		if (!Compare(curr->Key, key))
+		if (!this->Compare(curr->Key, key))
 			return true;
 		curr = curr->next;
 	}
 	return false;
 }
 
-void SortedList::Set(Symbol *key, void *value) {
-	if (!Find(key)) {
+
+template<typename Type>
+void SortedList<Type>::Set(Symbol *key, Type *value) {
+	if (!this->Find(key)) {
 		// new entry
-		Entry* curr = Data;
+		Entry* curr = Data_;
 		Entry* prev = 0;
 		Entry* newEntry = new Entry(key, value);
 		if (curr) {
 			// insert
 
-			if (Compare(curr->Key, key) > 0) {  // before the first
-				newEntry->next = Data;
-				Data = newEntry;
+			if (this->Compare(curr->Key, key) > 0) {  // before the first
+				newEntry->next = Data_;
+				Data_ = newEntry;
 			} else {
 				while (curr) {
-					if (Compare(curr->Key, key) < 0) {
+					if (this->Compare(curr->Key, key) < 0) {
 						prev = curr;
 						curr = curr->next;
 					} else {
@@ -87,24 +97,25 @@ void SortedList::Set(Symbol *key, void *value) {
 				newEntry->next = curr;
 			}
 		} else {
-			Data = newEntry;             // first entry
+			Data_ = newEntry;             // first entry
 		}
 		Count++;
 	} else {
 		// existing entry - overwrite
-		Entry* curr = Data;
-		while (Compare(curr->Key, key)) {
+		Entry* curr = Data_;
+		while (this->Compare(curr->Key, key)) {
 			curr = curr->next;
 		}
 		curr->Value = value;
 	}
 }
 
-void* SortedList::Get(Symbol* key) const // Value
+template<typename Type>
+Type* SortedList<Type>::Get(Symbol* key) const // Value
 {
-	Entry* curr = Data;
+	Entry* curr = Data_;
 	while (curr) {
-		if (!Compare(curr->Key, key))
+		if (!this->Compare(curr->Key, key))
 			return curr->Value;
 		curr = curr->next;
 	}
@@ -112,10 +123,11 @@ void* SortedList::Get(Symbol* key) const // Value
 }
 
 
-Symbol* SortedList::GetKey(int index) const // Key
+template<typename Type>
+Symbol* SortedList<Type>::GetKey(int index) const // Key
 {
 	if (0 <= index && index < Count) {
-		Entry* curr = Data;
+		Entry* curr = Data_;
 		for (int i=0; i<index; i++) {
 			curr = curr->next;
 		}

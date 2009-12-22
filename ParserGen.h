@@ -70,7 +70,7 @@ public:
 	FILE* gen;              //!< generated parser source file
 	wchar_t* err;           //!< generated parser error messages
 
-	ArrayList *symSet;
+	ArrayList<BitArray> *symSet;
 
 	Tab *tab;               //!< other Coco objects
 	FILE* trace;            //!< trace file

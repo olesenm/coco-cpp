@@ -33,7 +33,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "ArrayList.h"
 #include "HashTable.h"
 #include "StringBuilder.h"
-#include "SortedList.h"
 #include "Scanner.h"
 #include "Position.h"
 #include "Symbol.h"
@@ -77,7 +76,7 @@ public:
 	Symbol *eofSy;          //!< end of file symbol
 	Symbol *noSym;          //!< used in case of an error
 	BitArray *allSyncSets;  //!< union of all synchronisation sets
-	HashTable *literals;    //!< symbols that are used as literals
+	HashTable<Symbol> *literals;    //!< symbols that are used as literals
 	wchar_t* srcName;       //!< name of the atg file (including path)
 	wchar_t* srcDir;        //!< directory path of the atg file
 	wchar_t* nsName;        //!< namespace for generated files
@@ -91,15 +90,15 @@ public:
 
 	Errors *errors;
 
-	ArrayList *terminals;
-	ArrayList *pragmas;
-	ArrayList *nonterminals;
+	ArrayList<Symbol> *terminals;
+	ArrayList<Symbol> *pragmas;
+	ArrayList<Symbol> *nonterminals;
 
 
-	ArrayList *nodes;
+	ArrayList<Node> *nodes;
 	Node *dummyNode;
 
-	ArrayList *classes;
+	ArrayList<CharClass> *classes;
 	int dummyName;
 
 
@@ -212,7 +211,7 @@ public:
 		CNode(Symbol *l, Symbol *r) : left(l), right(r) {}
 	};
 
-	void GetSingles(Node *p, ArrayList *singles);
+	void GetSingles(Node *p, ArrayList<Symbol> *singles);
 	bool NoCircularProductions();
 
 	//--------------- check for LL(1) errors ----------------------

@@ -37,22 +37,12 @@ namespace Coco {
                        Class DictionaryEntry Declaration
 \*---------------------------------------------------------------------------*/
 //! An entry for the HashTable
+template<typename Type>
 class DictionaryEntry {
 public:
 	wchar_t *key;
-	void *val;
-};
-
-
-/*---------------------------------------------------------------------------*\
-                          Class Iterator Declaration
-\*---------------------------------------------------------------------------*/
-//! An iterator for the HashTable
-class Iterator {
-public:
-	virtual bool HasNext() = 0;
-	virtual DictionaryEntry* Next() = 0;
-	virtual ~Iterator() {}
+	Type *val;
+	DictionaryEntry *next;
 };
 
 
@@ -60,38 +50,39 @@ public:
                           Class HashTable Declaration
 \*---------------------------------------------------------------------------*/
 //! A simple HashTable implementation
+template<typename Type>
 class HashTable
 {
+	typedef DictionaryEntry<Type> Entry;
+
 public:
+	class Iterator;            //!< Forward declaration of iterators
+	friend class Iterator;     //!< Declare friendship with the iterator
+
 	HashTable(int size = 128);
-	virtual ~HashTable();
+	~HashTable();
 
-	virtual void Set(wchar_t *key, void *value);
-	virtual void* Get(wchar_t *key) const;
-	inline void* operator[](wchar_t *key) const { return Get(key); };
-	virtual Iterator* GetIterator();
-
-private:
-	class Obj : public DictionaryEntry {
-	public:
-		Obj *next;
-	};
-
-	class Iter : public Iterator {
+	class Iterator {
 	private:
 		HashTable *ht;
 		int pos;
-		Obj* cur;
+		Entry* cur;
 
 	public:
-		Iter(HashTable *ht);
-		virtual bool HasNext();
-		virtual DictionaryEntry* Next();
+		Iterator(HashTable<Type> *ht);
+		bool HasNext();
+		DictionaryEntry<Type>* Next();
 	};
 
+	void Set(wchar_t *key, Type *value);
+	Type* Get(wchar_t *key) const;
+	inline  Type* operator[](wchar_t *key) const { return Get(key); };
+	Iterator* GetIterator();
+
+private:
 	int size;
-	Obj **data;
-	Obj* GetObj(wchar_t *key) const;
+	Entry** data;
+	Entry* GetObj(wchar_t *key) const;
 
 };
 
@@ -100,6 +91,8 @@ private:
 } // End namespace Coco
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "HashTable.tpp"
 
 #endif
 

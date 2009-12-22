@@ -38,24 +38,25 @@ class Symbol;
                          Class SortedList Declaration
 \*---------------------------------------------------------------------------*/
 
+template<typename Type>
 class SortedList
 {
 private:
 	struct Entry
 	{
 		Symbol* Key;
-		void* Value;
+		Type* Value;
 		Entry* next;
 
-		Entry(Symbol* key, void* value);
+		Entry(Symbol* k, Type* v);
 	};
 
 public:
 	SortedList();
 	virtual ~SortedList();
 
-	void Set(Symbol *key, void *value);
-	void* Get(Symbol* key) const;        //!< return Value
+	void  Set(Symbol *key, Type *value);
+	Type* Get(Symbol* key) const;        //!< return Value
 	Symbol* GetKey(int index) const ;    //!< return Key
 
 	int Count;
@@ -63,7 +64,7 @@ private:
 	static int Compare(Symbol* x, Symbol* y);
 	bool Find(Symbol* key);
 
-	Entry *Data;
+	Entry *Data_;
 
 };
 
@@ -73,6 +74,8 @@ private:
 } // End namespace Coco
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "SortedList.tpp"
 
 #endif
 

@@ -75,7 +75,7 @@ void StringBuilder::Append(const wchar_t value) {
 }
 
 void StringBuilder::Append(const wchar_t *value) {
-	if (length + (int)wcslen(value) < capacity) {
+	if (length + int(wcslen(value)) < capacity) {
 		wcscpy(data + length, value);
 		length += wcslen(value);
 	}

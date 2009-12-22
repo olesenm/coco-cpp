@@ -36,20 +36,26 @@ namespace Coco {
 \*---------------------------------------------------------------------------*/
 
 //! An array of pointers
+template<typename Type>
 class ArrayList
 {
 public:
+
 	ArrayList();
+
 	virtual ~ArrayList();
+	void Add(Type *ptr);
+	bool Remove(Type *ptr);
+	void Clear();
 
-	void Add(void *value);
-	void Remove(void *value);
-	void* operator[](int index);
+	Type* operator[](int index);
 
+public:
 	int Count;
-	int Capacity;
+
 private:
-	void** Data;
+	int Capacity;
+	Type** Data_;
 };
 
 
@@ -58,6 +64,8 @@ private:
 } // End namespace Coco
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "ArrayList.tpp"
 
 #endif
 

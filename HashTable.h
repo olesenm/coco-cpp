@@ -77,7 +77,7 @@ public:
 	void Set(wchar_t *key, Type *value);
 	Type* Get(wchar_t *key) const;
 	inline  Type* operator[](wchar_t *key) const { return Get(key); };
-	Iterator* GetIterator();
+	Iterator GetIterator();
 
 private:
 	int size;

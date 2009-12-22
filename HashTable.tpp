@@ -96,9 +96,9 @@ Type* HashTable<Type>::Get(wchar_t *key) const {
 
 
 template<typename Type>
-typename HashTable<Type>::Iterator*
+typename HashTable<Type>::Iterator
 HashTable<Type>::GetIterator() {
-	return new HashTable<Type>::Iterator(this);
+	return HashTable<Type>::Iterator(this);
 }
 
 

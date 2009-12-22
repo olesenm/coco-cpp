@@ -150,9 +150,9 @@ void Tab::PrintSymbolTable() {
 	fwprintf(trace, L"\nLiteral Tokens:\n");
 	fwprintf(trace, L"--------------\n");
 
-	HashTable<Symbol>::Iterator *iter = literals->GetIterator();
-	while (iter->HasNext()) {
-		DictionaryEntry<Symbol> *e = iter->Next();
+	HashTable<Symbol>::Iterator iter = literals->GetIterator();
+	while (iter.HasNext()) {
+		DictionaryEntry<Symbol> *e = iter.Next();
 		fwprintf(trace, L"_%ls =  %ls.\n", (e->val)->name, e->key);
 	}
 	fwprintf(trace, L"\n");

@@ -610,9 +610,9 @@ wchar_t* DFA::SymName(Symbol *sym) { // real name value is stored in Tab.literal
 	if (('a' <= sym->name[0] && sym->name[0] <= 'z') ||
 		('A' <= sym->name[0] && sym->name[0] <= 'Z')) { //Char::IsLetter(sym->name[0])
 
-		HashTable<Symbol>::Iterator *iter = tab->literals->GetIterator();
-		while (iter->HasNext()) {
-			DictionaryEntry<Symbol> *e = iter->Next();
+		HashTable<Symbol>::Iterator iter = tab->literals->GetIterator();
+		while (iter.HasNext()) {
+			DictionaryEntry<Symbol> *e = iter.Next();
 			if (e->val == sym) { return e->key; }
 		}
 	}
@@ -621,15 +621,13 @@ wchar_t* DFA::SymName(Symbol *sym) { // real name value is stored in Tab.literal
 
 
 void DFA::GenLiterals() {
-	Symbol *sym;
-
 	ArrayList<Symbol> *ts[2];
 	ts[0] = tab->terminals;
 	ts[1] = tab->pragmas;
 
 	for (int i = 0; i < 2; ++i) {
 		for (int j = 0; j < ts[i]->Count; j++) {
-			sym = (*(ts[i]))[j];
+			Symbol *sym = (*(ts[i]))[j];
 			if (sym->tokenKind == Symbol::litToken) {
 				wchar_t* name = coco_string_create(SymName(sym));
 				if (ignoreCase) {

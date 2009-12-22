@@ -46,9 +46,9 @@ namespace Coco {
 wchar_t* DFA::Ch(wchar_t ch) {
 	wchar_t* format = new wchar_t[10];
 	if (ch < L' ' || ch >= 127 || ch == L'\'' || ch == L'\\')
-		coco_swprintf(format, 10, L"%d\0", (int) ch);
+		coco_swprintf(format, 10, L"%d\0", int(ch));
 	else
-		coco_swprintf(format, 10, L"L'%lc'\0", (int) ch);
+		coco_swprintf(format, 10, L"L'%lc'\0", int(ch));
 	return format;
 }
 
@@ -65,16 +65,16 @@ wchar_t* DFA::ChCond(wchar_t ch) {
 void DFA::PutRange(CharSet *s) {
 	for (CharSet::Range *r = s->head; r != NULL; r = r->next) {
 		if (r->from == r->to) {
-			wchar_t *from = Ch((wchar_t) r->from);
+			wchar_t *from = Ch(wchar_t(r->from));
 			fwprintf(gen, L"ch == %ls", from);
 			delete [] from;
 		} else if (r->from == 0) {
-			wchar_t *to = Ch((wchar_t) r->to);
+			wchar_t *to = Ch(wchar_t(r->to));
 			fwprintf(gen, L"ch <= %ls", to);
 			delete [] to;
 		} else {
-			wchar_t *from = Ch((wchar_t) r->from);
-			wchar_t *to = Ch((wchar_t) r->to);
+			wchar_t *from = Ch(wchar_t(r->from));
+			wchar_t *to = Ch(wchar_t(r->to));
 			fwprintf(gen, L"(ch >= %ls && ch <= %ls)", from, to);
 			delete [] from;
 			delete [] to;
@@ -495,11 +495,11 @@ wchar_t* DFA::CommentStr(Node *p) {
 	StringBuilder s = StringBuilder();
 	while (p != NULL) {
 		if (p->typ == Node::chr) {
-			s.Append((wchar_t)p->val);
+			s.Append(wchar_t(p->val));
 		} else if (p->typ == Node::clas) {
 			CharSet *set = tab->CharClassSet(p->val);
 			if (set->Elements() != 1) parser->SemErr(L"character set contains more than 1 character");
-			s.Append((wchar_t) set->First());
+			s.Append(wchar_t(set->First()));
 		}
 		else parser->SemErr(L"comment delimiters may not be structured");
 		p = p->next;
@@ -678,7 +678,7 @@ void DFA::WriteState(State *state) {
 		if (action == state->firstAction) fwprintf(gen, L"\t\t\tif (");
 		else fwprintf(gen, L"\t\t\telse if (");
 		if (action->typ == Node::chr) {
-			wchar_t* res = ChCond((wchar_t)action->sym);
+			wchar_t* res = ChCond(wchar_t(action->sym));
 			fwprintf(gen, L"%ls", res);
 			delete [] res;
 		} else PutRange(tab->CharClassSet(action->sym));

@@ -53,19 +53,35 @@ const wchar_t* Tab::prefixMacro = L"$PREFIX$";
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Tab::Tab(Parser *parser)
+Tab::Tab(Parser *theParser)
 :
 	emitLines(false),
 	makeBackup(false),
 	explicitEof(false),
+	semDeclPos(NULL),
+	initCodePos(NULL),
+	deinitCodePos(NULL),
+	ignored(NULL),
+	gramSy(NULL),
+	eofSy(NULL),
+	noSym(NULL),
+	allSyncSets(NULL),
+	srcName(NULL),
+	srcDir(NULL),
+	nsName(NULL),
+	prefixName(NULL),
+	frameDir(NULL),
+	outDir(NULL),
+	visited(NULL),
+	curSy(NULL),
+	parser(theParser),
+	trace(parser->trace),
+	errors(parser->errors),
 	dummyNode(NULL),
 	dummyName('A')
 {
 	for (int i=0; i<10; i++) ddt[i] = false;
 
-	this->parser = parser;
-	trace = parser->trace;
-	errors = parser->errors;
 	eofSy = NewSym(Node::t, L"EOF", 0);
 	dummyNode = NewNode(Node::eps, reinterpret_cast<Symbol*>(0), 0);
 }
@@ -74,6 +90,8 @@ Tab::Tab(Parser *parser)
 Tab::~Tab()
 {
 	if (semDeclPos) { delete semDeclPos; }
+	if (initCodePos) { delete initCodePos; }
+	if (deinitCodePos) { delete deinitCodePos; }
 	if (ignored) { delete ignored; }
 	if (eofSy) { delete eofSy; }
 	if (noSym) { delete noSym; }

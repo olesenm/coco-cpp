@@ -2,6 +2,28 @@
 
 ---------------
 
+#### Extended syntax
+
+Compared to the C# version, the C++ version adds an extended syntax
+to deal with initialization and destruction of user code.
+
+    Coco =
+      {ANY}           // #include clauses in C++
+      "COMPILER" ident          .)
+      {ANY}           // global fields and methods
+      ["INITIALIZE" {ANY}]
+      ["DESTROY"    {ANY}]
+      ScannerSpecification
+      ParserSpecification
+      "END" ident '.'
+
+
+The *INITIALIZE* code is added to the Parser constructor, the
+*DESTROY* code is added to the Parser destructor.
+
+
+---------------
+
 #### Extended pragma directives
 
 To improve the reliability of builds in complex environments, it is

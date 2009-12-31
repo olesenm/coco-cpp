@@ -80,10 +80,10 @@ private:
 		_string=3,
 		_badString=4,
 		_char=5,
-		_ddtSym=42,
-		_directive=43,
+		_ddtSym=44,
+		_directive=45,
 	};
-	static const int maxT = 41;
+	static const int maxT = 43;
 
 	static const int minErrDist = 2; //!< min. distance before reporting errors
 
@@ -106,24 +106,17 @@ public:
 	Token *la;                  //!< lookahead token
 
 private:
-	int id;
-	int str;
+	static const int id = 0;
+	static const int str = 1;
+	bool genScanner;
 	wchar_t* tokenString;   //!< used in declarations of literal tokens
 	wchar_t* noString;      //!< used in declarations of literal tokens
 
-	void InitDeclarations() {
-		id  = 0;
-		str = 1;
-		tokenString = NULL;
-		noString = coco_string_create(L"-none-");
-	}
-
 public:
-	FILE* trace;           //!< trace file
-	Tab *tab;              //!< other Coco objects referenced in this ATG
+	FILE* trace;            //!< trace file
+	Tab *tab;               //!< other Coco objects referenced in this ATG
 	DFA *dfa;
 	ParserGen *pgen;
-	bool genScanner;
 
 /*-------------------------------------------------------------------------*/
 
@@ -135,7 +128,7 @@ public:
 	 *  handler, which will not be deleted upon destruction.
 	 */
 	Parser(Scanner* scan, Errors* err = 0);
-	~Parser();      //!< Destructor - cleanup errors and dummyToken
+	~Parser();
 	void SemErr(const wchar_t* msg);    //!< Handle semantic error
 
 	void Coco();

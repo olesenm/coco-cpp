@@ -348,8 +348,8 @@ public:
 //! A Coco/R Scanner
 class Scanner {
 private:
-	static const int maxT = 41;
-	static const int noSym = 41;
+	static const int maxT = 43;
+	static const int noSym = 43;
 
 	static const int eofSym = 0;    //!< end-of-file token id
 	static const char EOL = '\n';   //!< end-of-line character

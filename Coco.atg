@@ -39,24 +39,31 @@ COMPILER Coco
 $namespace=Coco
 
 private:
-	int id;
-	int str;
+	static const int id = 0;
+	static const int str = 1;
+	bool genScanner;
 	wchar_t* tokenString;   //!< used in declarations of literal tokens
 	wchar_t* noString;      //!< used in declarations of literal tokens
 
-	void InitDeclarations() {
-		id  = 0;
-		str = 1;
-		tokenString = NULL;
-		noString = coco_string_create(L"-none-");
-	}
-
 public:
-	FILE* trace;           //!< trace file
-	Tab *tab;              //!< other Coco objects referenced in this ATG
+	FILE* trace;            //!< trace file
+	Tab *tab;               //!< other Coco objects referenced in this ATG
 	DFA *dfa;
 	ParserGen *pgen;
-	bool genScanner;
+
+/*-------------------------------------------------------------------------*/
+
+INITIALIZE
+	genScanner = false;
+	tokenString = NULL;
+	noString = coco_string_create(L"-none-");
+	trace = NULL;
+	tab = NULL;
+	dfa = NULL;
+	pgen = NULL;
+
+DESTROY
+	coco_string_delete(noString);
 
 /*-------------------------------------------------------------------------*/
 
@@ -93,14 +100,12 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 
-Coco                            (. Symbol *sym; Graph *g, *g1, *g2; wchar_t* gramName = NULL; CharSet *s;
-                                   InitDeclarations(); .)
+Coco                            (. Symbol *sym; Graph *g, *g1, *g2; wchar_t* gramName = NULL; CharSet *s; .)
 =
                                 (. int beg = la->pos; int line = la->line; .)
-  { // this section can be used
-    // for #include statements
-    ANY
-  }                             (. if (la->pos != beg) {
+
+  // this section can be used for #include statements
+  { ANY }                       (. if (la->pos != beg) {
                                      pgen->usingPos = new Position(beg, t->pos + coco_string_length(t->val), 0, line);
                                    }
                                 .)
@@ -111,7 +116,24 @@ Coco                            (. Symbol *sym; Graph *g, *g1, *g2; wchar_t* gra
                                    beg = la->pos;
                                    line = la->line;
                                 .)
-  { ANY }                       (. tab->semDeclPos = new Position(beg, la->pos, 0, line); .)
+  { ANY }                       (. tab->semDeclPos = new Position(beg, la->pos, 0, line);
+                                   beg = la->pos;
+                                   line = la->line; .)
+
+  // this section can be used to add code to the constructor
+  [ "INITIALIZE"                (. beg = la->pos; line = la->line; .)
+    { ANY }                     (. tab->initCodePos = new Position(beg, la->pos, 0, line);
+                                   beg = la->pos;
+                                   line = la->line; .)
+  ]
+
+  // this section can be used to add code to the destructor
+  [ "DESTROY"                   (. beg = la->pos; line = la->line; .)
+    { ANY }                     (. tab->deinitCodePos = new Position(beg, la->pos, 0, line);
+                                   beg = la->pos;
+                                   line = la->line; .)
+  ]
+
   [ "IGNORECASE"                (. dfa->ignoreCase = true; .) ]   /* pdt */
   [ "CHARACTERS" { SetDecl }]
   [ "TOKENS"  { TokenDecl<Node::t> }]

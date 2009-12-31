@@ -637,22 +637,24 @@ void Scanner::Init() {
 	start.set(Buffer::EoF, -1);
 
 	keywords.set(L"COMPILER", 6);
-	keywords.set(L"IGNORECASE", 7);
-	keywords.set(L"CHARACTERS", 8);
-	keywords.set(L"TOKENS", 9);
-	keywords.set(L"PRAGMAS", 10);
-	keywords.set(L"COMMENTS", 11);
-	keywords.set(L"FROM", 12);
-	keywords.set(L"TO", 13);
-	keywords.set(L"NESTED", 14);
-	keywords.set(L"IGNORE", 15);
-	keywords.set(L"PRODUCTIONS", 16);
-	keywords.set(L"END", 19);
-	keywords.set(L"ANY", 23);
-	keywords.set(L"WEAK", 29);
-	keywords.set(L"SYNC", 36);
-	keywords.set(L"IF", 37);
-	keywords.set(L"CONTEXT", 38);
+	keywords.set(L"INITIALIZE", 7);
+	keywords.set(L"DESTROY", 8);
+	keywords.set(L"IGNORECASE", 9);
+	keywords.set(L"CHARACTERS", 10);
+	keywords.set(L"TOKENS", 11);
+	keywords.set(L"PRAGMAS", 12);
+	keywords.set(L"COMMENTS", 13);
+	keywords.set(L"FROM", 14);
+	keywords.set(L"TO", 15);
+	keywords.set(L"NESTED", 16);
+	keywords.set(L"IGNORE", 17);
+	keywords.set(L"PRODUCTIONS", 18);
+	keywords.set(L"END", 21);
+	keywords.set(L"ANY", 25);
+	keywords.set(L"WEAK", 31);
+	keywords.set(L"SYNC", 38);
+	keywords.set(L"IF", 39);
+	keywords.set(L"CONTEXT", 40);
 
 
 	tvalLength = 128;
@@ -897,11 +899,11 @@ Token* Scanner::NextToken() {
 		case 10:
 			case_10:
 			if ((ch >= L'0' && ch <= L'9') || (ch >= L'A' && ch <= L'Z') || ch == L'_' || (ch >= L'a' && ch <= L'z')) {AddCh(); goto case_10;}
-			else {t->kind = 42; break;}
+			else {t->kind = 44; break;}
 		case 11:
 			case_11:
 			if ((ch >= L'-' && ch <= L'.') || (ch >= L'0' && ch <= L':') || (ch >= L'A' && ch <= L'Z') || ch == L'_' || (ch >= L'a' && ch <= L'z')) {AddCh(); goto case_11;}
-			else {t->kind = 43; break;}
+			else {t->kind = 45; break;}
 		case 12:
 			case_12:
 			if (ch <= 9 || (ch >= 11 && ch <= 12) || (ch >= 14 && ch <= L'!') || (ch >= L'#' && ch <= L'[') || (ch >= L']' && ch <= 65535)) {AddCh(); goto case_12;}
@@ -912,7 +914,7 @@ Token* Scanner::NextToken() {
 		case 13:
 			if ((ch >= L'0' && ch <= L'9')) {AddCh(); goto case_10;}
 			else if ((ch >= L'A' && ch <= L'Z') || ch == L'_' || (ch >= L'a' && ch <= L'z')) {AddCh(); goto case_15;}
-			else {t->kind = 42; break;}
+			else {t->kind = 44; break;}
 		case 14:
 			case_14:
 			if ((ch >= L' ' && ch <= L'~')) {AddCh(); goto case_12;}
@@ -922,53 +924,53 @@ Token* Scanner::NextToken() {
 			if ((ch >= L'0' && ch <= L'9')) {AddCh(); goto case_10;}
 			else if ((ch >= L'A' && ch <= L'Z') || ch == L'_' || (ch >= L'a' && ch <= L'z')) {AddCh(); goto case_15;}
 			else if (ch == L'=') {AddCh(); goto case_11;}
-			else {t->kind = 42; break;}
+			else {t->kind = 44; break;}
 		case 16:
-			{t->kind = 17; break;}
+			{t->kind = 19; break;}
 		case 17:
-			{t->kind = 20; break;}
+			{t->kind = 22; break;}
 		case 18:
-			{t->kind = 21; break;}
+			{t->kind = 23; break;}
 		case 19:
 			case_19:
-			{t->kind = 22; break;}
+			{t->kind = 24; break;}
 		case 20:
-			{t->kind = 25; break;}
+			{t->kind = 27; break;}
 		case 21:
 			case_21:
-			{t->kind = 26; break;}
+			{t->kind = 28; break;}
 		case 22:
 			case_22:
-			{t->kind = 27; break;}
+			{t->kind = 29; break;}
 		case 23:
-			{t->kind = 28; break;}
+			{t->kind = 30; break;}
 		case 24:
-			{t->kind = 31; break;}
-		case 25:
-			{t->kind = 32; break;}
-		case 26:
 			{t->kind = 33; break;}
-		case 27:
+		case 25:
 			{t->kind = 34; break;}
-		case 28:
+		case 26:
 			{t->kind = 35; break;}
+		case 27:
+			{t->kind = 36; break;}
+		case 28:
+			{t->kind = 37; break;}
 		case 29:
 			case_29:
-			{t->kind = 39; break;}
+			{t->kind = 41; break;}
 		case 30:
 			case_30:
-			{t->kind = 40; break;}
+			{t->kind = 42; break;}
 		case 31:
 			if (ch == L'.') {AddCh(); goto case_19;}
 			else if (ch == L'>') {AddCh(); goto case_22;}
 			else if (ch == L')') {AddCh(); goto case_30;}
-			else {t->kind = 18; break;}
+			else {t->kind = 20; break;}
 		case 32:
 			if (ch == L'.') {AddCh(); goto case_21;}
-			else {t->kind = 24; break;}
+			else {t->kind = 26; break;}
 		case 33:
 			if (ch == L'.') {AddCh(); goto case_29;}
-			else {t->kind = 30; break;}
+			else {t->kind = 32; break;}
 
 	}
 	AppendVal(t);

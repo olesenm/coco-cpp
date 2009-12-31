@@ -45,6 +45,7 @@ void ParserGen::Indent(int n) {
 	for (int i=0; i < n; ++i) fwprintf(gen, L"\t");
 }
 
+
 // AW: use a switch if more than 5 alternatives and none starts with a resolver
 bool ParserGen::UseSwitch(Node *p) {
 	if (p->typ != Node::alt) return false;
@@ -325,7 +326,7 @@ void ParserGen::GenProductions() {
 
 
 void ParserGen::InitSets() {
-	fwprintf(gen, L"\tstatic bool set[%d][%d] = {\n", symSet.Count, tab->terminals.Count+1);
+	fwprintf(gen, L"\tstatic const bool set[%d][%d] = {\n", symSet.Count, tab->terminals.Count+1);
 
 	for (int i=0; i < symSet.Count; i++) {
 		BitArray *s = symSet[i];
@@ -335,7 +336,7 @@ void ParserGen::InitSets() {
 			Symbol *sym = tab->terminals[k];
 			if ((*s)[sym->n]) fwprintf(gen, L"T,"); else fwprintf(gen, L"x,");
 			++j;
-			if (j%4 == 0) fwprintf(gen, L" ");
+			if (j % 4 == 0) fwprintf(gen, L" ");
 		}
 		if (i == symSet.Count-1) fwprintf(gen, L"x}\n"); else fwprintf(gen, L"x},\n");
 	}
@@ -371,7 +372,7 @@ void ParserGen::WriteParser() {
 	CopyFramePart(L"-->begin", keepCopyright);
 	CopyFramePart(L"-->headerdef");
 
-	if (usingPos != NULL) {CopySourcePart(usingPos, 0); fwprintf(gen, L"\n");}
+	if (usingPos != NULL) { CopySourcePart(usingPos, 0); fwprintf(gen, L"\n"); }
 	CopyFramePart(L"-->namespace_open");
 	int nrOfNs = tab->GenNamespaceOpen(gen);
 
@@ -409,7 +410,16 @@ void ParserGen::WriteParser() {
 		fwprintf(gen, L"\tExpect(0); // expect end-of-file automatically added\n");
 	}
 	CopyFramePart(L"-->constants");
+	if (tab->initCodePos) {
+		Indent(1);    // indentation of the first line gets lost otherwise
+		CopySourcePart(tab->initCodePos, 0);
+	}
 	CopyFramePart(L"-->initialization"); InitSets();
+	CopyFramePart(L"-->destructor");
+	if (tab->deinitCodePos) {
+		Indent(1);    // indentation of the first line gets lost otherwise
+		CopySourcePart(tab->deinitCodePos, 0);
+	}
 	CopyFramePart(L"-->errors"); fwprintf(gen, L"%ls", err);
 	CopyFramePart(L"-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);
@@ -430,15 +440,20 @@ void ParserGen::WriteStatistics() {
 }
 
 
-ParserGen::ParserGen(Parser *parser) {
-	tab = parser->tab;
-	errors = parser->errors;
-	trace = parser->trace;
-	buffer = parser->scanner->buffer;
-	errorNr = -1;
-	usingPos = NULL;
-	err = NULL;
-}
+ParserGen::ParserGen(Parser *parser)
+:
+	usingPos(NULL),
+	errorNr(-1),
+	curSy(NULL),
+	fram(NULL),
+	gen(NULL),
+	err(NULL),
+	tab(parser->tab),
+	trace(parser->trace),
+	errors(parser->errors),
+	buffer(parser->scanner->buffer)
+{}
+
 
 ParserGen::~ParserGen() {
 	if (usingPos) {

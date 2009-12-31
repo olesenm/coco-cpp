@@ -41,13 +41,16 @@ class ArrayList
 {
 public:
 
-	ArrayList();
-
+	ArrayList(int size=10);     //!< Construct with default capacity
 	virtual ~ArrayList();
-	void Add(Type *ptr);
-	bool Remove(Type *ptr);
-	void Clear();
 
+	void Add(Type *ptr);        //!< Add pointer to the list
+	bool Remove(Type *ptr);     //!< Remove pointer from the list
+
+	void Delete();              //!< Delete all pointers in the list
+	void Clear();               //!< Reduce size to zero, does not delete pointers
+
+	//! Return pointer correspond to the index, return NULL for out-of-range
 	Type* operator[](int index);
 
 public:

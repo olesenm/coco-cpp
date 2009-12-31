@@ -56,9 +56,11 @@ class BitArray;
 class Tab {
 public:
 	//! String representations for the node types (in Node class)
+	//! Corresponds to Node::nodeType
 	static const char* nTyp[];
 
 	//! String representations for the token kinds (in Symbol class)
+	//! Corresponds to Symbol::kind
 	static const char* tKind[];
 
 	//! String for replacing the file prefix name
@@ -76,7 +78,7 @@ public:
 	Symbol *eofSy;          //!< end of file symbol
 	Symbol *noSym;          //!< used in case of an error
 	BitArray *allSyncSets;  //!< union of all synchronisation sets
-	HashTable<Symbol> *literals;    //!< symbols that are used as literals
+	HashTable<Symbol> literals;    //!< symbols that are used as literals
 	wchar_t* srcName;       //!< name of the atg file (including path)
 	wchar_t* srcDir;        //!< directory path of the atg file
 	wchar_t* nsName;        //!< namespace for generated files
@@ -90,28 +92,33 @@ public:
 
 	Errors *errors;
 
-	ArrayList<Symbol> *terminals;
-	ArrayList<Symbol> *pragmas;
-	ArrayList<Symbol> *nonterminals;
+	ArrayList<Symbol> terminals;
+	ArrayList<Symbol> pragmas;
+	ArrayList<Symbol> nonterminals;
+	ArrayList<Node> nodes;
+	ArrayList<CharClass> classes;
 
-
-	ArrayList<Node> *nodes;
 	Node *dummyNode;
-
-	ArrayList<CharClass> *classes;
 	int dummyName;
 
 
 	Tab(Parser *parser);
+	~Tab();
 
 	//---------------------------------------------------------------------
 	//  Symbol list management
 	//---------------------------------------------------------------------
 
 
+	//! Create a new symbol (terminal, nonterminal or pragma)
 	Symbol* NewSym(int typ, const wchar_t* name, int line);
+
+	//! Find symbol by name in terminals and nonterminals
 	Symbol* FindSym(const wchar_t* name);
-	int Num(Node *p);
+
+	//! Return node number
+	static int Num(Node *p);
+
 	void PrintSym(Symbol *sym);
 	void PrintSymbolTable();
 	void PrintSet(BitArray *s, int indent);
@@ -211,7 +218,8 @@ public:
 		CNode(Symbol *l, Symbol *r) : left(l), right(r) {}
 	};
 
-	void GetSingles(Node *p, ArrayList<Symbol> *singles);
+	//! Check for circular productions
+	void GetSingles(Node *p, ArrayList<Symbol>& singles);
 	bool NoCircularProductions();
 
 	//--------------- check for LL(1) errors ----------------------

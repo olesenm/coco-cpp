@@ -44,24 +44,29 @@ class BitArray;
 \*---------------------------------------------------------------------------*/
 class Node {
 public:
-	// enum constants for node kinds
-	static const int t    =  1;  //!< terminal symbol
-	static const int pr   =  2;  //!< pragma
-	static const int nt   =  3;  //!< nonterminal symbol
-	static const int clas =  4;  //!< character class
-	static const int chr  =  5;  //!< character
-	static const int wt   =  6;  //!< weak terminal symbol
-	static const int any  =  7;  //!< any character
-	static const int eps  =  8;  //!< empty
-	static const int sync =  9;  //!< synchronization symbol
-	static const int sem  = 10;  //!< semantic action: (. .)
-	static const int alt  = 11;  //!< alternative: |
-	static const int iter = 12;  //!< iteration: { }
-	static const int opt  = 13;  //!< option: [ ]
-	static const int rslv = 14;  //!< resolver expression
+	//! Enumeration for the types of nodes
+	enum nodeType {
+		t    =  1,  //!< terminal symbol
+		pr   =  2,  //!< pragma
+		nt   =  3,  //!< nonterminal symbol
+		clas =  4,  //!< character class
+		chr  =  5,  //!< character
+		wt   =  6,  //!< weak terminal symbol
+		any  =  7,  //!< any character
+		eps  =  8,  //!< empty
+		sync =  9,  //!< synchronization symbol
+		sem  = 10,  //!< semantic action: (. .)
+		alt  = 11,  //!< alternative: |
+		iter = 12,  //!< iteration: { }
+		opt  = 13,  //!< option: [ ]
+		rslv = 14   //!< resolver expression
+	};
 
-	static const int normalTrans  = 0;  //!< normal transition
-	static const int contextTrans = 1;  //!< context transition
+	//! Enumeration for the types of transitions
+	enum transitionType {
+		normalTrans  = 0,  //!< normal transition
+		contextTrans = 1   //!< context transition
+	};
 
 	int      n;     //!< node number
 	int      typ;   //!< node type, one of t, nt, wt, chr, clas, any, eps, sem, sync, alt, iter, opt, rslv
@@ -82,7 +87,7 @@ public:
 	int      line;  //!< source text line number of item in this node
 
 	//! DFA state corresponding to this node
-	// (only used in DFA.ConvertToStates)
+	//! (only used in DFA.ConvertToStates)
 	State    *state;
 
 	Node(int theTyp, Symbol* theSym, int lineNr) :

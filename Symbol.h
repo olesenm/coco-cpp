@@ -44,14 +44,16 @@ class BitArray;
 
 class Symbol {
 public:
-	// token kinds
-	static const int fixedToken    = 0; //!< e.g. 'a' ('b' | 'c') (structure of literals)
-	static const int classToken    = 1; //!< eg. digit {digit}   (at least one char class)
-	static const int litToken      = 2; //!< e.g. "while"
-	static const int classLitToken = 3; //!< e.g. letter {letter} but without literals that have the same structure*/
+	//! Enumeration for the kind of tokens
+	enum kind {
+		fixedToken    = 0,  //!< eg, 'a' ('b' | 'c') (structure of literals)
+		classToken    = 1,  //!< eg, digit {digit}   (at least one char class)
+		litToken      = 2,  //!< eg, "while"
+		classLitToken = 3   //!< eg, letter {letter} but without literals that have the same structure*/
+	};
 
 	int      n;           //!< symbol number
-	int      typ;         //!< t, nt, pr, unknown, rslv /* ML 29_11_2002 slv added */ /* AW slv --> rslv */
+	int      typ;         //!< node type: t, nt, pr, unknown, rslv
 	wchar_t  *name;       //!< symbol name
 	Node     *graph;      //!< nt: to first node of syntax graph
 	int      tokenKind;   //!< t:  token kind (fixedToken, classToken, ...)
@@ -66,12 +68,12 @@ public:
 	                      //!< nt: pos of local declarations in source text (or null)
 
 	//! Construct from components
-	Symbol(int symTyp, const wchar_t* symName, int lineNr) :
+	Symbol(int nodeTyp, const wchar_t* symName, int lineNr) :
 		n(0),
-		typ(symTyp),
+		typ(nodeTyp),
 		name(coco_string_create(symName)),
 		graph(0),
-		tokenKind(0),
+		tokenKind(fixedToken),
 		deletable(false),
 		firstReady(false),
 		first(0),

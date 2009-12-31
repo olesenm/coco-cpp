@@ -294,9 +294,9 @@ void Parser::TokenDecl(int typ) {
 			if (tokenString == NULL || coco_string_equal(tokenString, noString))
 			  dfa->ConvertToStates(g->l, sym);
 			else { // TokenExpr is a single string
-			  if ((*(tab->literals))[tokenString] != NULL)
+			  if (tab->literals[tokenString] != NULL)
 			    SemErr(L"token string declared twice");
-			  tab->literals->Set(tokenString, sym);
+			  tab->literals.Set(tokenString, sym);
 			  dfa->MatchLiteral(tokenString, sym);
 			}
 			
@@ -527,7 +527,7 @@ void Parser::Factor(Graph* &g) {
 			Sym(name, kind);
 			Symbol *sym = tab->FindSym(name);
 			 if (sym == NULL && kind == str)
-			   sym = (Symbol*)((*(tab->literals))[name]);
+			   sym = tab->literals[name];
 			 bool undef = (sym == NULL);
 			 if (undef) {
 			   if (kind == id)

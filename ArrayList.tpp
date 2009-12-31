@@ -31,10 +31,10 @@ namespace Coco {
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<typename Type>
-ArrayList<Type>::ArrayList()
+ArrayList<Type>::ArrayList(int size)
 :
 	Count(0),
-	Capacity(10),
+	Capacity(size),
 	Data_(new Type*[Capacity])
 {}
 
@@ -77,6 +77,17 @@ bool ArrayList<Type>::Remove(Type *ptr)
 		}
 	}
 	return false;
+}
+
+
+template<typename Type>
+void ArrayList<Type>::Delete()
+{
+	for (int i=0; i<Count; i++) {
+		delete Data_[i];
+		Data_[i] = 0;
+	}
+	Count = 0;
 }
 
 

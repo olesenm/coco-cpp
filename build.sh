@@ -6,7 +6,7 @@ usage() {
 
 usage: ${0##*/} [OPTION]
 options:
-  -parser        create new parser code first
+  -parser        create new scanner/parser code for Coco/R first
   -warn          enable additional gcc warnings
 
 * compile Coco executable

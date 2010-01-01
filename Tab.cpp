@@ -141,9 +141,7 @@ int Tab::Num(Node *p) {
 
 
 void Tab::PrintSym(Symbol *sym) {
-	wchar_t *paddedName = Name(sym->name);
-	fwprintf(trace, L"%3d %14s %ls", sym->n, paddedName, nTyp[sym->typ]);
-	coco_string_delete(paddedName);
+	fwprintf(trace, L"%3d %-14ls %s", sym->n, sym->name, nTyp[sym->typ]);
 
 	if (sym->attrPos) fwprintf(trace, L" true  "); else fwprintf(trace, L" false ");
 	if (sym->typ == Node::nt) {
@@ -159,7 +157,7 @@ void Tab::PrintSym(Symbol *sym) {
 void Tab::PrintSymbolTable() {
 	fwprintf(trace, L"Symbol Table:\n");
 	fwprintf(trace, L"------------\n\n");
-	fwprintf(trace, L" nr name          typ  hasAt graph  del    line tokenKind\n");
+	fwprintf(trace, L" nr name           typ  hasAt graph delete line tokenKind\n");
 
 	for (int i=0; i < terminals.Count; i++) {
 		PrintSym(terminals[i]);
@@ -194,7 +192,7 @@ void Tab::PrintSet(BitArray *s, int indent) {
 				fwprintf(trace, L"\n");
 				for (col = 1; col < indent; col++) fwprintf(trace, L" ");
 			}
-			fwprintf(trace, L"%ls ", sym->name);
+			fwprintf(trace, L" %ls", sym->name);
 			col += len + 1;
 		}
 	}
@@ -375,35 +373,21 @@ wchar_t* Tab::Pos(Position *pos) {
 }
 
 
-wchar_t* Tab::Name(const wchar_t *name) {
-	wchar_t *name2 = coco_string_create_append(name, L"           ");
-	wchar_t *subName2 = coco_string_create(name2, 0, 12);
-	coco_string_delete(name2);
-	return subName2;
-	// found no simpler way to get the first 12 characters of the name
-	// padded with blanks on the right
-}
-
-
 void Tab::PrintNodes() {
 	fwprintf(trace, L"Graph nodes:\n");
-	fwprintf(trace, L"----------------------------------------------------\n");
-	fwprintf(trace, L"   n type name          next  down   sub   pos  line\n");
-	fwprintf(trace, L"                               val  code\n");
-	fwprintf(trace, L"----------------------------------------------------\n");
+	fwprintf(trace, L"------------------------------------------------------\n");
+	fwprintf(trace, L"   n type name            next  down   sub   pos  line\n");
+	fwprintf(trace, L"                                 val  code\n");
+	fwprintf(trace, L"------------------------------------------------------\n");
 
 	for (int i=0; i < nodes.Count; i++) {
 		Node *p = nodes[i];
 		fwprintf(trace, L"%4d %s ", p->n, nTyp[p->typ]);
 		if (p->sym != NULL) {
-			wchar_t *paddedName = Name(p->sym->name);
-			fwprintf(trace, L"%12s ", paddedName);
-			coco_string_delete(paddedName);
+			fwprintf(trace, L"%-14ls ", p->sym->name);
 		} else if (p->typ == Node::clas) {
-			wchar_t *paddedName = Name(classes[p->val]->name);
-			fwprintf(trace, L"%12s ", paddedName);
-			coco_string_delete(paddedName);
-		} else fwprintf(trace, L"             ");
+			fwprintf(trace, L"%-14ls ", classes[p->val]->name);
+		} else fwprintf(trace, L"               ");
 		fwprintf(trace, L"%5d ", Ptr(p->next, p->up));
 
 		if (p->typ == Node::t || p->typ == Node::nt || p->typ == Node::wt) {
@@ -470,7 +454,7 @@ CharSet* Tab::CharClassSet(int i) {
 wchar_t* Tab::Ch(const wchar_t ch) {
 	wchar_t* format = new wchar_t[10];
 	if (ch < L' ' || ch >= 127 || ch == L'\'' || ch == L'\\') {
-		coco_swprintf(format, 10, L"%d", ch);
+		coco_swprintf(format, 10, L"%d", int(ch));
 	} else {
 		coco_swprintf(format, 10, L"'%lc'", ch);
 	}
@@ -479,17 +463,13 @@ wchar_t* Tab::Ch(const wchar_t ch) {
 
 void Tab::WriteCharSet(CharSet *s) {
 	for (CharSet::Range *r = s->head; r != NULL; r = r->next) {
+		wchar_t *from = Ch(r->from);
+		fwprintf(trace, L" %ls", from);
+		delete [] from;
 		if (r->from < r->to) {
-			wchar_t *from = Ch(r->from);
 			wchar_t *to = Ch(r->to);
-			fwprintf(trace, L"%ls .. %ls ", from, to);
-			delete [] from;
+			fwprintf(trace, L" .. %ls", to);
 			delete [] to;
-		}
-		else {
-			wchar_t *from = Ch(r->from);
-			fwprintf(trace, L"%ls ", from);
-			delete [] from;
 		}
 	}
 }
@@ -498,15 +478,9 @@ void Tab::WriteCharClasses() {
 	for (int i=0; i < classes.Count; i++) {
 		CharClass *c = classes[i];
 
-		wchar_t* format2 = coco_string_create_append(c->name, L"            ");
-		wchar_t* format  = coco_string_create(format2, 0, 10);
-		coco_string_merge(format, L": ");
-		fwprintf(trace, format);
-
+		fwprintf(trace, L"%-12ls :", c->name);
 		WriteCharSet(c->set);
 		fwprintf(trace, L"\n");
-		coco_string_delete(format);
-		coco_string_delete(format2);
 	}
 	fwprintf(trace, L"\n");
 }
@@ -561,7 +535,7 @@ BitArray* Tab::First(Node *p) {
 	delete mark;
 	if (ddt[3]) {
 		fwprintf(trace, L"\n");
-		if (p != NULL) fwprintf(trace, L"First: node = %d\n", p->n );
+		if (p != NULL) fwprintf(trace, L"First: node = %d\n", p->n);
 		else fwprintf(trace, L"First: node = null\n");
 		PrintSet(fs, 0);
 	}
@@ -786,13 +760,13 @@ void Tab::CompSymbolSets() {
 	if (ddt[1]) {
 		fwprintf(trace, L"\n");
 		fwprintf(trace, L"First & follow symbols:\n");
-		fwprintf(trace, L"----------------------\n\n");
+		fwprintf(trace, L"----------------------\n");
 
 		for (int i=0; i < nonterminals.Count; i++) {
 			Symbol *sym = nonterminals[i];
 			fwprintf(trace, L"%ls\n", sym->name);
-			fwprintf(trace, L"first:   "); PrintSet(sym->first, 10);
-			fwprintf(trace, L"follow:  "); PrintSet(sym->follow, 10);
+			fwprintf(trace, L" first:  "); PrintSet(sym->first, 10);
+			fwprintf(trace, L" follow: "); PrintSet(sym->follow, 10);
 			fwprintf(trace, L"\n");
 		}
 	}
@@ -828,7 +802,7 @@ wchar_t Tab::Hex2Char(const wchar_t* s) {
 	if (val >= COCO_WCHAR_MAX) {/* pdt */
 		parser->SemErr(L"bad escape sequence in string or character");
 	}
-	return wchar_t(val);
+	return val;
 }
 
 wchar_t* Tab::Char2Hex(const wchar_t ch) {
@@ -1214,9 +1188,7 @@ void Tab::XRef() {
 
 	for (int i=0; i < xref.Count; i++) {
 		Symbol *sym = xref.GetKey(i);
-		wchar_t *paddedName = Name(sym->name);
-		fwprintf(trace, L"  %12s", paddedName);
-		coco_string_delete(paddedName);
+		fwprintf(trace, L"  %-12ls", sym->name);
 		ArrayList<int> *list = xref.Get(sym);
 		int col = 14;
 		for (int j=0; j <list->Count; j++) {

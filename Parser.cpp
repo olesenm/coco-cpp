@@ -467,7 +467,7 @@ void Parser::Char(int &n) {
 		wchar_t* name = tab->Unescape(subName);
 		coco_string_delete(subName);
 		
-		                                   // "<= 1" instead of "== 1" to allow the escape sequence '\0' in c++
+		                                   // "<= 1" instead of "== 1" to allow the escape sequence '\0' in C++
 		                                   if (coco_string_length(name) <= 1) n = name[0];
 		                                   else SemErr(L"unacceptable character value");
 		                                   coco_string_delete(name);
@@ -759,7 +759,7 @@ Parser::Parser(Scanner* scan, Errors* err)
 		errors = new Errors();
 	}
 	// user-defined initialization:
-	genScanner = false;
+genScanner = false;
 	tokenString = NULL;
 	noString = coco_string_create(L"-none-");
 	trace = NULL;
@@ -813,7 +813,7 @@ Parser::~Parser() {
 	}
 	delete dummyToken;
 	// user-defined destruction:
-	coco_string_delete(noString);
+coco_string_delete(noString);
 
 /*-------------------------------------------------------------------------*/
 

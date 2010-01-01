@@ -39,7 +39,11 @@ namespace Coco {
 template<typename Type>
 class ArrayList
 {
+	int Capacity;
+	Type** Data_;
+
 public:
+	int Count;
 
 	ArrayList(int size=10);     //!< Construct with default capacity
 	virtual ~ArrayList();
@@ -53,12 +57,6 @@ public:
 	//! Return pointer correspond to the index, return NULL for out-of-range
 	Type* operator[](int index);
 
-public:
-	int Count;
-
-private:
-	int Capacity;
-	Type** Data_;
 };
 
 

@@ -76,19 +76,20 @@ CHARACTERS
     stringCh  = ANY - '"' - '\\' - cr - lf.
     charCh    = ANY - '\'' - '\\' - cr - lf.
     printable =  '\u0020' .. '\u007e'.
-    hex       = "0123456789abcdef".
+    alphanum  = digit + letter.
+    hex       = digit + "abcdef".
 
 TOKENS
-    ident     = letter { letter | digit }.
+    ident     = letter { alphanum }.
     number    = digit { digit }.
     string    = '"' { stringCh | '\\' printable } '"'.
     badString = '"' { stringCh | '\\' printable } (cr | lf).
     char      = '\'' ( charCh | '\\' printable { hex } ) '\''.
 
 PRAGMAS
-    ddtSym    = '$' { digit | letter }.  (. tab->SetDDT(la->val+1); .)
+    ddtSym    = '$' { alphanum }.   (. tab->SetDDT(la->val+1); .)
     directive = '$' letter { letter } '='
-        { letter | digit | '-' | '.' | ':' } .
+        { alphanum | '-' | '.' | ':' } .
                                 (. tab->DispatchPragma(la->val+1); .)
 
 COMMENTS FROM "/*" TO "*/" NESTED
@@ -272,7 +273,7 @@ Char<int &n>
                                    wchar_t* name = tab->Unescape(subName);
                                    coco_string_delete(subName);
 
-                                   // "<= 1" instead of "== 1" to allow the escape sequence '\0' in c++
+                                   // "<= 1" instead of "== 1" to allow the escape sequence '\0' in C++
                                    if (coco_string_length(name) <= 1) n = name[0];
                                    else SemErr(L"unacceptable character value");
                                    coco_string_delete(name);

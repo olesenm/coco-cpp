@@ -34,7 +34,8 @@ namespace Coco {
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<typename Type>
-SortedList<Type>::Entry::Entry(Symbol* k, Type* v) :
+SortedList<Type>::Entry::Entry(Symbol* k, Type* v)
+:
 	Key(k),
 	Value(v),
 	next(0)
@@ -42,9 +43,10 @@ SortedList<Type>::Entry::Entry(Symbol* k, Type* v) :
 
 
 template<typename Type>
-SortedList<Type>::SortedList() :
-	Count(0),
-	Data_(0)
+SortedList<Type>::SortedList()
+:
+	Data_(0),
+	Count(0)
 {}
 
 
@@ -54,13 +56,15 @@ SortedList<Type>::~SortedList()
 
 
 template<typename Type>
-int SortedList<Type>::Compare(Symbol *x, Symbol *y) {
+int SortedList<Type>::Compare(Symbol *x, Symbol *y)
+{
 	return coco_string_compareto(x->name, y->name);
 }
 
 
 template<typename Type>
-bool SortedList<Type>::Find(Symbol* key) {
+bool SortedList<Type>::Find(Symbol* key)
+{
 	Entry* curr = Data_;
 	while (curr) {
 		if (!this->Compare(curr->Key, key))
@@ -72,7 +76,8 @@ bool SortedList<Type>::Find(Symbol* key) {
 
 
 template<typename Type>
-void SortedList<Type>::Set(Symbol *key, Type *value) {
+void SortedList<Type>::Set(Symbol *key, Type *value)
+{
 	if (!this->Find(key)) {
 		// new entry
 		Entry* curr = Data_;
@@ -84,23 +89,27 @@ void SortedList<Type>::Set(Symbol *key, Type *value) {
 			if (this->Compare(curr->Key, key) > 0) {  // before the first
 				newEntry->next = Data_;
 				Data_ = newEntry;
-			} else {
+			}
+			else {
 				while (curr) {
 					if (this->Compare(curr->Key, key) < 0) {
 						prev = curr;
 						curr = curr->next;
-					} else {
+					}
+					else {
 						break;
 					}
 				}
 				prev->next = newEntry;
 				newEntry->next = curr;
 			}
-		} else {
+		}
+		else {
 			Data_ = newEntry;             // first entry
 		}
 		Count++;
-	} else {
+	}
+	else {
 		// existing entry - overwrite
 		Entry* curr = Data_;
 		while (this->Compare(curr->Key, key)) {
@@ -128,11 +137,12 @@ Symbol* SortedList<Type>::GetKey(int index) const // Key
 {
 	if (0 <= index && index < Count) {
 		Entry* curr = Data_;
-		for (int i=0; i<index; i++) {
+		for (int i=0; i < index; i++) {
 			curr = curr->next;
 		}
 		return curr->Key;
-	} else {
+	}
+	else {
 		return 0;
 	}
 }

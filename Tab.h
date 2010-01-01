@@ -154,7 +154,6 @@ public:
 
 	int Ptr(Node *p, bool up);
 	wchar_t* Pos(Position *pos);
-	wchar_t* Name(const wchar_t* name);
 	void PrintNodes();
 
 	//---------------------------------------------------------------------

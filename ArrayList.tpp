@@ -33,9 +33,9 @@ namespace Coco {
 template<typename Type>
 ArrayList<Type>::ArrayList(int size)
 :
-	Count(0),
 	Capacity(size),
-	Data_(new Type*[Capacity])
+	Data_(new Type*[Capacity]),
+	Count(0)
 {}
 
 
@@ -52,7 +52,7 @@ void ArrayList<Type>::Add(Type *ptr)
 	if (Count >= Capacity) {
 		Capacity *= 2;
 		Type** newData = new Type*[Capacity];
-		for (int i=0; i<Count; i++) {
+		for (int i=0; i < Count; i++) {
 			newData[i] = Data_[i];   // copy
 		}
 		delete[] Data_;
@@ -66,7 +66,7 @@ void ArrayList<Type>::Add(Type *ptr)
 template<typename Type>
 bool ArrayList<Type>::Remove(Type *ptr)
 {
-	for (int i=0; i<Count; i++) {
+	for (int i=0; i < Count; i++) {
 		if (Data_[i] == ptr) {
 			for (int j=i+1; j<Count; j++)
 			{
@@ -83,7 +83,7 @@ bool ArrayList<Type>::Remove(Type *ptr)
 template<typename Type>
 void ArrayList<Type>::Delete()
 {
-	for (int i=0; i<Count; i++) {
+	for (int i=0; i < Count; i++) {
 		delete Data_[i];
 		Data_[i] = 0;
 	}

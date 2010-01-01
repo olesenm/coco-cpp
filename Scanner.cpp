@@ -47,7 +47,7 @@ namespace Coco {
 // string handling, wide character
 
 wchar_t* coco_string_create(const wchar_t* str) {
-	int len = coco_string_length(str);
+	const int len = coco_string_length(str);
 	wchar_t* dest = new wchar_t[len + 1];
 	if (len) {
 		wcsncpy(dest, str, len);
@@ -57,10 +57,7 @@ wchar_t* coco_string_create(const wchar_t* str) {
 }
 
 wchar_t* coco_string_create(const wchar_t* str, int index, int length) {
-	int len = coco_string_length(str);
-	if (len) {
-		len = length;
-	}
+	const int len = (str && *str) ? length : 0;
 	wchar_t* dest = new wchar_t[len + 1];
 	if (len) {
 		wcsncpy(dest, &(str[index]), len);
@@ -95,8 +92,8 @@ wchar_t* coco_string_create_lower(const wchar_t* str, int index, int len) {
 
 
 wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2) {
-	int str1Len = coco_string_length(str1);
-	int str2Len = coco_string_length(str2);
+	const int str1Len = coco_string_length(str1);
+	const int str2Len = coco_string_length(str2);
 
 	wchar_t* dest = new wchar_t[str1Len + str2Len + 1];
 
@@ -108,7 +105,7 @@ wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2) {
 }
 
 wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t ch) {
-	int len = coco_string_length(str1);
+	const int len = coco_string_length(str1);
 	wchar_t* dest = new wchar_t[len + 2];
 	wcsncpy(dest, str1, len);   // or use if (len) { wcscpy(dest, str1); }
 	dest[len] = ch;
@@ -126,8 +123,8 @@ int coco_string_length(const wchar_t* str) {
 }
 
 bool coco_string_endswith(const wchar_t* str, const wchar_t* endstr) {
-	int strLen = wcslen(str);
-	int endLen = wcslen(endstr);
+	const int strLen = wcslen(str);
+	const int endLen = wcslen(endstr);
 	return (endLen <= strLen) && (wcscmp(str + strLen - endLen, endstr) == 0);
 }
 
@@ -185,7 +182,7 @@ float coco_string_toFloat(const wchar_t* str)
 //
 
 wchar_t* coco_string_create(const char* str) {
-	int len = str ? strlen(str) : 0;
+	const int len = str ? strlen(str) : 0;
 	wchar_t* dest = new wchar_t[len + 1];
 	for (int i = 0; i < len; ++i) {
 		dest[i] = wchar_t(str[i]);
@@ -195,7 +192,7 @@ wchar_t* coco_string_create(const char* str) {
 }
 
 wchar_t* coco_string_create(const char* str, int index, int length) {
-	int len = str ? length : 0;
+	const int len = str ? length : 0;
 	wchar_t* dest = new wchar_t[len + 1];
 	for (int i = 0; i < len; ++i) {
 		dest[i] = wchar_t(str[index + i]);
@@ -206,8 +203,8 @@ wchar_t* coco_string_create(const char* str, int index, int length) {
 
 
 char* coco_string_create_char(const wchar_t* str) {
-	int len = coco_string_length(str);
-	char *dest = new char[len + 1];
+	const int len = coco_string_length(str);
+	char* dest = new char[len + 1];
 	for (int i = 0; i < len; ++i)
 	{
 		dest[i] = char(str[i]);
@@ -217,11 +214,8 @@ char* coco_string_create_char(const wchar_t* str) {
 }
 
 char* coco_string_create_char(const wchar_t* str, int index, int length) {
-	int len = coco_string_length(str);
-	if (len) {
-		len = length;
-	}
-	char *dest = new char[len + 1];
+	const int len = (str && *str) ? length : 0;
+	char* dest = new char[len + 1];
 	for (int i = 0; i < len; ++i) {
 		dest[i] = char(str[index + i]);
 	}
@@ -659,6 +653,8 @@ void Scanner::Init() {
 
 	tvalLength = 128;
 	tval = new wchar_t[tvalLength]; // text of current token
+	tlen = 0;
+	tval[tlen] = 0;
 
 	// HEAP_BLOCK_SIZE byte heap + pointer to next heap block
 	heap = malloc(HEAP_BLOCK_SIZE + sizeof(void*));

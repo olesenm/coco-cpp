@@ -409,17 +409,9 @@ void ParserGen::WriteParser() {
 	else {
 		fwprintf(gen, L"\tExpect(0); // expect end-of-file automatically added\n");
 	}
-	CopyFramePart(L"-->constants");
-	if (tab->initCodePos) {
-		Indent(1);    // indentation of the first line gets lost otherwise
-		CopySourcePart(tab->initCodePos, 0);
-	}
+	CopyFramePart(L"-->constants"); CopySourcePart(tab->initCodePos, 0);
 	CopyFramePart(L"-->initialization"); InitSets();
-	CopyFramePart(L"-->destructor");
-	if (tab->deinitCodePos) {
-		Indent(1);    // indentation of the first line gets lost otherwise
-		CopySourcePart(tab->deinitCodePos, 0);
-	}
+	CopyFramePart(L"-->destructor"); CopySourcePart(tab->deinitCodePos, 0);
 	CopyFramePart(L"-->errors"); fwprintf(gen, L"%ls", err);
 	CopyFramePart(L"-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);
@@ -431,7 +423,8 @@ void ParserGen::WriteParser() {
 
 
 void ParserGen::WriteStatistics() {
-	fwprintf(trace, L"\n");
+	fwprintf(trace, L"Statistics:\n");
+	fwprintf(trace, L"----------\n");
 	fwprintf(trace, L"%d terminals\n", tab->terminals.Count);
 	fwprintf(trace, L"%d symbols\n", tab->terminals.Count + tab->pragmas.Count +
 	                               tab->nonterminals.Count);

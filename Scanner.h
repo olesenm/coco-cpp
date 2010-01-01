@@ -244,7 +244,6 @@ public:
 //------------------------------------------------------------------------------
 //! maps characters (integers) to start states of tokens
 class StartStates {
-private:
 	class Elem {
 	public:
 		int key, val;
@@ -260,7 +259,7 @@ public:
 	StartStates() :
 		tab(new Elem*[128])
 	{
-		memset(tab, 0, 128 * sizeof(Elem*));
+		memset(tab, 0, 128*sizeof(Elem*));
 	}
 
 	virtual ~StartStates() {
@@ -277,7 +276,7 @@ public:
 
 	void set(int key, int val) {
 		Elem *e = new Elem(key, val);
-		int k = unsigned(key) % 128;
+		const int k = unsigned(key) % 128;
 		e->next = tab[k];
 		tab[k] = e;
 	}
@@ -295,7 +294,6 @@ public:
 //------------------------------------------------------------------------------
 //! maps strings to integers (identifiers to keyword kinds)
 class KeywordMap {
-private:
 	class Elem {
 	public:
 		wchar_t *key;
@@ -315,7 +313,7 @@ public:
 	KeywordMap() :
 		tab(new Elem*[128])
 	{
-		memset(tab, 0, 128 * sizeof(Elem*));
+		memset(tab, 0, 128*sizeof(Elem*));
 	}
 
 	virtual ~KeywordMap() {

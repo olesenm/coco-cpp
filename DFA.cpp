@@ -65,16 +65,16 @@ wchar_t* DFA::ChCond(wchar_t ch) {
 void DFA::PutRange(CharSet *s) {
 	for (CharSet::Range *r = s->head; r != NULL; r = r->next) {
 		if (r->from == r->to) {
-			wchar_t *from = Ch(wchar_t(r->from));
+			wchar_t *from = Ch(r->from);
 			fwprintf(gen, L"ch == %ls", from);
 			delete [] from;
 		} else if (r->from == 0) {
-			wchar_t *to = Ch(wchar_t(r->to));
+			wchar_t *to = Ch(r->to);
 			fwprintf(gen, L"ch <= %ls", to);
 			delete [] to;
 		} else {
-			wchar_t *from = Ch(wchar_t(r->from));
-			wchar_t *to = Ch(wchar_t(r->to));
+			wchar_t *from = Ch(r->from);
+			wchar_t *to = Ch(r->to);
 			fwprintf(gen, L"(ch >= %ls && ch <= %ls)", from, to);
 			delete [] from;
 			delete [] to;
@@ -393,17 +393,21 @@ void DFA::PrintStates() {
 		bool first = true;
 		if (state->endOf == NULL) fwprintf(trace, L"               ");
 		else {
-			wchar_t *paddedName = tab->Name(state->endOf->name);
-			fwprintf(trace, L"E(%12s)", paddedName);
-			coco_string_delete(paddedName);
+			fwprintf(trace, L"E(%-12ls)", state->endOf->name);
 		}
 		fwprintf(trace, L"%3d:", state->nr);
 		if (state->firstAction == NULL) fwprintf(trace, L"\n");
 		for (Action *action = state->firstAction; action != NULL; action = action->next) {
 			if (first) {fwprintf(trace, L" "); first = false;} else fwprintf(trace, L"                    ");
 
-			if (action->typ == Node::clas) fwprintf(trace, L"%ls", tab->classes[action->sym]->name);
-			else fwprintf(trace, L"%3s", Ch(wchar_t(action->sym)));
+			if (action->typ == Node::clas) {
+				fwprintf(trace, L"%ls", tab->classes[action->sym]->name);
+			}
+			else {
+				wchar_t* res = Ch(action->sym);
+				fwprintf(trace, L"%ls", res);
+				delete [] res;
+			}
 			for (Target *targ = action->target; targ != NULL; targ = targ->next) {
 				fwprintf(trace, L"%3d", targ->state->nr);
 			}

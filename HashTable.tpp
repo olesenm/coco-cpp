@@ -36,15 +36,18 @@ namespace Coco {
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<typename Type>
-HashTable<Type>::HashTable(int sz) :
-	size(sz), data(new Entry*[sz])
+HashTable<Type>::HashTable(int sz)
+:
+	size(sz),
+	data(new Entry*[size])
 {
 	memset(data, 0, size * sizeof(Entry*));
 }
 
 
 template<typename Type>
-HashTable<Type>::~HashTable() {
+HashTable<Type>::~HashTable()
+{
 	for (int i = 0; i < size; ++i) {
 		Entry *o = data[i];
 		while (o) {
@@ -60,8 +63,9 @@ HashTable<Type>::~HashTable() {
 
 template<typename Type>
 DictionaryEntry<Type>*
-HashTable<Type>::GetObj(wchar_t *key) const {
-	int k = coco_string_hash(key) % size;
+HashTable<Type>::GetObj(wchar_t *key) const
+{
+	const int k = coco_string_hash(key) % size;
 	Entry *o = data[k];
 	while (o && !coco_string_equal(key, o->key)) {
 		o = o->next;
@@ -71,14 +75,16 @@ HashTable<Type>::GetObj(wchar_t *key) const {
 
 
 template<typename Type>
-void HashTable<Type>::Set(wchar_t *key, Type *val) {
+void HashTable<Type>::Set(wchar_t *key, Type *val)
+{
 	Entry *o = GetObj(key);
 	if (o) {
-		// exist entry - overwrite
+		// existing entry - overwrite
 		o->val = val;
-	} else {
+	}
+	else {
 		// new entry
-		int k = coco_string_hash(key) % size;
+		const int k = coco_string_hash(key) % size;
 		o = new Entry();
 		o->key = key;
 		o->val = val;
@@ -89,7 +95,8 @@ void HashTable<Type>::Set(wchar_t *key, Type *val) {
 
 
 template<typename Type>
-Type* HashTable<Type>::Get(wchar_t *key) const {
+Type* HashTable<Type>::Get(wchar_t *key) const
+{
 	Entry *o = GetObj(key);
 	return o ? o->val : NULL;
 }
@@ -97,7 +104,8 @@ Type* HashTable<Type>::Get(wchar_t *key) const {
 
 template<typename Type>
 typename HashTable<Type>::Iterator
-HashTable<Type>::GetIterator() {
+HashTable<Type>::GetIterator()
+{
 	return HashTable<Type>::Iterator(this);
 }
 
@@ -111,7 +119,8 @@ HashTable<Type>::Iterator::Iterator(HashTable<Type> *htbl) :
 
 
 template<typename Type>
-bool HashTable<Type>::Iterator::HasNext() {
+bool HashTable<Type>::Iterator::HasNext()
+{
 	while (!cur && pos < ht->size) {
 		cur = ht->data[pos];
 		++pos;
@@ -122,7 +131,8 @@ bool HashTable<Type>::Iterator::HasNext() {
 
 template<typename Type>
 DictionaryEntry<Type>*
-HashTable<Type>::Iterator::Next() {
+HashTable<Type>::Iterator::Next()
+{
 	if (!HasNext()) {
 		return NULL;
 	}

@@ -41,7 +41,6 @@ class Symbol;
 template<typename Type>
 class SortedList
 {
-private:
 	struct Entry
 	{
 		Symbol* Key;
@@ -51,21 +50,20 @@ private:
 		Entry(Symbol* k, Type* v);
 	};
 
+	static int Compare(Symbol* x, Symbol* y);
+	bool Find(Symbol* key);
+
+	Entry *Data_;
+
 public:
+	int Count;
+
 	SortedList();
 	virtual ~SortedList();
 
 	void  Set(Symbol *key, Type *value);
 	Type* Get(Symbol* key) const;        //!< return Value
 	Symbol* GetKey(int index) const ;    //!< return Key
-
-	int Count;
-private:
-	static int Compare(Symbol* x, Symbol* y);
-	bool Find(Symbol* key);
-
-	Entry *Data_;
-
 };
 
 

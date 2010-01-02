@@ -77,7 +77,7 @@ wchar_t* coco_string_create(const wchar_t* str, int index, int length);
 //! Create a lowercase string from str
 wchar_t* coco_string_create_lower(const wchar_t* str);
 
-//! Create a lowercase substring from str starting at index and length characters long
+//! Create a lowercase substring of str starting at index and length characters long
 wchar_t* coco_string_create_lower(const wchar_t* str, int index, int length);
 
 //! Create a string by concatenating str1 and str2
@@ -132,9 +132,6 @@ float coco_string_toFloat(const wchar_t* str);
 //! Create by copying byte str
 wchar_t* coco_string_create(const char* str);
 
-//! Create a substring of byte str starting at index and length characters long
-wchar_t* coco_string_create(const char* str, int index, int length);
-
 //! Create a byte string by copying str
 char* coco_string_create_char(const wchar_t* str);
 
@@ -144,16 +141,6 @@ char* coco_string_create_char(const wchar_t* str, int index, int length);
 //! Free storage and nullify the argument
 void  coco_string_delete(char* &str);
 
-
-//
-// String conversions, byte character
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//! Convert byte string to double
-double coco_string_toDouble(const char* str);
-
-//! Convert byte string to float
-float coco_string_toFloat(const char* str);
 
 // * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
 

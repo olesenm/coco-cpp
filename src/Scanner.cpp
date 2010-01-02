@@ -191,17 +191,6 @@ wchar_t* coco_string_create(const char* str) {
 	return dest;
 }
 
-wchar_t* coco_string_create(const char* str, int index, int length) {
-	const int len = str ? length : 0;
-	wchar_t* dest = new wchar_t[len + 1];
-	for (int i = 0; i < len; ++i) {
-		dest[i] = wchar_t(str[index + i]);
-	}
-	dest[len] = 0;
-	return dest;
-}
-
-
 char* coco_string_create_char(const wchar_t* str) {
 	const int len = coco_string_length(str);
 	char* dest = new char[len + 1];
@@ -227,17 +216,6 @@ char* coco_string_create_char(const wchar_t* str, int index, int length) {
 void coco_string_delete(char* &str) {
 	delete [] str;
 	str = NULL;
-}
-
-
-double coco_string_toDouble(const char* str)
-{
-	return str ? strtod(str, NULL) : 0;
-}
-
-float coco_string_toFloat(const char* str)
-{
-	return str ? strtof(str, NULL) : 0;
 }
 
 

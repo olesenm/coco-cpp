@@ -56,6 +56,7 @@ const wchar_t* Tab::prefixMacro = L"$PREFIX$";
 Tab::Tab(Parser *theParser)
 :
 	emitLines(false),
+	singleOutput(false),
 	makeBackup(false),
 	explicitEof(false),
 	semDeclPos(NULL),

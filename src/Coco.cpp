@@ -42,6 +42,7 @@ Options:
   -trace     <traceString>
   -o         <outputDirectory>
   -lines     include #line pragmas in the generated code
+  -single    include the Scanner code in the Parser file
   -bak       save existing Parser/Scanner files as .bak
   -help      print this usage
 @endverbatim
@@ -164,6 +165,7 @@ void printUsage(const char* message)
 	wprintf(L"  -trace     <traceString>\n");
 	wprintf(L"  -o         <outputDirectory>\n");
 	wprintf(L"  -lines     include #line pragmas in the generated code\n");
+	wprintf(L"  -single    include the Scanner code in the Parser file\n");
 	wprintf(L"  -bak       save existing Parser/Scanner files as .bak\n");
 	wprintf(L"  -help      print this usage\n");
 	wprintf(L"Valid characters in the trace string:\n");
@@ -203,6 +205,7 @@ int main(int argc, char *argv_[]) {
 	wchar_t *ddtString = NULL, *traceFileName = NULL;
 	char *chTrFileName = NULL;
 	bool emitLines = false;
+	bool singleOutput = false;
 	bool makeBackup = false;
 
 	for (int i = 1; i < argc; i++) {
@@ -243,6 +246,9 @@ int main(int argc, char *argv_[]) {
 		}
 		else if (coco_string_equal(argv[i], L"-lines")) {
 			emitLines = true;
+		}
+		else if (coco_string_equal(argv[i], L"-single")) {
+			singleOutput = true;
 		}
 		else if (coco_string_equal(argv[i], L"-bak")) {
 			makeBackup = true;
@@ -301,6 +307,7 @@ int main(int argc, char *argv_[]) {
 		parser->tab->frameDir = coco_string_create(frameDir);
 		parser->tab->outDir   = coco_string_create(outDir != NULL ? outDir : srcDir);
 		parser->tab->emitLines = emitLines;
+		parser->tab->singleOutput = singleOutput;
 		parser->tab->makeBackup = makeBackup;
 
 		if (ddtString != NULL) parser->tab->SetDDT(ddtString);

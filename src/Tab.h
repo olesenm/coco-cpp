@@ -68,6 +68,7 @@ public:
 
 	// miscellaneous generation controls
 	bool emitLines;         //!< emit line directives in generated parser
+	bool singleOutput;      //!< include the Scanner code in the Parser file
 	bool makeBackup;        //!< create .bak files for generated parser/scanner
 	bool explicitEof;       //!< user must explicitly add EOF in grammar
 	bool ddt[10];           //!< debug and test switches

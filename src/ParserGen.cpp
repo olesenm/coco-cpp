@@ -397,6 +397,15 @@ void ParserGen::WriteParser() {
 
 	CopyFramePart(L"-->begin", keepCopyright);
 	CopyFramePart(L"-->namespace_open");
+	if (tab->singleOutput) {
+		wchar_t* scannerCpp = coco_string_create_append
+		(
+			tab->prefixName,
+			L"Scanner.cpp"
+		);
+		fwprintf(gen, L"\n// quick hack to provide a single Make target:\n#include \"%ls\"\n\n", scannerCpp);
+		coco_string_delete(scannerCpp);
+	}
 	nrOfNs = tab->GenNamespaceOpen(gen);
 
 	CopyFramePart(L"-->pragmas"); GenCodePragmas();

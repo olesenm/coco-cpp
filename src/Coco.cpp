@@ -29,6 +29,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 @mainpage The Compiler Generator Coco/R, C++ version.
 
+http://www.ssw.uni-linz.ac.at/coco/
+
 @section usage Program Usage
 
 @verbatim
@@ -177,6 +179,7 @@ void printUsage(const char* message)
 	wprintf(L"  1. In the specified -frames directory.\n");
 	wprintf(L"  2. The current directory.\n");
 	wprintf(L"  3. The same directory as the atg grammar.\n\n");
+	wprintf(L"http://www.ssw.uni-linz.ac.at/coco/\n\n");
 }
 
 

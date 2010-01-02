@@ -9,7 +9,7 @@ to deal with initialization and destruction of user code.
 
     Coco =
       {ANY}           // #include clauses in C++
-      "COMPILER" ident          .)
+      "COMPILER" ident
       {ANY}           // global fields and methods
       ["INITIALIZE" {ANY}]
       ["DESTROY"    {ANY}]

@@ -42,10 +42,10 @@ done
 
 echo "compile Coco executable"
 echo "~~~~~~~~~~~~~~~~~~~~~~~"
-echo "g++ *.cpp -o Coco -g -Wall $warn"
+echo "g++ src/*.cpp -o Coco -g -O2 -Wall $warn"
 echo
 
-g++ *.cpp -o Coco -g -Wall $warn
+g++ src/*.cpp -o Coco -g -O2 -Wall $warn
 
 if [ $? -eq 0 ]
 then

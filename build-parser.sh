@@ -9,9 +9,9 @@ echo
 coco=Coco
 [ -x "$coco" ] && coco=./Coco
 
-echo "$coco Coco.atg -bak"
+echo "$coco src/Coco.atg -bak"
 
-$coco Coco.atg -bak
+$coco src/Coco.atg -bak
 echo
 
 # ----------------------------------------------------------------- end-of-file

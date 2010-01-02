@@ -1,1 +1,1 @@
-coco Coco.atg -bak -namespace Coco
+coco src\Coco.atg -bak

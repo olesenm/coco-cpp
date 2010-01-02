@@ -193,7 +193,7 @@ int main(int argc, char *argv_[]) {
 #error unknown compiler!
 #endif
 
-	wprintf(L"Coco/R C++ (01 Jan 2010)\n");
+	wprintf(L"Coco/R C++ (02 Jan 2010)\n");
 
 	wchar_t *srcName = NULL, *nsName = NULL, *prefixName = NULL;
 	wchar_t *frameDir = NULL, *outDir = NULL;

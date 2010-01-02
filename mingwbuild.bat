@@ -1,2 +1,1 @@
-C:\MinGW\bin\g++ *.cpp -o Coco.exe
-
+C:\MinGW\bin\g++ src/*.cpp -o Coco.exe

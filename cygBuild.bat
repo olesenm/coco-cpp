@@ -1,1 +1,1 @@
-g++ *.cpp -o Coco.exe
+g++ src/*.cpp -o Coco.exe

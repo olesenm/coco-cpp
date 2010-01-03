@@ -82,6 +82,9 @@ public:
 	Symbol *noSym;          //!< used in case of an error
 	BitArray *allSyncSets;  //!< union of all synchronisation sets
 	HashTable<Symbol> literals;    //!< symbols that are used as literals
+
+	wchar_t* grammarName;   //!< The name of the grammar, set by Coco.atg
+
 	wchar_t* srcName;       //!< name of the atg file (including path)
 	wchar_t* srcDir;        //!< directory path of the atg file
 	wchar_t* nsName;        //!< namespace for generated files
@@ -274,7 +277,7 @@ public:
 	static void GenNamespaceClose(FILE*, int nrOfNs);
 
 	//! Check if Grammar file name appears to be Coco itself
-	bool checkIsCocoAtg() const;
+	bool checkIsCocoGrammar() const;
 
 	//! Open a frame file for reading, return NULL on failure
 	FILE* OpenFrameFile(const wchar_t* frameName) const;

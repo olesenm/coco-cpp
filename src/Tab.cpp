@@ -67,6 +67,7 @@ Tab::Tab(Parser *theParser)
 	eofSy(NULL),
 	noSym(NULL),
 	allSyncSets(NULL),
+	grammarName(NULL),
 	srcName(NULL),
 	srcDir(NULL),
 	nsName(NULL),
@@ -99,6 +100,8 @@ Tab::~Tab()
 	if (allSyncSets) { delete allSyncSets; }
 	if (visited) { delete visited; }
 	if (dummyNode) { delete dummyNode; }
+
+	coco_string_delete(grammarName);
 
 	classes.Delete();
 }
@@ -1368,9 +1371,9 @@ void Tab::GenNamespaceClose(FILE* ostr, int nrOfNs) {
 }
 
 
-bool Tab::checkIsCocoAtg() const {
-	wchar_t *lowerCaseName = coco_string_create_lower(srcName);
-	bool isCoco = coco_string_endswith(lowerCaseName, L"coco.atg");
+bool Tab::checkIsCocoGrammar() const {
+	wchar_t *lowerCaseName = coco_string_create_lower(grammarName);
+	bool isCoco = coco_string_equal(lowerCaseName, L"coco");
 	coco_string_delete(lowerCaseName);
 	return isCoco;
 }

@@ -37,6 +37,7 @@ namespace Coco {
                             Class Sets Declaration
 \*---------------------------------------------------------------------------*/
 
+//! Functions for BitArray operations
 class Sets {
 public:
 	static int First(BitArray *s) {

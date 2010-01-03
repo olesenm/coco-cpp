@@ -102,7 +102,7 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 
-Coco                            (. Symbol *sym; Graph *g; wchar_t* gramName = NULL; CharSet *s; .)
+Coco                            (. Symbol *sym; Graph *g; CharSet *s; .)
 =
                                 (. int beg = la->pos; int line = la->line; .)
 
@@ -114,7 +114,7 @@ Coco                            (. Symbol *sym; Graph *g; wchar_t* gramName = NU
 
   "COMPILER"                    (. genScanner = true;
                                    tab->ignored = new CharSet(); .)
-  ident                         (. gramName = coco_string_create(t->val);
+  ident                         (. tab->grammarName = coco_string_create(t->val);
                                    beg = la->pos;
                                    line = la->line;
                                  .)
@@ -177,9 +177,9 @@ Coco                            (. Symbol *sym; Graph *g; wchar_t* gramName = NU
                                 WEAK
     '.'
   }
-  "END" ident                   (. if (!coco_string_equal(gramName, t->val))
+  "END" ident                   (. if (!coco_string_equal(tab->grammarName, t->val))
                                      SemErr(L"name does not match grammar name");
-                                   tab->gramSy = tab->FindSym(gramName);
+                                   tab->gramSy = tab->FindSym(tab->grammarName);
                                    if (tab->gramSy == NULL)
                                      SemErr(L"missing production for grammar name");
                                    else {

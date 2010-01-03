@@ -46,20 +46,39 @@ wchar_t* coco_string_create(const char* str)
     return dest;
 }
 
+
+wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2)
+{
+    const int str1Len = coco_string_length(str1);
+    const int str2Len = coco_string_length(str2);
+
+    wchar_t* dest = new wchar_t[str1Len + str2Len + 1];
+
+    if (str1Len) { wcscpy(dest, str1); }
+    if (str2Len) { wcscpy(dest + str1Len, str2); }
+
+    dest[str1Len + str2Len] = 0;
+    return dest;
+}
+
+
+wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t ch)
+{
+    const int len = coco_string_length(str1);
+    wchar_t* dest = new wchar_t[len + 2];
+    wcsncpy(dest, str1, len);   // or use if (len) { wcscpy(dest, str1); }
+    dest[len] = ch;
+    dest[len + 1] = 0;
+    return dest;
+}
+
+
 void coco_string_merge(wchar_t* &dest, const wchar_t* str)
 {
     if (!str) return;
     wchar_t* newstr = coco_string_create_append(dest, str);
     delete[] dest;
     dest = newstr;
-}
-
-
-bool coco_string_endswith(const wchar_t* str, const wchar_t* endstr)
-{
-    const int strLen = wcslen(str);
-    const int endLen = wcslen(endstr);
-    return (endLen <= strLen) && (wcscmp(str + strLen - endLen, endstr) == 0);
 }
 
 

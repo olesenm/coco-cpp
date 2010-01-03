@@ -51,11 +51,14 @@ namespace Coco
 //! Create by copying byte str
 wchar_t* coco_string_create(const char* str);
 
+//! Create a string by concatenating str1 and str2
+wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2);
+
+//! Create a string by concatenating a character to the end of str
+wchar_t* coco_string_create_append(const wchar_t* str, const wchar_t ch);
+
 //! Append str to dest
 void coco_string_merge(wchar_t* &dest, const wchar_t* str);
-
-//! Return true if the str ends with the endstr
-bool coco_string_endswith(const wchar_t* str, const wchar_t* endstr);
 
 //! Compare strings, return 0 if they are equal
 int coco_string_compareto(const wchar_t* str1, const wchar_t* str2);

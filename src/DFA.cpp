@@ -740,7 +740,7 @@ void DFA::WriteStartTab() {
 
 void DFA::WriteScanner() {
 	// keep copyright in frame when processing coco grammar
-	const bool keepCopyright = tab->checkIsCocoAtg();
+	const bool keepCopyright = tab->checkIsCocoGrammar();
 
 	fram = tab->OpenFrameFile(L"Scanner.frame");
 	if (fram == NULL) {

@@ -123,7 +123,7 @@ bool Parser::WeakSeparator(int n, int syFol, int repFol) {
 
 
 void Parser::Coco() {
-		Symbol *sym; Graph *g; wchar_t* gramName = NULL; CharSet *s; 
+		Symbol *sym; Graph *g; CharSet *s; 
 		int beg = la->pos; int line = la->line; 
 		while (StartOf(1)) {
 			Get();
@@ -136,7 +136,7 @@ void Parser::Coco() {
 		genScanner = true;
 		tab->ignored = new CharSet(); 
 		Expect(1);
-		gramName = coco_string_create(t->val);
+		tab->grammarName = coco_string_create(t->val);
 		beg = la->pos;
 		line = la->line;
 		
@@ -244,9 +244,9 @@ void Parser::Coco() {
 		}
 		Expect(21);
 		Expect(1);
-		if (!coco_string_equal(gramName, t->val))
+		if (!coco_string_equal(tab->grammarName, t->val))
 		 SemErr(L"name does not match grammar name");
-		tab->gramSy = tab->FindSym(gramName);
+		tab->gramSy = tab->FindSym(tab->grammarName);
 		if (tab->gramSy == NULL)
 		  SemErr(L"missing production for grammar name");
 		else {

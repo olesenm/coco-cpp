@@ -38,6 +38,7 @@ class Symbol;
                          Class SortedList Declaration
 \*---------------------------------------------------------------------------*/
 
+//! Key/value pairs that are sorted by the keys, accessible by key and by index.
 template<typename Type>
 class SortedList
 {

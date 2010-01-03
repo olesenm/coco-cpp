@@ -84,7 +84,7 @@ wchar_t* coco_string_create_lower(const wchar_t* str, int index, int len) {
 	if (!str) { return NULL; }
 	wchar_t* dest = new wchar_t[len + 1];
 
-	for (int i = 0; i < len; i++) {
+	for (int i = 0; i < len; ++i) {
 		const wchar_t ch = str[index + i];
 		if ((L'A' <= ch) && (ch <= L'Z')) {
 			dest[i] = ch - (L'A' - L'a');
@@ -97,28 +97,6 @@ wchar_t* coco_string_create_lower(const wchar_t* str, int index, int len) {
 	return dest;
 }
 
-
-wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2) {
-	const int str1Len = coco_string_length(str1);
-	const int str2Len = coco_string_length(str2);
-
-	wchar_t* dest = new wchar_t[str1Len + str2Len + 1];
-
-	if (str1Len) { wcscpy(dest, str1); }
-	if (str2Len) { wcscpy(dest + str1Len, str2); }
-
-	dest[str1Len + str2Len] = 0;
-	return dest;
-}
-
-wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t ch) {
-	const int len = coco_string_length(str1);
-	wchar_t* dest = new wchar_t[len + 2];
-	wcsncpy(dest, str1, len);   // or use if (len) { wcscpy(dest, str1); }
-	dest[len] = ch;
-	dest[len + 1] = 0;
-	return dest;
-}
 
 void coco_string_delete(wchar_t* &str) {
 	delete [] str;

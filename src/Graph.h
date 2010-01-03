@@ -37,6 +37,7 @@ namespace Coco {
                             Class Graph Declaration
 \*---------------------------------------------------------------------------*/
 
+//! A connection of nodes
 class Graph {
 public:
 	Node *l;   //!< left end of graph = head

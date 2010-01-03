@@ -34,8 +34,11 @@ namespace Coco {
 /*---------------------------------------------------------------------------*\
                            Class CharSet Declaration
 \*---------------------------------------------------------------------------*/
+
+//! A Character set
 class CharSet {
 public:
+	//! A character range within a character set
 	class Range {
 	public:
 		int from;

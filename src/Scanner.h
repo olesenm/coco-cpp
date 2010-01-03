@@ -74,12 +74,6 @@ wchar_t* coco_string_create_lower(const wchar_t* str);
 //! Create a lowercase substring of str starting at index and length characters long
 wchar_t* coco_string_create_lower(const wchar_t* str, int index, int length);
 
-//! Create a string by concatenating str1 and str2
-wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2);
-
-//! Create a string by concatenating a character to the end of str
-wchar_t* coco_string_create_append(const wchar_t* str, const wchar_t ch);
-
 //! Free storage and nullify the argument
 void  coco_string_delete(wchar_t* &str);
 

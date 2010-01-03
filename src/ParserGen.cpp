@@ -346,7 +346,7 @@ void ParserGen::InitSets() {
 
 void ParserGen::WriteParser() {
 	// keep copyright in frame when processing coco grammar
-	const bool keepCopyright = tab->checkIsCocoAtg();
+	const bool keepCopyright = tab->checkIsCocoGrammar();
 
 	int oldPos = buffer->GetPos();  // Pos is modified by CopySourcePart
 	symSet.Add(tab->allSyncSets);

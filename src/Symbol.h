@@ -42,6 +42,7 @@ class BitArray;
                            Class Symbol Declaration
 \*---------------------------------------------------------------------------*/
 
+//! ...
 class Symbol {
 public:
 	//! Enumeration for the kind of tokens

@@ -123,7 +123,7 @@ bool Parser::WeakSeparator(int n, int syFol, int repFol) {
 
 
 void Parser::Coco() {
-		Symbol *sym; Graph *g, *g1, *g2; wchar_t* gramName = NULL; CharSet *s; 
+		Symbol *sym; Graph *g; wchar_t* gramName = NULL; CharSet *s; 
 		int beg = la->pos; int line = la->line; 
 		while (StartOf(1)) {
 			Get();
@@ -190,7 +190,7 @@ void Parser::Coco() {
 		}
 		while (la->kind == 13) {
 			Get();
-			bool nested = false; 
+			Graph *g1, *g2; bool nested = false; 
 			Expect(14);
 			TokenExpr(g1);
 			Expect(15);
@@ -295,9 +295,9 @@ void Parser::SetDecl() {
 }
 
 void Parser::TokenDecl(int typ) {
-		wchar_t* name = NULL; int kind; Symbol *sym; Graph *g; 
+		wchar_t* name = NULL; int kind; Graph *g; 
 		Sym(name, kind);
-		sym = tab->FindSym(name);
+		Symbol *sym = tab->FindSym(name);
 		if (sym != NULL) SemErr(L"name declared twice");
 		else {
 		  sym = tab->NewSym(typ, name, t->line);
@@ -310,7 +310,7 @@ void Parser::TokenDecl(int typ) {
 			Get();
 			TokenExpr(g);
 			Expect(20);
-			if (kind == str) SemErr(L"a literal must not be declared with a structure");
+			if (kind == isLiteral) SemErr(L"a literal must not be declared with a structure");
 			tab->Finish(g);
 			if (tokenString == NULL || coco_string_equal(tokenString, noString))
 			  dfa->ConvertToStates(g->l, sym);
@@ -322,7 +322,7 @@ void Parser::TokenDecl(int typ) {
 			}
 			
 		} else if (StartOf(8)) {
-			if (kind == id) genScanner = false;
+			if (kind == isIdent) genScanner = false;
 			else dfa->MatchLiteral(sym->name, sym);
 			
 		} else SynErr(46);
@@ -423,8 +423,7 @@ void Parser::Expression(Graph* &g) {
 }
 
 void Parser::SimSet(CharSet* &s) {
-		int n1, n2; 
-		s = new CharSet(); 
+		int n1, n2; s = new CharSet(); 
 		if (la->kind == 1) {
 			Get();
 			CharClass *c = tab->FindCharClass(t->val);
@@ -466,21 +465,20 @@ void Parser::Char(int &n) {
 		wchar_t* subName = coco_string_create(t->val, 1, coco_string_length(t->val)-2);
 		wchar_t* name = tab->Unescape(subName);
 		coco_string_delete(subName);
+		// "<= 1" instead of "== 1" to allow the escape sequence '\0' in C++
+		if (coco_string_length(name) <= 1) n = name[0];
+		else SemErr(L"unacceptable character value");
+		coco_string_delete(name);
+		// n is int, we can create lowercase directly
+		if (dfa->ignoreCase && (n >= 'A') && (n <= 'Z')) n += 32;
 		
-		                                   // "<= 1" instead of "== 1" to allow the escape sequence '\0' in C++
-		                                   if (coco_string_length(name) <= 1) n = name[0];
-		                                   else SemErr(L"unacceptable character value");
-		                                   coco_string_delete(name);
-		                                   // n is int, we can create lowercase directly
-		                                   if (dfa->ignoreCase && (n >= 'A') && (n <= 'Z')) n += 32;
-		                                 
 }
 
 void Parser::Sym(wchar_t* &name, int &kind) {
-		name = coco_string_create(L"???"); kind = id; 
+		name = coco_string_create(L"???"); kind = isIdent; 
 		if (la->kind == 1) {
 			Get();
-			kind = id; coco_string_delete(name); name = coco_string_create(t->val); 
+			kind = isIdent; coco_string_delete(name); name = coco_string_create(t->val); 
 		} else if (la->kind == 3 || la->kind == 5) {
 			if (la->kind == 3) {
 				Get();
@@ -493,14 +491,15 @@ void Parser::Sym(wchar_t* &name, int &kind) {
 				name[0] = name[len-1] = L'"';
 				
 			}
-			kind = str;
+			kind = isLiteral;
 			if (dfa->ignoreCase) {
 			  wchar_t *oldName = name;
-			  name = coco_string_create_lower(name);
+			  name = coco_string_create_lower(oldName);
 			  coco_string_delete(oldName);
 			}
 			if (coco_string_indexof(name, ' ') >= 0)
-			  SemErr(L"literal tokens must not contain blanks"); 
+			  SemErr(L"literal tokens must not contain blanks");
+			
 		} else SynErr(49);
 }
 
@@ -523,7 +522,7 @@ void Parser::Term(Graph* &g) {
 			g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0)); 
 		} else SynErr(50);
 		if (g == NULL) // invalid start of Term
-		g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0)); 
+		 g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0)); 
 }
 
 void Parser::Resolver(Position* &pos) {
@@ -536,7 +535,7 @@ void Parser::Resolver(Position* &pos) {
 
 void Parser::Factor(Graph* &g) {
 		wchar_t* name = NULL; int kind; Position *pos; bool weak = false;
-		 g = NULL;
+		g = NULL;
 		
 		switch (la->kind) {
 		case 1: case 3: case 5: case 31: {
@@ -546,33 +545,33 @@ void Parser::Factor(Graph* &g) {
 			}
 			Sym(name, kind);
 			Symbol *sym = tab->FindSym(name);
-			 if (sym == NULL && kind == str)
-			   sym = tab->literals[name];
-			 bool undef = (sym == NULL);
-			 if (undef) {
-			   if (kind == id)
-			     sym = tab->NewSym(Node::nt, name, 0);  // forward nt
-			   else if (genScanner) {
-			     sym = tab->NewSym(Node::t, name, t->line);
-			     dfa->MatchLiteral(sym->name, sym);
-			   } else {  // undefined string in production
-			     SemErr(L"undefined string in production");
-			     sym = tab->eofSy;  // dummy
-			   }
-			 }
-			 int typ = sym->typ;
-			 if (typ != Node::t && typ != Node::nt)
-			   SemErr(L"this symbol kind is not allowed in a production");
-			 if (weak) {
-			   if (typ == Node::t) typ = Node::wt;
-			   else SemErr(L"only terminals may be weak");
-			 }
-			 Node *p = tab->NewNode(typ, sym, t->line);
-			 g = new Graph(p);
+			if (sym == NULL && kind == isLiteral)
+			  sym = tab->literals[name];
+			bool undef = (sym == NULL);
+			if (undef) {
+			  if (kind == isIdent)
+			    sym = tab->NewSym(Node::nt, name, 0);  // forward nt
+			  else if (genScanner) {
+			    sym = tab->NewSym(Node::t, name, t->line);
+			    dfa->MatchLiteral(sym->name, sym);
+			  } else {  // undefined string in production
+			    SemErr(L"undefined string in production");
+			    sym = tab->eofSy;  // dummy
+			  }
+			}
+			int typ = sym->typ;
+			if (typ != Node::t && typ != Node::nt)
+			  SemErr(L"this symbol kind is not allowed in a production");
+			if (weak) {
+			  if (typ == Node::t) typ = Node::wt;
+			  else SemErr(L"only terminals may be weak");
+			}
+			Node *p = tab->NewNode(typ, sym, t->line);
+			g = new Graph(p);
 			
 			if (la->kind == 26 || la->kind == 28) {
 				Attribs(p);
-				if (kind != id) SemErr(L"a literal must not have attributes"); 
+				if (kind == isLiteral) SemErr(L"a literal must not have attributes"); 
 			}
 			if (undef)
 			 sym->attrPos = p->pos;  // dummy
@@ -604,9 +603,9 @@ void Parser::Factor(Graph* &g) {
 		case 41: {
 			SemText(pos);
 			Node *p = tab->NewNode(Node::sem, (Symbol*)NULL, 0);
-			   p->pos = pos;
-			   g = new Graph(p);
-			 
+			p->pos = pos;
+			g = new Graph(p);
+			
 			break;
 		}
 		case 25: {
@@ -683,31 +682,31 @@ void Parser::TokenTerm(Graph* &g) {
 			Get();
 			Expect(32);
 			TokenExpr(g2);
-			tab->SetContextTrans(g2->l); dfa->hasCtxMoves = true;
-			   tab->MakeSequence(g, g2); 
+			tab->SetContextTrans(g2->l);
+			dfa->hasCtxMoves = true;
+			tab->MakeSequence(g, g2); 
 			Expect(33);
 		}
 }
 
 void Parser::TokenFactor(Graph* &g) {
-		wchar_t* name = NULL; int kind; 
-		g = NULL; 
+		wchar_t* name = NULL; int kind; g = NULL; 
 		if (la->kind == 1 || la->kind == 3 || la->kind == 5) {
 			Sym(name, kind);
-			if (kind == id) {
-			   CharClass *c = tab->FindCharClass(name);
-			   if (c == NULL) {
-			     SemErr(L"undefined name");
-			     c = tab->NewCharClass(name, new CharSet());
-			   }
-			   Node *p = tab->NewNode(Node::clas, (Symbol*)NULL, 0); p->val = c->n;
-			   g = new Graph(p);
-			   tokenString = coco_string_create(noString);
-			 } else { // str
-			   g = tab->StrToGraph(name);
-			   if (tokenString == NULL) tokenString = coco_string_create(name);
-			   else tokenString = coco_string_create(noString);
+			if (kind == isIdent) {
+			 CharClass *c = tab->FindCharClass(name);
+			 if (c == NULL) {
+			   SemErr(L"undefined name");
+			   c = tab->NewCharClass(name, new CharSet());
 			 }
+			 Node *p = tab->NewNode(Node::clas, (Symbol*)NULL, 0); p->val = c->n;
+			 g = new Graph(p);
+			 tokenString = coco_string_create(noString);
+			} else { // str
+			  g = tab->StrToGraph(name);
+			  if (tokenString == NULL) tokenString = coco_string_create(name);
+			  else tokenString = coco_string_create(noString);
+			}
 			
 		} else if (la->kind == 32) {
 			Get();

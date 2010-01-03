@@ -106,8 +106,8 @@ public:
 	Token *la;                  //!< lookahead token
 
 private:
-	static const int id = 0;
-	static const int str = 1;
+	static const int isIdent = 0;
+	static const int isLiteral = 1;
 	bool genScanner;
 	wchar_t* tokenString;   //!< used in declarations of literal tokens
 	wchar_t* noString;      //!< used in declarations of literal tokens

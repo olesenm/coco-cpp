@@ -375,6 +375,9 @@ public:
 	Token* Peek();     //!< peek for the next token, ignore pragmas
 	void ResetPeek();  //!< ensure that peeking starts at the current scan position
 
+	int  Line() const;     //!< Return the current line
+	void Line(int lineNo); //!< Define the starting line for reporting errors
+
 }; // end Scanner
 
 } // End namespace

@@ -370,6 +370,9 @@ public:
 	Token* Peek();     //!< peek for the next token, ignore pragmas
 	void ResetPeek();  //!< ensure that peeking starts at the current scan position
 
+	int  Line() const;     //!< Return the current line
+	void Line(int lineNo); //!< Define the starting line for reporting errors
+
 }; // end Scanner
 
 -->namespace_close
@@ -1135,6 +1138,14 @@ Token* Scanner::Peek() {
 // make sure that peeking starts at the current scan position
 void Scanner::ResetPeek() {
 	pt = tokens;
+}
+
+int Scanner::Line() const {
+	return line;
+}
+
+void Scanner::Line(int lineNo) {
+	line = lineNo;
 }
 
 

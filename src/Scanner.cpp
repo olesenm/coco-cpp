@@ -956,6 +956,14 @@ void Scanner::ResetPeek() {
 	pt = tokens;
 }
 
+int Scanner::Line() const {
+	return line;
+}
+
+void Scanner::Line(int lineNo) {
+	line = lineNo;
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

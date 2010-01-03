@@ -39,12 +39,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include <fstream>
 #include <iostream>
 
-// io.h and fcntl are used to ensure binary read from streams on windows
-#if _MSC_VER >= 1300
-#include <io.h>
-#include <fcntl.h>
-#endif
-
 #if _MSC_VER >= 1400
 #define coco_swprintf swprintf_s
 #elif _MSC_VER >= 1300
@@ -92,25 +86,12 @@ void  coco_string_delete(wchar_t* &str);
 //! The length of the str, or 0 if the str is NULL
 int   coco_string_length(const wchar_t* str);
 
-//! Return true if the str ends with the endstr
-bool  coco_string_endswith(const wchar_t* str, const wchar_t* endstr);
-
 //! Return the index of the first occurrence of ch.
 //  Return -1 if nothing is found.
 int   coco_string_indexof(const wchar_t* str, const wchar_t ch);
 
-//! Return the index of the last occurrence of ch.
-//  Return -1 if nothing is found.
-int   coco_string_lastindexof(const wchar_t* str, const wchar_t ch);
-
-//! Append str to dest
-void  coco_string_merge(wchar_t* &dest, const wchar_t* str);
-
 //! Compare strings, return true if they are equal
 bool  coco_string_equal(const wchar_t* str1, const wchar_t* str2);
-
-//! Compare strings, return 0 if they are equal
-int   coco_string_compareto(const wchar_t* str1, const wchar_t* str2);
 
 //! Simple string hashing function
 int   coco_string_hash(const wchar_t* str);
@@ -128,9 +109,6 @@ float coco_string_toFloat(const wchar_t* str);
 //
 // String handling, byte character
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//! Create by copying byte str
-wchar_t* coco_string_create(const char* str);
 
 //! Create a byte string by copying str
 char* coco_string_create_char(const wchar_t* str);
@@ -399,7 +377,7 @@ public:
 
 }; // end Scanner
 
-} // namespace
+} // End namespace
 
 
 #endif // COCO_SCANNER_H__

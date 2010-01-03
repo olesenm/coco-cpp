@@ -145,6 +145,7 @@ with the same syntax. For example,
 #include <stdio.h>
 #include "Scanner.h"
 #include "Parser.h"
+#include "Utils.h"
 #include "Tab.h"
 
 //! @namespace Coco

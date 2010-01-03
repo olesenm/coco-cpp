@@ -30,6 +30,13 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 #include <sstream>
 
+// io.h and fcntl are used to ensure binary read from streams on windows
+#if _MSC_VER >= 1300
+#include <io.h>
+#include <fcntl.h>
+#endif
+
+
 #include "Scanner.h"
 
 // values for the file stream buffering
@@ -122,35 +129,13 @@ int coco_string_length(const wchar_t* str) {
 	return str ? wcslen(str) : 0;
 }
 
-bool coco_string_endswith(const wchar_t* str, const wchar_t* endstr) {
-	const int strLen = wcslen(str);
-	const int endLen = wcslen(endstr);
-	return (endLen <= strLen) && (wcscmp(str + strLen - endLen, endstr) == 0);
-}
-
 int coco_string_indexof(const wchar_t* str, const wchar_t ch) {
 	const wchar_t* fnd = wcschr(str, ch);
 	return fnd ? (fnd - str) : -1;
 }
 
-int coco_string_lastindexof(const wchar_t* str, const wchar_t ch) {
-	const wchar_t* fnd = wcsrchr(str, ch);
-	return fnd ? (fnd - str) : -1;
-}
-
-void coco_string_merge(wchar_t* &dest, const wchar_t* str) {
-	if (!str) { return; }
-	wchar_t* newstr = coco_string_create_append(dest, str);
-	delete [] dest;
-	dest = newstr;
-}
-
 bool coco_string_equal(const wchar_t* str1, const wchar_t* str2) {
 	return wcscmp(str1, str2) == 0;
-}
-
-int coco_string_compareto(const wchar_t* str1, const wchar_t* str2) {
-	return wcscmp(str1, str2);
 }
 
 int coco_string_hash(const wchar_t* str) {
@@ -180,16 +165,6 @@ float coco_string_toFloat(const wchar_t* str)
 //
 // string handling, byte character
 //
-
-wchar_t* coco_string_create(const char* str) {
-	const int len = str ? strlen(str) : 0;
-	wchar_t* dest = new wchar_t[len + 1];
-	for (int i = 0; i < len; ++i) {
-		dest[i] = wchar_t(str[i]);
-	}
-	dest[len] = 0;
-	return dest;
-}
 
 char* coco_string_create_char(const wchar_t* str) {
 	const int len = coco_string_length(str);
@@ -984,7 +959,7 @@ void Scanner::ResetPeek() {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // namespace
+} // End namespace
 
 
 // ************************************************************************* //

@@ -31,7 +31,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Tab.h"
 #include "Parser.h"
 #include "BitArray.h"
-#include "Scanner.h"
+#include "Utils.h"
 #include "SortedList.h"
 
 namespace Coco {
@@ -1246,10 +1246,43 @@ void Tab::DispatchDirective(const wchar_t* str)
 	}
 	else if (coco_string_equal(name, L"eof"))
 	{
-		if (coco_string_equal(strval, L"true")) {
+		const int boolval = coco_string_checkBool(strval);
+		if (boolval > 0) {
 			explicitEof = true;
-		} else if (coco_string_equal(strval, L"false")) {
+		} else if (!boolval) {
 			explicitEof = false;
+		}
+		else {
+			wprintf
+			(
+				L"ignoring unknown bool value for pragma: '%ls' = '%ls'\n",
+				name, strval
+			);
+		}
+	}
+	else if (coco_string_equal(name, L"lines"))
+	{
+		const int boolval = coco_string_checkBool(strval);
+		if (boolval > 0) {
+			emitLines = true;
+		} else if (!boolval) {
+			emitLines = false;
+		}
+		else {
+			wprintf
+			(
+				L"ignoring unknown bool value for pragma: '%ls' = '%ls'\n",
+				name, strval
+			);
+		}
+	}
+	else if (coco_string_equal(name, L"single"))
+	{
+		const int boolval = coco_string_checkBool(strval);
+		if (boolval > 0) {
+			singleOutput = true;
+		} else if (!boolval) {
+			singleOutput = false;
 		}
 		else {
 			wprintf

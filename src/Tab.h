@@ -33,7 +33,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "ArrayList.h"
 #include "HashTable.h"
 #include "StringBuilder.h"
-#include "Scanner.h"
+#include "Utils.h"
 #include "Position.h"
 #include "Symbol.h"
 #include "Node.h"

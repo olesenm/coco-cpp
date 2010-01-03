@@ -32,7 +32,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "ParserGen.h"
 #include "Parser.h"
 #include "BitArray.h"
-#include "Scanner.h"
+#include "Utils.h"
 
 namespace Coco {
 

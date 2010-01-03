@@ -30,7 +30,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #define COCO_MELTED_H__
 
 #include "State.h"
-#include "Scanner.h"
+#include "Utils.h"
 
 namespace Coco {
 

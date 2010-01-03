@@ -33,7 +33,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Position.h"
 #include "Tab.h"
 #include "Symbol.h"
-#include "Scanner.h"
+#include "Utils.h"
 #include "DFA.h"
 
 namespace Coco {

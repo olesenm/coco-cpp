@@ -63,7 +63,7 @@ void Parser::Get() {
 				tab->SetDDT(la->val+1); 
 		}
 		if (la->kind == 45) {
-				tab->DispatchPragma(la->val+1); 
+				tab->DispatchDirective(la->val+1); 
 		}
 
 		if (dummyToken != t) {
@@ -487,11 +487,10 @@ void Parser::Sym(wchar_t* &name, int &kind) {
 				coco_string_delete(name); name = coco_string_create(t->val); 
 			} else {
 				Get();
-				wchar_t *subName = coco_string_create(t->val, 1, coco_string_length(t->val)-2);
-				coco_string_delete(name);
-				name = coco_string_create_append(L"\"", subName);
-				coco_string_delete(subName);
-				coco_string_merge(name, L"\"");
+				coco_string_delete(name); name = coco_string_create(t->val);
+				const int len = coco_string_length(name);
+				// change surrounding single quotes to double quotes (does not escape '"')
+				name[0] = name[len-1] = L'"';
 				
 			}
 			kind = str;
@@ -942,7 +941,7 @@ void Errors::Exception(const wchar_t* msg) {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // namespace
+} // End namespace
 
 
 // ************************************************************************* //

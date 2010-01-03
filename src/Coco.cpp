@@ -77,16 +77,16 @@ the pragma:
 @endverbatim
 in the attributed grammar.
 
-The extended pragma format may also be used in the attributed grammar:
+The extended directive format may also be used in the attributed grammar:
 @verbatim
     $trace=(digit | letter){ digit | letter }
 @endverbatim
 
-@section pragma Extended Pragmas
+@section Compiler Directives (Extended Pragmas)
 
 To improve the reliability of builds in complex environments, it is
 possible to specify the desired namespace and/or file prefix as a
-pragma within the grammar. For example, when compiling the Coco.atg
+directive within the grammar. For example, when compiling the Coco.atg
 itself, it can be compiled within the 'Coco' namespace as specified
 on the command-line. For example,
 
@@ -185,17 +185,14 @@ void printUsage(const char* message)
 }
 
 
-
 #ifdef _WIN32
 int wmain(int argc, wchar_t *argv[]) {
-#elif defined __GNUC__
+#else
 int main(int argc, char *argv_[]) {
-	wchar_t ** argv = new wchar_t*[argc];
+	wchar_t** argv = new wchar_t*[argc];
 	for (int i = 0; i < argc; ++i) {
 		argv[i] = coco_string_create(argv_[i]);
 	}
-#else
-#error unknown compiler!
 #endif
 
 	wprintf(L"Coco/R C++ (02 Jan 2010)\n");
@@ -272,7 +269,8 @@ int main(int argc, char *argv_[]) {
 		}
 	}
 
-#if defined __GNUC__
+#ifndef _WIN32
+	// deallocate the wide-character strings
 	for (int i = 0; i < argc; ++i) {
 		coco_string_delete(argv[i]);
 	}

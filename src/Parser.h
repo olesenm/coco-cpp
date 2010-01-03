@@ -154,7 +154,7 @@ public:
 
 }; // end Parser
 
-} // namespace
+} // End namespace
 
 
 #endif // COCO_PARSER_H__

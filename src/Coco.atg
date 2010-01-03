@@ -36,8 +36,9 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "ParserGen.h"
 
 COMPILER Coco
-$namespace=Coco
+$namespace=Coco         // grammar directive
 
+// Parser Data Members and Methods
 private:
 	static const int id = 0;
 	static const int str = 1;
@@ -53,7 +54,7 @@ public:
 
 /*-------------------------------------------------------------------------*/
 
-INITIALIZE
+INITIALIZE      // Add to Parser constructor
 	genScanner = false;
 	tokenString = NULL;
 	noString = coco_string_create(L"-none-");
@@ -62,7 +63,7 @@ INITIALIZE
 	dfa = NULL;
 	pgen = NULL;
 
-DESTROY
+DESTROY         // Add to Parser destructor
 	coco_string_delete(noString);
 
 /*-------------------------------------------------------------------------*/
@@ -90,7 +91,7 @@ PRAGMAS
     ddtSym    = '$' { alphanum }.   (. tab->SetDDT(la->val+1); .)
     directive = '$' letter { letter } '='
         { alphanum | '-' | '.' | ':' } .
-                                (. tab->DispatchPragma(la->val+1); .)
+                                (. tab->DispatchDirective(la->val+1); .)
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -490,12 +491,10 @@ Sym<wchar_t* &name, int &kind>
 =                               (. name = coco_string_create(L"???"); kind = id; .)
 ( ident                         (. kind = id; coco_string_delete(name); name = coco_string_create(t->val); .)
 | (string                       (. coco_string_delete(name); name = coco_string_create(t->val); .)
-  | char                        (.
-                                   wchar_t *subName = coco_string_create(t->val, 1, coco_string_length(t->val)-2);
-                                   coco_string_delete(name);
-                                   name = coco_string_create_append(L"\"", subName);
-                                   coco_string_delete(subName);
-                                   coco_string_merge(name, L"\"");
+  | char                        (. coco_string_delete(name); name = coco_string_create(t->val);
+                                   const int len = coco_string_length(name);
+                                   // change surrounding single quotes to double quotes (does not escape '"')
+                                   name[0] = name[len-1] = L'"';
                                 .)
   )                             (. kind = str;
                                    if (dfa->ignoreCase) {

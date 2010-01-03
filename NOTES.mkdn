@@ -24,11 +24,11 @@ The *INITIALIZE* code is added to the Parser constructor, the
 
 ---------------
 
-#### Extended pragma directives
+#### Compiler directives (extended pragmas)
 
 To improve the reliability of builds in complex environments, it is
 now possible to specify the desired namespace and/or file prefix as a
-pragma within the grammar. For example, the Coco.atg itself should be
+directive within the grammar. For example, the Coco.atg itself should be
 compiled within the 'Coco' namespace. There are two ways to do this.
 
 1. specify directly on the command-line:
@@ -70,21 +70,26 @@ avoid confusion. For example, when the compiler -I includes both
 directories, an include "Parser.h" will only be able to address one of
 the parsers.
 
-
 For completeness, it is also possible to add in trace string parameters
 with the same syntax. For example,
 
     COMPILER GramC
-    $trace=ags
-
+    $trace=AGS
 
 
 For some grammars, it may be desirable to suppress the automatically
 added expectation that the parser content ends with the end-of-file.
-The pragma to do this:
+The *eof* directive does this:
 
     COMPILER GramC
     $eof=false
+
+
+Beyond this, there are directives for the *-lines* and the *-single*
+command-line options:
+
+    $lines=true
+    $single=true
 
 
 ---------------

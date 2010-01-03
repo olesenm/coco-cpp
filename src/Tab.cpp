@@ -1206,7 +1206,7 @@ void Tab::XRef() {
 }
 
 
-void Tab::DispatchPragma(const wchar_t* str)
+void Tab::DispatchDirective(const wchar_t* str)
 {
 	const int len1 = coco_string_indexof(str, L'=');
 	const int len2 = coco_string_length(str) - len1 - 1;
@@ -1330,7 +1330,7 @@ int Tab::GenNamespaceOpen(FILE* ostr) const {
 
 void Tab::GenNamespaceClose(FILE* ostr, int nrOfNs) {
 	for (int i = 0; i < nrOfNs; ++i) {
-		fwprintf(ostr, L"} // namespace\n");
+		fwprintf(ostr, L"} // End namespace\n");
 	}
 }
 

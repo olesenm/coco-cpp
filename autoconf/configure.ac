@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([Coco/r cpp], [20090102], [Loeberbauer AT ssw.jku.at])
+AC_INIT([Coco/R C++], [20090103], [Loeberbauer AT ssw.jku.at], [coco-cpp])
 AC_CONFIG_AUX_DIR(autoconf)
 AC_CONFIG_SRCDIR([src/Coco.cpp])
 AC_CONFIG_HEADERS([src/config.h])

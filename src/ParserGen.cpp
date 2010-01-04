@@ -431,13 +431,9 @@ void ParserGen::WriteParser() {
 }
 
 
-void ParserGen::WriteStatistics() {
-	fwprintf(trace, L"Statistics:\n");
-	fwprintf(trace, L"----------\n");
-	fwprintf(trace, L"%d terminals\n", tab->terminals.Count);
-	fwprintf(trace, L"%d symbols\n", tab->terminals.Count + tab->pragmas.Count +
-	                               tab->nonterminals.Count);
-	fwprintf(trace, L"%d nodes\n", tab->nodes.Count);
+void ParserGen::PrintStatistics() const {
+	FILE* trace = tab->trace;
+
 	fwprintf(trace, L"%d sets\n", symSet.Count);
 }
 
@@ -451,7 +447,6 @@ ParserGen::ParserGen(Parser *parser)
 	gen(NULL),
 	err(NULL),
 	tab(parser->tab),
-	trace(parser->trace),
 	errors(parser->errors),
 	buffer(parser->scanner->buffer)
 {}

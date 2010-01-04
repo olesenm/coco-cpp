@@ -113,7 +113,6 @@ private:
 	wchar_t* noString;      //!< used in declarations of literal tokens
 
 public:
-	FILE* trace;            //!< trace file
 	Tab *tab;               //!< other Coco objects referenced in this ATG
 	DFA *dfa;
 	ParserGen *pgen;

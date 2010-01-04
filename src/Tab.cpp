@@ -77,8 +77,8 @@ Tab::Tab(Parser *theParser)
 	visited(NULL),
 	curSy(NULL),
 	parser(theParser),
-	trace(parser->trace),
 	errors(parser->errors),
+	trace(NULL),
 	dummyNode(NULL),
 	dummyName('A')
 {
@@ -202,6 +202,15 @@ void Tab::PrintSet(BitArray *s, int indent) {
 	}
 	if (col == indent) fwprintf(trace, L"-- empty set --");
 	fwprintf(trace, L"\n");
+}
+
+
+void Tab::PrintStatistics() const {
+	fwprintf(trace, L"Statistics:\n");
+	fwprintf(trace, L"----------\n");
+	fwprintf(trace, L"%d terminals\n", terminals.Count);
+	fwprintf(trace, L"%d symbols\n", terminals.Count + pragmas.Count + nonterminals.Count);
+	fwprintf(trace, L"%d nodes\n", nodes.Count);
 }
 
 

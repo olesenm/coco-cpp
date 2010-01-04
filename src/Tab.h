@@ -93,10 +93,11 @@ public:
 	wchar_t* outDir;        //!< directory for generated files
 	BitArray *visited;      //!< mark list for graph traversals
 	Symbol *curSy;          //!< current symbol in computation of sets
-	Parser *parser;         //!< other Coco objects
-	FILE* trace;            //!< trace file
 
+	Parser *parser;         //!< other Coco objects
 	Errors *errors;
+
+	FILE* trace;            //!< trace file
 
 	ArrayList<Symbol> terminals;
 	ArrayList<Symbol> pragmas;
@@ -115,7 +116,6 @@ public:
 	//  Symbol list management
 	//---------------------------------------------------------------------
 
-
 	//! Create a new symbol (terminal, nonterminal or pragma)
 	Symbol* NewSym(int typ, const wchar_t* name, int line);
 
@@ -128,6 +128,7 @@ public:
 	void PrintSym(Symbol *sym);
 	void PrintSymbolTable();
 	void PrintSet(BitArray *s, int indent);
+	void PrintStatistics() const;
 
 	//---------------------------------------------------------------------
 	//  Syntax graph management

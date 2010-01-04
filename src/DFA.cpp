@@ -388,6 +388,8 @@ void DFA::MakeDeterministic() {
 
 
 void DFA::PrintStates() {
+	FILE* trace = tab->trace;
+
 	fwprintf(trace, L"\n");
 	fwprintf(trace, L"---------- states ----------\n");
 	for (State *state = firstState; state != NULL; state = state->next) {
@@ -417,6 +419,10 @@ void DFA::PrintStates() {
 	}
 	fwprintf(trace, L"\n---------- character classes ----------\n");
 	tab->WriteCharClasses();
+}
+
+
+void DFA::PrintStatistics() const {
 }
 
 
@@ -850,20 +856,23 @@ void DFA::WriteScanner() {
 }
 
 
-DFA::DFA(Parser *parser) {
-	this->parser = parser;
-	tab = parser->tab;
-	errors = parser->errors;
-	trace = parser->trace;
-	firstState = NULL;
-	lastState = NULL;
-	lastStateNr = -1;
+DFA::DFA(Parser *theParser)
+:
+	maxStates(0),
+	lastStateNr(-1),
+	firstState(NULL),
+	lastState(NULL),
+	ignoreCase(false),
+	dirtyDFA(false),
+	hasCtxMoves(false),
+	existLabel(NULL),
+	parser(theParser),
+	tab(parser->tab),
+	errors(parser->errors),
+	firstMelted(NULL),
+	firstComment(NULL)
+{
 	firstState = NewState();
-	firstMelted = NULL;
-	firstComment = NULL;
-	ignoreCase = false;
-	dirtyDFA = false;
-	hasCtxMoves = false;
 }
 
 

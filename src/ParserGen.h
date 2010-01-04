@@ -73,7 +73,6 @@ public:
 	ArrayList<BitArray> symSet;
 
 	Tab *tab;               //!< other Coco objects
-	FILE* trace;            //!< trace file
 	Errors *errors;
 	Buffer *buffer;
 
@@ -96,7 +95,7 @@ public:
 	void GenProductionsHeader();
 	void InitSets();
 	void WriteParser();
-	void WriteStatistics();
+	void PrintStatistics() const;
 
 	ParserGen(Parser *parser);
 	~ParserGen();

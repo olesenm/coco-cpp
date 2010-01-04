@@ -271,7 +271,11 @@ void Parser::Coco() {
 		      if (tab->ddt[0]) dfa->PrintStates();
 		    }
 		    wprintf(L" generated\n");
-		    if (tab->ddt[8]) pgen->WriteStatistics();
+		    if (tab->ddt[8]) {
+		        tab->PrintStatistics();
+		        pgen->PrintStatistics();
+		        dfa->PrintStatistics();
+		    }
 		  }
 		}
 		if (tab->ddt[6]) tab->PrintSymbolTable();
@@ -760,7 +764,6 @@ Parser::Parser(Scanner* scan, Errors* err)
 genScanner = false;
 	tokenString = NULL;
 	noString = coco_string_create(L"-none-");
-	trace = NULL;
 	tab = NULL;
 	dfa = NULL;
 	pgen = NULL;

@@ -60,7 +60,7 @@ public:
 	int lastStateNr;    //!< highest state number
 	State *firstState;
 	State *lastState;   //!< last allocated state
-	int lastSimState;   //!< last non melted state
+	int lastSimState;   //!< last non-melted state
 	FILE* fram;         //!< scanner frame input
 	FILE* gen;          //!< generated scanner file
 	Symbol *curSy;      //!< current token to be recognized (in FindTrans)
@@ -75,7 +75,6 @@ public:
 	Tab        *tab;
 	Errors     *errors;
 
-	FILE* trace;            //!< trace file
 	Melted *firstMelted;    //!< head of melted state list
 	Comment *firstComment;  //!< list of comments
 
@@ -106,6 +105,8 @@ public:
 	void MakeDeterministic();
 	void PrintStates();
 	void CheckLabels();
+
+	void PrintStatistics() const;
 
 	//---------------------------- actions --------------------------------
 	Action* FindAction(State *state, wchar_t ch);

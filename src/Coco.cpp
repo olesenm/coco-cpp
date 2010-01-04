@@ -200,8 +200,7 @@ int main(int argc, char *argv_[]) {
 
 	wchar_t *srcName = NULL, *nsName = NULL, *prefixName = NULL;
 	wchar_t *frameDir = NULL, *outDir = NULL;
-	wchar_t *ddtString = NULL, *traceFileName = NULL;
-	char *chTrFileName = NULL;
+	wchar_t *ddtString = NULL;
 	bool emitLines = false;
 	bool singleOutput = false;
 	bool makeBackup = false;
@@ -278,48 +277,49 @@ int main(int argc, char *argv_[]) {
 	delete [] argv; argv = NULL;
 #endif
 
-	if (argc > 0 && srcName != NULL) {
+	if (srcName != NULL) {
 		int pos = coco_string_lastindexof(srcName, '/');
 		if (pos < 0) pos = coco_string_lastindexof(srcName, '\\');
-		wchar_t* file = coco_string_create(srcName);
 		wchar_t* srcDir = coco_string_create(srcName, 0, pos+1);
 
-		Coco::Scanner *scanner = new Coco::Scanner(file);
+		Coco::Scanner *scanner = new Coco::Scanner(srcName);
 		Coco::Parser  *parser  = new Coco::Parser(scanner);
+		Coco::Tab     *tab     = new Coco::Tab(parser);
 
-		traceFileName = coco_string_create_append(srcDir, L"trace.txt");
-		chTrFileName = coco_string_create_char(traceFileName);
+		tab->srcName  = srcName;
+		tab->srcDir   = srcDir;
+		tab->nsName   = coco_string_create(nsName);
+		tab->prefixName = coco_string_create(prefixName);
+		tab->frameDir = coco_string_create(frameDir);
+		tab->outDir   = (outDir != NULL ? outDir : srcDir);
+		tab->emitLines = emitLines;
+		tab->singleOutput = singleOutput;
+		tab->makeBackup = makeBackup;
 
-		if ((parser->trace = fopen(chTrFileName, "w")) == NULL) {
+		if (ddtString != NULL) tab->SetDDT(ddtString);
+
+		wchar_t *traceFileName = coco_string_create_append(tab->outDir, L"trace.txt");
+		char *chTrFileName = coco_string_create_char(traceFileName);
+
+		if ((tab->trace = fopen(chTrFileName, "w")) == NULL) {
 			wprintf(L"-- cannot write trace file to %ls\n", traceFileName);
 			return 1;
 		}
 
-		parser->tab  = new Coco::Tab(parser);
+		// attach Tab before creating Scanner/Parser generators
+		parser->tab  = tab;
 		parser->dfa  = new Coco::DFA(parser);
 		parser->pgen = new Coco::ParserGen(parser);
 
-		parser->tab->srcName  = coco_string_create(srcName);
-		parser->tab->srcDir   = coco_string_create(srcDir);
-		parser->tab->nsName   = coco_string_create(nsName);
-		parser->tab->prefixName = coco_string_create(prefixName);
-		parser->tab->frameDir = coco_string_create(frameDir);
-		parser->tab->outDir   = coco_string_create(outDir != NULL ? outDir : srcDir);
-		parser->tab->emitLines = emitLines;
-		parser->tab->singleOutput = singleOutput;
-		parser->tab->makeBackup = makeBackup;
-
-		if (ddtString != NULL) parser->tab->SetDDT(ddtString);
-
 		parser->Parse();
 
-		fclose(parser->trace);
+		fclose(tab->trace);
 
 		// obtain the FileSize
-		parser->trace = fopen(chTrFileName, "r");
-		fseek(parser->trace, 0, SEEK_END);
-		long fileSize = ftell(parser->trace);
-		fclose(parser->trace);
+		tab->trace = fopen(chTrFileName, "r");
+		fseek(tab->trace, 0, SEEK_END);
+		long fileSize = ftell(tab->trace);
+		fclose(tab->trace);
 		if (fileSize == 0)
 			remove(chTrFileName);
 		else
@@ -332,10 +332,11 @@ int main(int argc, char *argv_[]) {
 
 		delete parser->pgen;
 		delete parser->dfa;
-		delete parser->tab;
+		delete tab;
 		delete parser;
 		delete scanner;
-		coco_string_delete(file);
+		coco_string_delete(chTrFileName);
+		coco_string_delete(traceFileName);
 		coco_string_delete(srcDir);
 	} else {
 		printUsage(NULL);
@@ -345,9 +346,8 @@ int main(int argc, char *argv_[]) {
 	coco_string_delete(nsName);
 	coco_string_delete(prefixName);
 	coco_string_delete(frameDir);
+	coco_string_delete(outDir);
 	coco_string_delete(ddtString);
-	coco_string_delete(chTrFileName);
-	coco_string_delete(traceFileName);
 
 	return 0;
 }

@@ -249,10 +249,9 @@ SimSet<CharSet* &s>             (. int n1, n2; s = new CharSet(); .)
                                    wchar_t *subName2 = coco_string_create(t->val, 1, coco_string_length(t->val)-2);
                                    wchar_t *name = tab->Unescape(subName2);
                                    coco_string_delete(subName2);
-                                   wchar_t ch;
-                                   int len = coco_string_length(name);
+                                   const int len = coco_string_length(name);
                                    for (int i=0; i < len; i++) {
-                                     ch = name[i];
+                                     wchar_t ch = name[i];
                                      if (dfa->ignoreCase) {
                                        if ((L'A' <= ch) && (ch <= L'Z')) ch = ch - (L'A' - L'a'); // ch.ToLower()
                                      }

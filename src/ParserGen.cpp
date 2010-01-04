@@ -418,7 +418,7 @@ void ParserGen::WriteParser() {
 	else {
 		fwprintf(gen, L"\tExpect(0); // expect end-of-file automatically added\n");
 	}
-	CopyFramePart(L"-->constants"); CopySourcePart(tab->initCodePos, 0);
+	CopyFramePart(L"-->constructor"); CopySourcePart(tab->initCodePos, 0);
 	CopyFramePart(L"-->initialization"); InitSets();
 	CopyFramePart(L"-->destructor"); CopySourcePart(tab->deinitCodePos, 0);
 	CopyFramePart(L"-->errors"); fwprintf(gen, L"%ls", err);

@@ -28,14 +28,14 @@ The *INITIALIZE* code is added to the Parser constructor, the
 
 To improve the reliability of builds in complex environments, it is
 now possible to specify the desired namespace and/or file prefix as a
-directive within the grammar. For example, the Coco.atg itself should be
-compiled within the 'Coco' namespace. There are two ways to do this.
+directive within the grammar. For example, the Coco-cpp.atg itself should
+be compiled within the 'Coco' namespace. There are two ways to do this.
 
 1. specify directly on the command-line:
 
-    Coco -namespace Coco Coco.atg
+    Coco -namespace Coco Coco-cpp.atg
 
-2. specify within the Coco.atg file:
+2. specify within the Coco-cpp.atg file:
 
     COMPILER Coco
     $namespace=Coco

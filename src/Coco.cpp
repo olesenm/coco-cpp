@@ -87,15 +87,15 @@ The extended directive format may also be used in the attributed grammar:
 
 To improve the reliability of builds in complex environments, it is
 possible to specify the desired namespace and/or file prefix as a
-directive within the grammar. For example, when compiling the Coco.atg
-itself, it can be compiled within the 'Coco' namespace as specified
-on the command-line. For example,
+directive within the grammar. For example, when compiling the
+Coco-cpp.atg itself, it can be compiled within the 'Coco' namespace
+as specified on the command-line. For example,
 
 @verbatim
-    Coco -namespace Coco Coco.atg
+    Coco -namespace Coco Coco-cpp.atg
 @endverbatim
 
-As an alternative, it can be specified within the Coco.atg file:
+As an alternative, it can be specified within the Coco-cpp.atg file:
 @verbatim
     COMPILER Coco
     $namespace=Coco

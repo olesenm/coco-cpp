@@ -83,7 +83,7 @@ public:
 	BitArray *allSyncSets;  //!< union of all synchronisation sets
 	HashTable<Symbol> literals;    //!< symbols that are used as literals
 
-	wchar_t* grammarName;   //!< The name of the grammar, set by Coco.atg
+	wchar_t* grammarName;   //!< The name of the grammar, set by Coco-cpp.atg
 
 	wchar_t* srcName;       //!< name of the atg file (including path)
 	wchar_t* srcDir;        //!< directory path of the atg file

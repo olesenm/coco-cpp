@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-Coco.atg -- Attributed Grammar
+Coco-cpp.atg -- Attributed Grammar for Coco/R C++ version
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -28,7 +28,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 -------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------
  compile with:
-   Coco Coco.atg -namespace Coco
+   Coco Coco-cpp.atg -namespace Coco
 -------------------------------------------------------------------------*/
 
 #include "Tab.h"

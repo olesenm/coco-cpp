@@ -255,7 +255,7 @@ Parser::Parser(Scanner* scan, Errors* err)
 		errors = new Errors();
 	}
 	// user-defined initialization:
--->constants
+-->constructor
 }
 
 

@@ -78,7 +78,7 @@ Tab::Tab(Parser *theParser)
 	curSy(NULL),
 	parser(theParser),
 	errors(parser->errors),
-	trace(NULL),
+	trace(stderr),
 	dummyNode(NULL),
 	dummyName('A')
 {

@@ -36,15 +36,16 @@ http://www.ssw.uni-linz.ac.at/coco/
 @verbatim
 Coco Grammar.atg {Option}
 Options:
-  -namespace <namespaceName>
-  -prefix    <prefixName>
-  -frames    <frameFilesDirectory>
-  -trace     <traceString>
-  -o         <outputDirectory>
-  -lines     include #line pragmas in the generated code
-  -single    include the Scanner code in the Parser file
-  -bak       save existing Parser/Scanner files as .bak
-  -help      print this usage
+  -namespace <Name>      eg, My::Name::Space
+  -prefix    <Name>      for unique Parser/Scanner file names
+  -frames    <Dir>       for frames not in the source directory
+  -trace     <String>    trace with output to trace.txt
+  -trace2    <String>    trace with output on stderr
+  -o         <Dir>       output directory
+  -lines                 include #line pragmas in the generated code
+  -single                include the Scanner code in the Parser file
+  -bak                   save existing Parser/Scanner files as .bak
+  -help                  print this usage
 @endverbatim
 The valid trace string values are listed below.
 
@@ -55,7 +56,7 @@ directories:
 -# The same directory as the atg grammar.
 
 Unless specified with the @em -o option, the generated scanner/parser
-files are written in the same directory as the atg grammar.
+files are written in the same directory as the atg grammar!
 
 
 @section trace Trace output options
@@ -160,16 +161,17 @@ void printUsage(const char* message)
 
 	wprintf(L"Usage: Coco Grammar.atg {Option}\n");
 	wprintf(L"Options:\n");
-	wprintf(L"  -namespace <namespaceName>\n");
-	wprintf(L"  -prefix    <prefixName>\n");
-	wprintf(L"  -frames    <frameFilesDirectory>\n");
-	wprintf(L"  -trace     <traceString>\n");
-	wprintf(L"  -o         <outputDirectory>\n");
-	wprintf(L"  -lines     include #line pragmas in the generated code\n");
-	wprintf(L"  -single    include the Scanner code in the Parser file\n");
-	wprintf(L"  -bak       save existing Parser/Scanner files as .bak\n");
-	wprintf(L"  -help      print this usage\n");
-	wprintf(L"Valid characters in the trace string:\n");
+	wprintf(L"  -namespace <Name>      eg, My::Name::Space\n");
+	wprintf(L"  -prefix    <Name>      for unique Parser/Scanner file names\n");
+	wprintf(L"  -frames    <Dir>       for frames not in the source directory\n");
+	wprintf(L"  -trace     <String>    trace with output to trace.txt\n");
+	wprintf(L"  -trace2    <String>    trace with output on stderr\n");
+	wprintf(L"  -o         <Dir>       output directory\n");
+	wprintf(L"  -lines                 include #line pragmas in the generated code\n");
+	wprintf(L"  -single                include the Scanner code in the Parser file\n");
+	wprintf(L"  -bak                   save existing Parser/Scanner files as .bak\n");
+	wprintf(L"  -help                  print this usage\n");
+	wprintf(L"\nValid characters in the trace string:\n");
 	wprintf(L"  A  trace automaton\n");
 	wprintf(L"  F  list first/follow sets\n");
 	wprintf(L"  G  print syntax graph\n");
@@ -186,6 +188,8 @@ void printUsage(const char* message)
 }
 
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #ifdef _WIN32
 int wmain(int argc, wchar_t *argv[]) {
 #else
@@ -196,7 +200,7 @@ int main(int argc, char *argv_[]) {
 	}
 #endif
 
-	wprintf(L"Coco/R C++ (03 Jan 2010)\n");
+	wprintf(L"Coco/R C++ (04 Jan 2010)\n");
 
 	wchar_t *srcName = NULL, *nsName = NULL, *prefixName = NULL;
 	wchar_t *frameDir = NULL, *outDir = NULL;
@@ -204,6 +208,7 @@ int main(int argc, char *argv_[]) {
 	bool emitLines = false;
 	bool singleOutput = false;
 	bool makeBackup = false;
+	bool traceToFile = true;
 
 	for (int i = 1; i < argc; i++) {
 		if (coco_string_equal(argv[i], L"-namespace")) {
@@ -232,6 +237,17 @@ int main(int argc, char *argv_[]) {
 				printUsage("missing parameter on -trace");
 				return 1;
 			}
+			traceToFile = true;
+			coco_string_delete(ddtString);
+			ddtString = coco_string_create(argv[i]);
+		}
+		else if (coco_string_equal(argv[i], L"-trace2")) {
+			if (++i == argc) {
+				printUsage("missing parameter on -trace2");
+				return 1;
+			}
+			traceToFile = false;
+			coco_string_delete(ddtString);
 			ddtString = coco_string_create(argv[i]);
 		}
 		else if (coco_string_equal(argv[i], L"-o")) {
@@ -301,7 +317,7 @@ int main(int argc, char *argv_[]) {
 		wchar_t *traceFileName = coco_string_create_append(tab->outDir, L"trace.txt");
 		char *chTrFileName = coco_string_create_char(traceFileName);
 
-		if ((tab->trace = fopen(chTrFileName, "w")) == NULL) {
+		if (traceToFile && (tab->trace = fopen(chTrFileName, "w")) == NULL) {
 			wprintf(L"-- cannot write trace file to %ls\n", traceFileName);
 			return 1;
 		}
@@ -313,22 +329,29 @@ int main(int argc, char *argv_[]) {
 
 		parser->Parse();
 
-		fclose(tab->trace);
+		// see if anything was written
+		if (traceToFile) {
+			fclose(tab->trace);
 
-		// obtain the FileSize
-		tab->trace = fopen(chTrFileName, "r");
-		fseek(tab->trace, 0, SEEK_END);
-		long fileSize = ftell(tab->trace);
-		fclose(tab->trace);
-		if (fileSize == 0)
-			remove(chTrFileName);
-		else
-			wprintf(L"trace output is in %ls\n", traceFileName);
+			// obtain the FileSize
+			tab->trace = fopen(chTrFileName, "r");
+			fseek(tab->trace, 0, SEEK_END);
+			long fileSize = ftell(tab->trace);
+			fclose(tab->trace);
+			if (fileSize == 0)
+				remove(chTrFileName);
+			else
+				wprintf(L"trace output is in %ls\n", traceFileName);
+		}
 
 		wprintf(L"%d errors detected\n", parser->errors->count);
 		if (parser->errors->count != 0) {
 			return 1;
 		}
+
+		coco_string_delete(tab->nsName);
+		coco_string_delete(tab->prefixName);
+		coco_string_delete(tab->frameDir);
 
 		delete parser->pgen;
 		delete parser->dfa;

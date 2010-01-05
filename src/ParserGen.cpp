@@ -372,14 +372,14 @@ void ParserGen::WriteParser() {
 	CopyFramePart(L"-->begin", keepCopyright);
 	CopyFramePart(L"-->headerdef");
 
-	if (usingPos != NULL) { CopySourcePart(usingPos, 0); fwprintf(gen, L"\n"); }
+	if (preamblePos != NULL) { CopySourcePart(preamblePos, 0); fwprintf(gen, L"\n"); }
 	CopyFramePart(L"-->namespace_open");
 	int nrOfNs = tab->GenNamespaceOpen(gen);
 
 	CopyFramePart(L"-->constantsheader");
 	GenTokensHeader();  /* ML 2002/09/07 write the token kinds */
 	fwprintf(gen, L"\tstatic const int maxT = %d;\n", tab->terminals.Count-1);
-	CopyFramePart(L"-->declarations"); CopySourcePart(tab->semDeclPos, 0);
+	CopyFramePart(L"-->declarations"); CopySourcePart(semDeclPos, 0);
 	CopyFramePart(L"-->productionsheader"); GenProductionsHeader();
 	CopyFramePart(L"-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);
@@ -418,9 +418,9 @@ void ParserGen::WriteParser() {
 	else {
 		fwprintf(gen, L"\tExpect(0); // expect end-of-file automatically added\n");
 	}
-	CopyFramePart(L"-->constructor"); CopySourcePart(tab->initCodePos, 0);
+	CopyFramePart(L"-->constructor"); CopySourcePart(initCodePos, 0);
 	CopyFramePart(L"-->initialization"); InitSets();
-	CopyFramePart(L"-->destructor"); CopySourcePart(tab->deinitCodePos, 0);
+	CopyFramePart(L"-->destructor"); CopySourcePart(deinitCodePos, 0);
 	CopyFramePart(L"-->errors"); fwprintf(gen, L"%ls", err);
 	CopyFramePart(L"-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);
@@ -440,7 +440,10 @@ void ParserGen::PrintStatistics() const {
 
 ParserGen::ParserGen(Parser *parser)
 :
-	usingPos(NULL),
+	preamblePos(NULL),
+	semDeclPos(NULL),
+	initCodePos(NULL),
+	deinitCodePos(NULL),
 	errorNr(-1),
 	curSy(NULL),
 	fram(NULL),
@@ -453,10 +456,10 @@ ParserGen::ParserGen(Parser *parser)
 
 
 ParserGen::~ParserGen() {
-	if (usingPos) {
-		delete usingPos;
-		usingPos = NULL;
-	}
+	if (preamblePos) { delete preamblePos; }
+	if (semDeclPos) { delete semDeclPos; }
+	if (initCodePos) { delete initCodePos; }
+	if (deinitCodePos) { delete deinitCodePos; }
 }
 
 

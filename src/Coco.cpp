@@ -153,7 +153,7 @@ with the same syntax. For example,
 //! @brief Compiler Generator Coco/R, C++ version
 using namespace Coco;
 
-void printUsage(const char* message)
+void printUsage(const char* message = NULL)
 {
 	if (message) {
 		wprintf(L"\nError: %s\n\n", message);
@@ -211,7 +211,12 @@ int main(int argc, char *argv_[]) {
 	bool traceToFile = true;
 
 	for (int i = 1; i < argc; i++) {
-		if (coco_string_equal(argv[i], L"-namespace")) {
+		if (coco_string_equal(argv[i], L"-help"))
+		{
+			printUsage();
+			return 0;
+		}
+		else if (coco_string_equal(argv[i], L"-namespace")) {
 			if (++i == argc) {
 				printUsage("missing parameter on -namespace");
 				return 1;
@@ -266,14 +271,9 @@ int main(int argc, char *argv_[]) {
 		else if (coco_string_equal(argv[i], L"-bak")) {
 			makeBackup = true;
 		}
-		else if (coco_string_equal(argv[i], L"-help"))
-		{
-			printUsage(NULL);
-			return 0;
-		}
 		else if (argv[i][0] == L'-') {
 			wprintf(L"\nError: unknown option: '%ls'\n\n", argv[i]);
-			printUsage(NULL);
+			printUsage();
 			return 1;
 		}
 		else if (srcName != NULL) {
@@ -302,17 +302,16 @@ int main(int argc, char *argv_[]) {
 		Coco::Parser  *parser  = new Coco::Parser(scanner);
 		Coco::Tab     *tab     = new Coco::Tab(parser);
 
-		tab->srcName  = srcName;
-		tab->srcDir   = srcDir;
-		tab->nsName   = coco_string_create(nsName);
+		tab->srcName    = srcName;
+		tab->srcDir     = srcDir;
+		tab->nsName     = coco_string_create(nsName);
 		tab->prefixName = coco_string_create(prefixName);
-		tab->frameDir = coco_string_create(frameDir);
-		tab->outDir   = (outDir != NULL ? outDir : srcDir);
-		tab->emitLines = emitLines;
-		tab->singleOutput = singleOutput;
+		tab->frameDir   = coco_string_create(frameDir);
+		tab->outDir     = (outDir != NULL ? outDir : srcDir);
+		tab->emitLines  = emitLines;
 		tab->makeBackup = makeBackup;
-
-		if (ddtString != NULL) tab->SetDDT(ddtString);
+		tab->singleOutput = singleOutput;
+		tab->SetDDT(ddtString);
 
 		wchar_t *traceFileName = coco_string_create_append(tab->outDir, L"trace.txt");
 		char *chTrFileName = coco_string_create_char(traceFileName);
@@ -362,7 +361,7 @@ int main(int argc, char *argv_[]) {
 		coco_string_delete(traceFileName);
 		coco_string_delete(srcDir);
 	} else {
-		printUsage(NULL);
+		printUsage();
 	}
 
 	coco_string_delete(srcName);

@@ -106,7 +106,7 @@ Coco                            (. Symbol *sym; Graph *g; CharSet *s; .)
 
   // this section can be used for #include statements
   { ANY }                       (. if (la->pos != beg) {
-                                     pgen->usingPos = new Position(beg, t->pos + coco_string_length(t->val), 0, line);
+                                     pgen->preamblePos = new Position(beg, t->pos + coco_string_length(t->val), 0, line);
                                    }
                                  .)
 
@@ -116,20 +116,20 @@ Coco                            (. Symbol *sym; Graph *g; CharSet *s; .)
                                    beg = la->pos;
                                    line = la->line;
                                  .)
-  { ANY }                       (. tab->semDeclPos = new Position(beg, la->pos, 0, line);
+  { ANY }                       (. pgen->semDeclPos = new Position(beg, la->pos, 0, line);
                                    beg = la->pos;
                                    line = la->line; .)
 
   // this section can be used to add code to the constructor
   [ "INITIALIZE"                (. beg = la->pos; line = la->line; .)
-    { ANY }                     (. tab->initCodePos = new Position(beg, la->pos, 0, line);
+    { ANY }                     (. pgen->initCodePos = new Position(beg, la->pos, 0, line);
                                    beg = la->pos;
                                    line = la->line; .)
   ]
 
   // this section can be used to add code to the destructor
   [ "DESTROY"                   (. beg = la->pos; line = la->line; .)
-    { ANY }                     (. tab->deinitCodePos = new Position(beg, la->pos, 0, line);
+    { ANY }                     (. pgen->deinitCodePos = new Position(beg, la->pos, 0, line);
                                    beg = la->pos;
                                    line = la->line; .)
   ]

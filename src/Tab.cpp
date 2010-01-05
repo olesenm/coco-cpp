@@ -59,9 +59,6 @@ Tab::Tab(Parser *theParser)
 	singleOutput(false),
 	makeBackup(false),
 	explicitEof(false),
-	semDeclPos(NULL),
-	initCodePos(NULL),
-	deinitCodePos(NULL),
 	ignored(NULL),
 	gramSy(NULL),
 	eofSy(NULL),
@@ -91,9 +88,6 @@ Tab::Tab(Parser *theParser)
 
 Tab::~Tab()
 {
-	if (semDeclPos) { delete semDeclPos; }
-	if (initCodePos) { delete initCodePos; }
-	if (deinitCodePos) { delete deinitCodePos; }
 	if (ignored) { delete ignored; }
 	if (eofSy) { delete eofSy; }
 	if (noSym) { delete noSym; }
@@ -1314,7 +1308,7 @@ void Tab::DispatchDirective(const wchar_t* str)
 
 
 void Tab::SetDDT(const wchar_t* str) {
-	const int len = coco_string_length(str);
+	const int len = (str && *str) ? coco_string_length(str) : 0;
 
 	for (int i = 0; i < len; i++) {
 		char ch = str[i];

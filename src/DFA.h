@@ -31,17 +31,19 @@ Coco/R itself) does not fall under the GNU General Public License.
 #define COCO_DFA_H__
 
 #include <stddef.h>
-#include "Action.h"
+
 #include "Comment.h"
 #include "State.h"
 #include "Symbol.h"
 #include "Melted.h"
 #include "Node.h"
+#include "Tab.h"
 #include "Target.h"
 
 namespace Coco {
 
 // forward declarations
+class Action;
 class Parser;
 class Tab;
 class BitArray;
@@ -53,8 +55,6 @@ class BitArray;
 class DFA
 {
 public:
-	static const int eoF = -1;  //!< End-of-file? ... unused?
-
 	int maxStates;
 
 	int lastStateNr;    //!< highest state number

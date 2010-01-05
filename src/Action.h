@@ -29,14 +29,14 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_ACTION_H__
 #define COCO_ACTION_H__
 
-#include "State.h"
-#include "Tab.h"
+#include "Node.h"
 
 namespace Coco {
 
 // forward declarations
-class Target;
 class CharSet;
+class Tab;
+class Target;
 
 /*---------------------------------------------------------------------------*\
                            Class Action Declaration

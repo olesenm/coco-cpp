@@ -129,7 +129,7 @@ void Parser::Coco() {
 			Get();
 		}
 		if (la->pos != beg) {
-		 pgen->usingPos = new Position(beg, t->pos + coco_string_length(t->val), 0, line);
+		 pgen->preamblePos = new Position(beg, t->pos + coco_string_length(t->val), 0, line);
 		}
 		
 		Expect(6);
@@ -143,7 +143,7 @@ void Parser::Coco() {
 		while (StartOf(2)) {
 			Get();
 		}
-		tab->semDeclPos = new Position(beg, la->pos, 0, line);
+		pgen->semDeclPos = new Position(beg, la->pos, 0, line);
 		beg = la->pos;
 		line = la->line; 
 		if (la->kind == 7) {
@@ -152,7 +152,7 @@ void Parser::Coco() {
 			while (StartOf(3)) {
 				Get();
 			}
-			tab->initCodePos = new Position(beg, la->pos, 0, line);
+			pgen->initCodePos = new Position(beg, la->pos, 0, line);
 			beg = la->pos;
 			line = la->line; 
 		}
@@ -162,7 +162,7 @@ void Parser::Coco() {
 			while (StartOf(4)) {
 				Get();
 			}
-			tab->deinitCodePos = new Position(beg, la->pos, 0, line);
+			pgen->deinitCodePos = new Position(beg, la->pos, 0, line);
 			beg = la->pos;
 			line = la->line; 
 		}

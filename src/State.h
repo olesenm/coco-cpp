@@ -29,12 +29,11 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_STATE_H__
 #define COCO_STATE_H__
 
-#include "Symbol.h"
-
 namespace Coco {
 
 // forward declarations
 class Action;
+class Symbol;
 
 /*---------------------------------------------------------------------------*\
                             Class State Declaration

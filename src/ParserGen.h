@@ -54,15 +54,17 @@ public:
 	static const char CR = '\r';    //!< carriage-return character
 	static const char LF = '\n';    //!< line-feed character
 
-	// unused: static const int EOF = -1;
-
 	//! error codes
 	static const int tErr    = 0;   //!< terminal error
 	static const int altErr  = 1;   //!< alt error
 	static const int syncErr = 2;   //!< sync error
 	static const int maxTerm = 3;   //!< sets of size < maxTerm are enumerated
 
-	Position *usingPos;     //!< "using" definitions from the attributed grammar
+	Position *preamblePos;   //!< position of preamble (eg, includes) in attributed grammar
+	Position *semDeclPos;    //!< position of global semantic declarations
+	Position *initCodePos;   //!< position of initialization code
+	Position *deinitCodePos; //!< position of de-initialization (destructor) code
+
 	int errorNr;            //!< highest parser error number
 	Symbol *curSy;          //!< symbol whose production is currently generated
 

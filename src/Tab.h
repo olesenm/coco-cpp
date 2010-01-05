@@ -73,9 +73,6 @@ public:
 	bool explicitEof;       //!< user must explicitly add EOF in grammar
 	bool ddt[10];           //!< debug and test switches
 
-	Position *semDeclPos;   //!< position of global semantic declarations
-	Position *initCodePos;  //!< position of initialization code
-	Position *deinitCodePos; //!< position of de-initialization (destructor) code
 	CharSet *ignored;       //!< characters ignored by the scanner
 	Symbol *gramSy;         //!< root nonterminal; filled by ATG
 	Symbol *eofSy;          //!< end of file symbol

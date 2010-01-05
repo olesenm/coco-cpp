@@ -298,7 +298,7 @@ void Parser::SetDecl() {
 		Expect(20);
 }
 
-void Parser::TokenDecl(int typ) {
+void Parser::TokenDecl(Node::nodeType typ) {
 		wchar_t* name = NULL; int kind; Graph *g; 
 		Sym(name, kind);
 		Symbol *sym = tab->FindSym(name);
@@ -562,7 +562,7 @@ void Parser::Factor(Graph* &g) {
 			    sym = tab->eofSy;  // dummy
 			  }
 			}
-			int typ = sym->typ;
+			Node::nodeType typ = sym->typ;
 			if (typ != Node::t && typ != Node::nt)
 			  SemErr(L"this symbol kind is not allowed in a production");
 			if (weak) {

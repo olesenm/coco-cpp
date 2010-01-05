@@ -47,7 +47,7 @@ class BitArray;
 class Symbol {
 public:
 	//! Enumeration for the kind of tokens
-	enum kind {
+	enum symbolType {
 		fixedToken    = 0,  //!< eg, 'a' ('b' | 'c') (structure of literals)
 		classToken    = 1,  //!< eg, digit {digit}   (at least one char class)
 		litToken      = 2,  //!< eg, "while"
@@ -55,10 +55,10 @@ public:
 	};
 
 	int      n;           //!< symbol number
-	int      typ;         //!< node type: t, nt, pr, unknown, rslv
+	Node::nodeType  typ;  //!< node type: t, nt, pr, unknown, rslv
 	wchar_t  *name;       //!< symbol name
 	Node     *graph;      //!< nt: to first node of syntax graph
-	int      tokenKind;   //!< t:  token kind (fixedToken, classToken, ...)
+	symbolType tokenKind; //!< t:  token kind (fixedToken, classToken, ...)
 	bool     deletable;   //!< nt: true if nonterminal is deletable
 	bool     firstReady;  //!< nt: true if terminal start symbols have already been computed
 	BitArray *first;      //!< nt: terminal start symbols
@@ -70,7 +70,7 @@ public:
 	                      //!< nt: pos of local declarations in source text (or null)
 
 	//! Construct from components
-	Symbol(int nodeTyp, const wchar_t* symName, int lineNr) :
+	Symbol(Node::nodeType nodeTyp, const wchar_t* symName, int lineNr) :
 		n(0),
 		typ(nodeTyp),
 		name(coco_string_create(symName)),

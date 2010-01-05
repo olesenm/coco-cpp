@@ -33,21 +33,21 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Node::Node(int theTyp, Symbol* theSym, int lineNr)
+Node::Node(Node::nodeType theTyp, Symbol* theSym, int lineNr)
 :
 	n(0),
 	typ(theTyp),
 	sym(theSym),
 	val(0),
-	code(0),
+	code(Node::normalTrans),
 	line(lineNr),
-	set(0),
-	pos(0),
-	state(0),
+	set(NULL),
+	pos(NULL),
+	state(NULL),
 	up(false),
-	next(0),
-	down(0),
-	sub(0)
+	next(NULL),
+	down(NULL),
+	sub(NULL)
 {}
 
 

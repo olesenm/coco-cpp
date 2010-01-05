@@ -54,11 +54,13 @@ public:
 	static const char CR = '\r';    //!< carriage-return character
 	static const char LF = '\n';    //!< line-feed character
 
-	//! error codes
-	static const int tErr    = 0;   //!< terminal error
-	static const int altErr  = 1;   //!< alt error
-	static const int syncErr = 2;   //!< sync error
-	static const int maxTerm = 3;   //!< sets of size < maxTerm are enumerated
+	//! Type of errors
+	enum errorType {
+		tErr    = 0,   //!< terminal error
+		altErr  = 1,   //!< alt error
+		syncErr = 2,   //!< sync error
+		maxTerm = 3    //!< sets of size < maxTerm are enumerated
+	};
 
 	Position *preamblePos;   //!< position of preamble (eg, includes) in attributed grammar
 	Position *semDeclPos;    //!< position of global semantic declarations
@@ -83,7 +85,7 @@ public:
 	bool UseSwitch(Node *p);
 	void CopyFramePart(const wchar_t* stop, const bool doOutput = true);
 	void CopySourcePart(Position *pos, int indent);
-	void GenErrorMsg(int errTyp, Symbol *sym);
+	void GenErrorMsg(errorType errTyp, Symbol *sym);
 	int  NewCondSet(BitArray *s);
 	void GenCond(BitArray *s, Node *p);
 	void PutCaseLabels(BitArray *s);

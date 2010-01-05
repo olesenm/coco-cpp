@@ -101,7 +101,7 @@ Tab::~Tab()
 }
 
 
-Symbol* Tab::NewSym(int typ, const wchar_t* name, int line) {
+Symbol* Tab::NewSym(Node::nodeType typ, const wchar_t* name, int line) {
 	if (coco_string_length(name) == 2 && name[0] == '"') {
 		parser->SemErr(L"empty token not allowed");
 		name = coco_string_create(L"???");
@@ -138,7 +138,7 @@ int Tab::Num(Node *p) {
 }
 
 
-void Tab::PrintSym(Symbol *sym) {
+void Tab::PrintSym(Symbol *sym) const {
 	fwprintf(trace, L"%3d %-14ls %s", sym->n, sym->name, nTyp[sym->typ]);
 
 	if (sym->attrPos) fwprintf(trace, L" true  "); else fwprintf(trace, L" false ");
@@ -212,7 +212,7 @@ void Tab::PrintStatistics() const {
 //  Syntax graph management
 //---------------------------------------------------------------------
 
-Node* Tab::NewNode(int typ, Symbol *sym, int line) {
+Node* Tab::NewNode(Node::nodeType typ, Symbol *sym, int line) {
 	Node* node = new Node(typ, sym, line);
 	node->n = nodes.Count;
 	nodes.Add(node);
@@ -220,14 +220,14 @@ Node* Tab::NewNode(int typ, Symbol *sym, int line) {
 }
 
 
-Node* Tab::NewNode(int typ, Node* sub) {
+Node* Tab::NewNode(Node::nodeType typ, Node* sub) {
 	Node* node = NewNode(typ, reinterpret_cast<Symbol*>(0), 0);
 	node->sub = sub;
 	return node;
 }
 
 
-Node* Tab::NewNode(int typ, int val, int line) {
+Node* Tab::NewNode(Node::nodeType typ, int val, int line) {
 	Node* node = NewNode(typ, reinterpret_cast<Symbol*>(0), line);
 	node->val = val;
 	return node;
@@ -320,7 +320,8 @@ Graph* Tab::StrToGraph(const wchar_t* str) {
 }
 
 
-void Tab::SetContextTrans(Node *p) { // set transition code in the graph rooted at p
+// set transition code in the graph rooted at p
+void Tab::SetContextTrans(Node *p) {
 	while (p != NULL) {
 		if (p->typ == Node::chr || p->typ == Node::clas) {
 			p->code = Node::contextTrans;
@@ -1024,7 +1025,6 @@ void Tab::ResErr(Node *p, const wchar_t* msg) {
 
 void Tab::CheckRes(Node *p, bool rslvAllowed) {
 	while (p != NULL) {
-
 		Node *q;
 		if (p->typ == Node::alt) {
 			BitArray *expected = new BitArray(terminals.Count);

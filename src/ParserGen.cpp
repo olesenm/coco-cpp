@@ -98,7 +98,7 @@ void ParserGen::CopySourcePart(Position *pos, int indent) {
 }
 
 
-void ParserGen::GenErrorMsg(int errTyp, Symbol *sym) {
+void ParserGen::GenErrorMsg(ParserGen::errorType errTyp, Symbol *sym) {
 	errorNr++;
 	const int formatLen = 1000;
 	wchar_t format[formatLen];

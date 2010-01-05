@@ -132,7 +132,7 @@ public:
 
 	void Coco();
 	void SetDecl();
-	void TokenDecl(int typ);
+	void TokenDecl(Node::nodeType typ);
 	void TokenExpr(Graph* &g);
 	void Set(CharSet* &s);
 	void AttrDecl(Symbol *sym);

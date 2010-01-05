@@ -285,7 +285,7 @@ Char<int &n>
 
 /*------------------------------------------------------------------------------------*/
 
-TokenDecl<int typ>              (. wchar_t* name = NULL; int kind; Graph *g; .)
+TokenDecl<Node::nodeType typ>   (. wchar_t* name = NULL; int kind; Graph *g; .)
 =
   Sym<name, kind>               (. Symbol *sym = tab->FindSym(name);
                                    if (sym != NULL) SemErr(L"name declared twice");
@@ -385,7 +385,7 @@ Factor<Graph* &g>               (. wchar_t* name = NULL; int kind; Position *pos
                                        sym = tab->eofSy;  // dummy
                                      }
                                    }
-                                   int typ = sym->typ;
+                                   Node::nodeType typ = sym->typ;
                                    if (typ != Node::t && typ != Node::nt)
                                      SemErr(L"this symbol kind is not allowed in a production");
                                    if (weak) {

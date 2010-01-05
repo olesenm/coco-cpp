@@ -35,11 +35,11 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Action::Action(int theTyp, int theSym, int transition)
+Action::Action(Node::nodeType theTyp, int symNr, Node::transitionType trans)
 :
 	typ(theTyp),
-	sym(theSym),
-	tc(transition),
+	sym(symNr),
+	tc(trans),
 	target(NULL),
 	next(NULL)
 {}

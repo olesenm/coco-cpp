@@ -60,7 +60,8 @@ public:
 		alt  = 11,  //!< alternative: |
 		iter = 12,  //!< iteration: { }
 		opt  = 13,  //!< option: [ ]
-		rslv = 14   //!< resolver expression
+		rslv = 14,  //!< resolver expression
+		invalid_ = 0  //!< internal use only
 	};
 
 	//! Enumeration for the types of transitions
@@ -70,10 +71,10 @@ public:
 	};
 
 	int      n;     //!< node number
-	int      typ;   //!< node type, one of t, nt, wt, chr, clas, any, eps, sem, sync, alt, iter, opt, rslv
+	nodeType typ;   //!< node type, one of t, nt, wt, chr, clas, any, eps, sem, sync, alt, iter, opt, rslv
 	Symbol   *sym;  //!< nt, t, wt: symbol represented by this node
 	int      val;   //!< chr:  ordinal character value, clas: index of character class
-	int      code;  //!< chr, clas: transition code
+	transitionType code;  //!< chr, clas: transition code
 	int      line;  //!< source text line number of item in this node
 
 	BitArray *set;  //!< any, sync: the set represented by this node
@@ -92,7 +93,7 @@ public:
 	Node     *down; //!< alt: to next alternative
 	Node     *sub;  //!< alt, iter, opt: to first node of substructure
 
-	Node(int theTyp, Symbol* theSym, int lineNr);
+	Node(nodeType theTyp, Symbol* theSym, int lineNr);
 };
 
 

@@ -114,7 +114,7 @@ public:
 	//---------------------------------------------------------------------
 
 	//! Create a new symbol (terminal, nonterminal or pragma)
-	Symbol* NewSym(int typ, const wchar_t* name, int line);
+	Symbol* NewSym(Node::nodeType typ, const wchar_t* name, int line);
 
 	//! Find symbol by name in terminals and nonterminals
 	Symbol* FindSym(const wchar_t* name);
@@ -122,7 +122,7 @@ public:
 	//! Return node number
 	static int Num(Node *p);
 
-	void PrintSym(Symbol *sym);
+	void PrintSym(Symbol *sym) const;
 	void PrintSymbolTable();
 	void PrintSet(BitArray *s, int indent);
 	void PrintStatistics() const;
@@ -131,31 +131,31 @@ public:
 	//  Syntax graph management
 	//---------------------------------------------------------------------
 
-	Node* NewNode(int typ, Symbol *sym, int line);
-	Node* NewNode(int typ, Node* sub);
-	Node* NewNode(int typ, int val, int line);
+	Node* NewNode(Node::nodeType typ, Symbol *sym, int line);
+	Node* NewNode(Node::nodeType typ, Node* sub);
+	Node* NewNode(Node::nodeType typ, int val, int line);
 	void MakeFirstAlt(Graph *g);
 	void MakeAlternative(Graph *g1, Graph *g2);
-	void MakeSequence(Graph *g1, Graph *g2);
+	static void MakeSequence(Graph *g1, Graph *g2);
 	void MakeIteration(Graph *g);
 	void MakeOption(Graph *g);
-	void Finish(Graph *g);
+	static void Finish(Graph *g);
 	void DeleteNodes();
 	Graph* StrToGraph(const wchar_t* str);
 
 	//! set transition code in the graph rooted at p
-	void SetContextTrans(Node *p);
+	static void SetContextTrans(Node *p);
 
 	//------------ graph deletability check -----------------
 
-	bool DelGraph(Node* p);
-	bool DelSubGraph(Node* p);
-	bool DelNode(Node* p);
+	static bool DelGraph(Node* p);
+	static bool DelSubGraph(Node* p);
+	static bool DelNode(Node* p);
 
 	//----------------- graph printing ----------------------
 
-	int Ptr(Node *p, bool up);
-	wchar_t* Pos(Position *pos);
+	static int Ptr(Node *p, bool up);
+	static wchar_t* Pos(Position *pos);
 	void PrintNodes();
 
 	//---------------------------------------------------------------------
@@ -169,7 +169,7 @@ public:
 
 	//----------- character class printing
 
-	wchar_t* Ch(const wchar_t ch);
+	static wchar_t* Ch(const wchar_t ch);
 	void WriteCharSet(CharSet *s);
 	void WriteCharClasses();
 
@@ -184,7 +184,7 @@ public:
 	void CompFollow(Node *p);
 	void Complete(Symbol *sym);
 	void CompFollowSets();
-	Node* LeadingAny(Node *p);
+	static Node* LeadingAny(Node *p);
 	void FindAS(Node *p); // find ANY sets
 	void CompAnySets();
 	BitArray* Expected(Node *p, Symbol *curSy);
@@ -202,9 +202,9 @@ public:
 	//---------------------------------------------------------------------
 
 	wchar_t  Hex2Char(const wchar_t* s);
-	wchar_t* Char2Hex(const wchar_t ch);
+	static wchar_t* Char2Hex(const wchar_t ch);
 	wchar_t* Unescape(const wchar_t* s);
-	wchar_t* Escape(const wchar_t* s);
+	static wchar_t* Escape(const wchar_t* s);
 
 	//---------------------------------------------------------------------
 	//  Grammar checks

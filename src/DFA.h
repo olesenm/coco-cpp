@@ -85,7 +85,11 @@ public:
 
 	//---------- State handling
 	State* NewState();
-	void NewTransition(State *from, State *to, int typ, int sym, int tc);
+	void NewTransition
+	(
+		State *from, State *to,
+		Node::nodeType typ, int sym, Node::transitionType tc
+	);
 	void CombineShifts();
 	void FindUsedStates(State *state, BitArray *used);
 	void DeleteRedundantStates();

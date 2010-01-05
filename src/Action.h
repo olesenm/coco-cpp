@@ -46,13 +46,15 @@ class Target;
 class Action
 {
 public:
-	int typ;        //!< type of action symbol: clas, chr
-	int sym;        //!< action symbol
-	int tc;         //!< transition code: normalTrans, contextTrans
-	Target *target; //!< states reached from this action
-	Action *next;   //!< the next Action
+	Node::nodeType typ;   //!< type of action symbol: clas, chr
+	int sym;              //!< action symbol
+	Node::transitionType tc;  //!< transition code: normalTrans, contextTrans
 
-	Action(int typ, int sym, int tc);
+	Target *target;       //!< states reached from this action
+	Action *next;         //!< the next Action
+
+
+	Action(Node::nodeType typ, int symNr, Node::transitionType tc);
 
 	void AddTarget(Target *t);  //!< add t to the action.targets
 	void AddTargets(Action *a); //!< add copy of a.targets to action.targets

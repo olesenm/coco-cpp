@@ -96,7 +96,12 @@ State* DFA::NewState() {
 }
 
 
-void DFA::NewTransition(State *from, State *to, int typ, int sym, int tc) {
+void DFA::NewTransition
+(
+    State *from, State *to,
+    Node::nodeType typ, int sym, Node::transitionType tc
+)
+{
 	Target *t = new Target(to);
 	Action *a = new Action(typ, sym, tc); a->target = t;
 	from->AddAction(a);
@@ -310,7 +315,7 @@ void DFA::SplitActions(State *state, Action *a, Action *b) {
 		setb->Subtract(setc);
 		a->ShiftWith(seta, tab);
 		b->ShiftWith(setb, tab);
-		c = new Action(0, 0, Node::normalTrans);  // typ and sym are set in ShiftWith
+		c = new Action(Node::invalid_, 0, Node::normalTrans);  // typ and sym are set in ShiftWith
 		c->AddTargets(a);
 		c->AddTargets(b);
 		c->ShiftWith(setc, tab);
@@ -323,7 +328,7 @@ bool DFA::Overlap(Action *a, Action *b) {
 	CharSet *seta, *setb;
 	if (a->typ == Node::chr)
 		if (b->typ == Node::chr) return (a->sym == b->sym);
-		else {setb = tab->CharClassSet(b->sym);	return setb->Get(a->sym);}
+		else {setb = tab->CharClassSet(b->sym); return setb->Get(a->sym);}
 	else {
 		seta = tab->CharClassSet(a->sym);
 		if (b->typ == Node::chr) return seta->Get(b->sym);

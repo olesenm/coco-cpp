@@ -4,22 +4,27 @@
 
 #### Extended syntax
 
-Compared to the C# version, the C++ version adds an extended syntax
-to deal with initialization and destruction of user code.
+To make the generated code more flexible, the syntax has been extended
+to deal with copyright notices, initialization and destruction of user
+code.
 
     Coco =
+      [ "[copy]" {ANY} "[/copy]" ]
       {ANY}           // #include clauses in C++
       "COMPILER" ident
       {ANY}           // global fields and methods
-      ["INITIALIZE" {ANY}]
-      ["DESTROY"    {ANY}]
+      [ "[initialize]" {ANY} "[/initialize]" ]
+      [ "[destroy]"    {ANY} "[/destroy]" ]
       ScannerSpecification
       ParserSpecification
       "END" ident '.'
 
 
-The *INITIALIZE* code is added to the Parser constructor, the
-*DESTROY* code is added to the Parser destructor.
+The *copy* section provides a general means of adding copyrights,
+notices, comments, etc. to the top of the generated files.
+
+The *initialize* code is added to the Parser constructor, the
+*destroy* code is added to the Parser destructor.
 
 
 ---------------

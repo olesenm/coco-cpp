@@ -51,9 +51,6 @@ class BitArray;
 class ParserGen
 {
 public:
-	static const char CR = '\r';    //!< carriage-return character
-	static const char LF = '\n';    //!< line-feed character
-
 	//! Type of errors
 	enum errorType {
 		tErr    = 0,   //!< terminal error
@@ -78,7 +75,6 @@ public:
 
 	Tab *tab;               //!< other Coco objects
 	Errors *errors;
-	Buffer *buffer;
 
 	void Indent(int n);     //!< indent with tabs to the specified level
 

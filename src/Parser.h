@@ -1,3 +1,4 @@
+
 /*-------------------------------*- C++ -*---------------------------------
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
@@ -27,13 +28,17 @@ Coco/R itself) does not fall under the GNU General Public License.
 -------------------------------------------------------------------------*/
 
 
-
 #ifndef COCO_PARSER_H__
 #define COCO_PARSER_H__
 
 #include "Tab.h"
 #include "DFA.h"
 #include "ParserGen.h"
+
+
+
+
+
 
 
 #include "Scanner.h"
@@ -80,10 +85,10 @@ private:
 		_string=3,
 		_badString=4,
 		_char=5,
-		_ddtSym=44,
-		_directive=45,
+		_ddtSym=48,
+		_directive=49,
 	};
-	static const int maxT = 43;
+	static const int maxT = 47;
 
 	static const int minErrDist = 2; //!< min. distance before reporting errors
 

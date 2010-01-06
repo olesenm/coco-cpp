@@ -199,8 +199,7 @@ int main(int argc, char *argv_[]) {
 		argv[i] = coco_string_create(argv_[i]);
 	}
 #endif
-
-	wprintf(L"Coco/R C++ (04 Jan 2010)\n");
+	wprintf(L"Coco/R C++ (06 Jan 2010)\n");
 
 	wchar_t *srcName = NULL, *nsName = NULL, *prefixName = NULL;
 	wchar_t *frameDir = NULL, *outDir = NULL;

@@ -55,6 +55,9 @@ class BitArray;
 //! Symbol Table Management
 class Tab {
 public:
+	static const char CR = '\r';    //!< carriage-return character
+	static const char LF = '\n';    //!< line-feed character
+
 	//! String representations for the node types (in Node class)
 	//! Corresponds to Node::nodeType
 	static const char* nTyp[];
@@ -73,14 +76,14 @@ public:
 	bool explicitEof;       //!< user must explicitly add EOF in grammar
 	bool ddt[10];           //!< debug and test switches
 
+	Position *copyPos;      //!< position of verbatim copy (eg, copyright headers) in atg
+
 	CharSet *ignored;       //!< characters ignored by the scanner
 	Symbol *gramSy;         //!< root nonterminal; filled by ATG
 	Symbol *eofSy;          //!< end of file symbol
 	Symbol *noSym;          //!< used in case of an error
 	BitArray *allSyncSets;  //!< union of all synchronisation sets
 	HashTable<Symbol> literals;    //!< symbols that are used as literals
-
-	wchar_t* grammarName;   //!< The name of the grammar, set by Coco-cpp.atg
 
 	wchar_t* srcName;       //!< name of the atg file (including path)
 	wchar_t* srcDir;        //!< directory path of the atg file
@@ -93,6 +96,7 @@ public:
 
 	Parser *parser;         //!< other Coco objects
 	Errors *errors;
+	Buffer *buffer;
 
 	FILE* trace;            //!< trace file
 
@@ -274,9 +278,6 @@ public:
 	//! Generate end of namespace enclosure
 	static void GenNamespaceClose(FILE*, int nrOfNs);
 
-	//! Check if Grammar file name appears to be Coco itself
-	bool checkIsCocoGrammar() const;
-
 	//! Open a frame file for reading, return NULL on failure
 	FILE* OpenFrameFile(const wchar_t* frameName) const;
 
@@ -292,6 +293,9 @@ public:
 		const wchar_t* stop,
 		const bool doOutput = true
 	) const;
+
+	void CopySourcePart(FILE *dest, Position *pos, int indent, bool emitLines = false);
+
 };
 
 

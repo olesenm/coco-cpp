@@ -59,12 +59,12 @@ Tab::Tab(Parser *theParser)
 	singleOutput(false),
 	makeBackup(false),
 	explicitEof(false),
-	ignored(NULL),
+	copyPos(NULL),
+	ignored(new CharSet),
 	gramSy(NULL),
 	eofSy(NULL),
 	noSym(NULL),
 	allSyncSets(NULL),
-	grammarName(NULL),
 	srcName(NULL),
 	srcDir(NULL),
 	nsName(NULL),
@@ -75,6 +75,7 @@ Tab::Tab(Parser *theParser)
 	curSy(NULL),
 	parser(theParser),
 	errors(parser->errors),
+	buffer(parser->scanner->buffer),
 	trace(stderr),
 	dummyNode(NULL),
 	dummyName('A')
@@ -89,13 +90,12 @@ Tab::Tab(Parser *theParser)
 Tab::~Tab()
 {
 	if (ignored) { delete ignored; }
+	if (copyPos) { delete copyPos; }
 	if (eofSy) { delete eofSy; }
 	if (noSym) { delete noSym; }
 	if (allSyncSets) { delete allSyncSets; }
 	if (visited) { delete visited; }
 	if (dummyNode) { delete dummyNode; }
-
-	coco_string_delete(grammarName);
 
 	classes.Delete();
 }
@@ -1374,14 +1374,6 @@ void Tab::GenNamespaceClose(FILE* ostr, int nrOfNs) {
 }
 
 
-bool Tab::checkIsCocoGrammar() const {
-	wchar_t *lowerCaseName = coco_string_create_lower(grammarName);
-	bool isCoco = coco_string_equal(lowerCaseName, L"coco");
-	coco_string_delete(lowerCaseName);
-	return isCoco;
-}
-
-
 FILE* Tab::OpenFrameFile(const wchar_t* frameName) const {
 	FILE* istr;
 
@@ -1527,6 +1519,39 @@ bool Tab::CopyFramePart
 
 	return false; // error
 }
+
+
+void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool emitLines)
+{
+	// Copy text described by pos from atg to dest
+	int ch, i;
+	if (pos != NULL) {
+		buffer->SetPos(pos->beg); ch = buffer->Read();
+		if (emitLines && pos->line) {
+			fwprintf(dest, L"\n#line %d \"%ls\"\n", pos->line, srcName);
+		}
+		for (int t=0; t < indent; ++t) fwprintf(dest, L"\t");
+		while (buffer->GetPos() <= pos->end) {
+			while (ch == CR || ch == LF) {  // eol is either CR or CRLF or LF
+				fwprintf(dest, L"\n");
+				for (int t=0; t < indent; ++t) fwprintf(dest, L"\t");
+				if (ch == CR) { ch = buffer->Read(); } // skip CR
+				if (ch == LF) { ch = buffer->Read(); } // skip LF
+				for (i = 1; i <= pos->col && (ch == ' ' || ch == '\t'); i++) {
+					// skip blanks at beginning of line
+					ch = buffer->Read();
+				}
+				if (i <= pos->col) pos->col = i - 1; // heading TABs => not enough blanks
+				if (buffer->GetPos() > pos->end) goto Done;
+			}
+			fwprintf(dest, L"%lc", ch);
+			ch = buffer->Read();
+		}
+		Done:
+		if (indent > 0) fwprintf(dest, L"\n");
+	}
+}
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

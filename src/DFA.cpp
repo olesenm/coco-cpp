@@ -618,7 +618,7 @@ void DFA::GenComment(Comment *com, int i) {
 void DFA::CopyFramePart(const wchar_t* stop, const bool doOutput) {
 	bool ok = tab->CopyFramePart(gen, fram, stop, doOutput);
 	if (!ok) {
-		errors->Exception(L" -- incomplete or corrupt parser frame file");
+		errors->Exception(L" -- incomplete or corrupt scanner frame file");
 	}
 }
 
@@ -751,8 +751,7 @@ void DFA::WriteStartTab() {
 
 
 void DFA::WriteScanner() {
-	// keep copyright in frame when processing coco grammar
-	const bool keepCopyright = tab->checkIsCocoGrammar();
+	int oldPos = tab->buffer->GetPos();  // Pos is modified by CopySourcePart
 
 	fram = tab->OpenFrameFile(L"Scanner.frame");
 	if (fram == NULL) {
@@ -770,7 +769,8 @@ void DFA::WriteScanner() {
 		errors->Exception(L"-- Cannot generate scanner header");
 	}
 
-	CopyFramePart(L"-->begin", keepCopyright);
+	CopyFramePart(L"-->begin", false);
+	tab->CopySourcePart(gen, tab->copyPos, 0);  // copy without emitLines
 	CopyFramePart(L"-->namespace_open");
 	int nrOfNs = tab->GenNamespaceOpen(gen);
 
@@ -802,7 +802,8 @@ void DFA::WriteScanner() {
 		errors->Exception(L"-- Cannot generate scanner source");
 	}
 
-	CopyFramePart(L"-->begin", keepCopyright);
+	CopyFramePart(L"-->begin", false);
+	tab->CopySourcePart(gen, tab->copyPos, 0);  // copy without emitLines
 	CopyFramePart(L"-->namespace_open");
 	nrOfNs = tab->GenNamespaceOpen(gen);
 
@@ -859,6 +860,7 @@ void DFA::WriteScanner() {
 
 	CopyFramePart(L"$$$");
 	fclose(gen);
+	tab->buffer->SetPos(oldPos);    // restore Pos
 }
 
 

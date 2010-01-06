@@ -70,31 +70,7 @@ void ParserGen::CopyFramePart(const wchar_t* stop, const bool doOutput) {
 
 void ParserGen::CopySourcePart(Position *pos, int indent) {
 	// Copy text described by pos from atg to gen
-	int ch, i;
-	if (pos != NULL) {
-		buffer->SetPos(pos->beg); ch = buffer->Read();
-		if (tab->emitLines && pos->line) {
-			fwprintf(gen, L"\n#line %d \"%ls\"\n", pos->line, tab->srcName);
-		}
-		Indent(indent);
-		while (buffer->GetPos() <= pos->end) {
-			while (ch == CR || ch == LF) {  // eol is either CR or CRLF or LF
-				fwprintf(gen, L"\n"); Indent(indent);
-				if (ch == CR) { ch = buffer->Read(); } // skip CR
-				if (ch == LF) { ch = buffer->Read(); } // skip LF
-				for (i = 1; i <= pos->col && (ch == ' ' || ch == '\t'); i++) {
-					// skip blanks at beginning of line
-					ch = buffer->Read();
-				}
-				if (i <= pos->col) pos->col = i - 1; // heading TABs => not enough blanks
-				if (buffer->GetPos() > pos->end) goto Done;
-			}
-			fwprintf(gen, L"%lc", ch);
-			ch = buffer->Read();
-		}
-		Done:
-		if (indent > 0) fwprintf(gen, L"\n");
-	}
+	tab->CopySourcePart(gen, pos, indent, tab->emitLines);
 }
 
 
@@ -345,10 +321,7 @@ void ParserGen::InitSets() {
 
 
 void ParserGen::WriteParser() {
-	// keep copyright in frame when processing coco grammar
-	const bool keepCopyright = tab->checkIsCocoGrammar();
-
-	int oldPos = buffer->GetPos();  // Pos is modified by CopySourcePart
+	int oldPos = tab->buffer->GetPos();  // Pos is modified by CopySourcePart
 	symSet.Add(tab->allSyncSets);
 
 	fram = tab->OpenFrameFile(L"Parser.frame");
@@ -369,7 +342,8 @@ void ParserGen::WriteParser() {
 		GenErrorMsg(tErr, sym);
 	}
 
-	CopyFramePart(L"-->begin", keepCopyright);
+	CopyFramePart(L"-->begin", false);
+	tab->CopySourcePart(gen, tab->copyPos, 0);  // copy without emitLines
 	CopyFramePart(L"-->headerdef");
 
 	if (preamblePos != NULL) { CopySourcePart(preamblePos, 0); fwprintf(gen, L"\n"); }
@@ -395,7 +369,8 @@ void ParserGen::WriteParser() {
 		errors->Exception(L"-- Cannot generate Parser source\n");
 	}
 
-	CopyFramePart(L"-->begin", keepCopyright);
+	CopyFramePart(L"-->begin", false);
+	tab->CopySourcePart(gen, tab->copyPos, 0);  // copy without emitLines
 	CopyFramePart(L"-->namespace_open");
 	if (tab->singleOutput) {
 		wchar_t* scannerCpp = coco_string_create_append
@@ -427,7 +402,7 @@ void ParserGen::WriteParser() {
 
 	CopyFramePart(L"$$$");
 	fclose(gen);
-	buffer->SetPos(oldPos);
+	tab->buffer->SetPos(oldPos);    // restore Pos
 }
 
 
@@ -450,8 +425,7 @@ ParserGen::ParserGen(Parser *parser)
 	gen(NULL),
 	err(NULL),
 	tab(parser->tab),
-	errors(parser->errors),
-	buffer(parser->scanner->buffer)
+	errors(parser->errors)
 {}
 
 

@@ -66,7 +66,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "ArrayList.tpp"
+#include "ArrayList.tcc"
 
 #endif
 

@@ -92,7 +92,7 @@ private:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "HashTable.tpp"
+#include "HashTable.tcc"
 
 #endif
 

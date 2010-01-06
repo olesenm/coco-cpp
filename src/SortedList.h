@@ -74,7 +74,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "SortedList.tpp"
+#include "SortedList.tcc"
 
 #endif
 

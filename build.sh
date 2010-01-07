@@ -9,7 +9,7 @@ options:
   -parser        create new scanner/parser code for Coco/R first
   -warn          enable additional gcc warnings
 
-* compile Coco executable
+* compile coco-cpp executable
 
 USAGE
     exit 1
@@ -42,10 +42,10 @@ done
 
 echo "compile Coco executable"
 echo "~~~~~~~~~~~~~~~~~~~~~~~"
-echo "g++ src/*.cpp -o Coco -g -O2 -Wall $warn"
+echo "g++ src/*.cpp -o coco-cpp -g -O2 -Wall $warn"
 echo
 
-g++ src/*.cpp -o Coco -g -O2 -Wall $warn
+g++ src/*.cpp -o coco-cpp -g -O2 -Wall $warn
 
 if [ $? -eq 0 ]
 then

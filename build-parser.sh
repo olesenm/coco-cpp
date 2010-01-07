@@ -6,8 +6,8 @@ echo "create Parser.cpp and Scanner.cpp for the Coco grammar"
 echo
 
 # use Coco in the PWD if possible, otherwise search the PATH
-coco=Coco
-[ -x "$coco" ] && coco=./Coco
+coco=coco-cpp
+[ -x "$coco" ] && coco=./coco-cpp
 
 echo "$coco src/Coco-cpp.atg -bak"
 

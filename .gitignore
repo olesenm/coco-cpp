@@ -29,7 +29,7 @@
 core
 
 # ignore generated executable
-/Coco
+/coco-cpp
 
 # ignore Doxygen docs
 /html

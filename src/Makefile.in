@@ -27,7 +27,7 @@ DATA_FILES = $(srcdir)/Parser.frame $(srcdir)/Scanner.frame
 DOC_FILES  = $(srcdir)/Coco-cpp.atg
 DATA_DIR   = $(datarootdir)/coco-cpp
 
-COCO = ../Coco
+COCO = ../coco-cpp
 
 # -----------------------------------------------------------------------------
 # There should be no need to modify anything below here.

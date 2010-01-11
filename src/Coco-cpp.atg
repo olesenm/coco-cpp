@@ -93,7 +93,7 @@ TOKENS
     char      = '\'' ( charCh | '\\' printable { hex } ) '\''.
 
 PRAGMAS
-    ddtSym    = '$' { alphanum }.   (. tab->SetDDT(la->val+1); .)
+    ddtSym    = '$' { alphanum }.   (. Tab::SetDDT(la->val+1); .)
     directive = '$' letter { letter } '='
         { alphanum | '-' | '.' | ':' } .
                                 (. tab->DispatchDirective(la->val+1); .)

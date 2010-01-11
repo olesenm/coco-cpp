@@ -394,7 +394,7 @@ void DFA::MakeDeterministic() {
 
 
 void DFA::PrintStates() {
-	FILE* trace = tab->trace;
+	FILE* trace = Tab::trace;
 
 	fwprintf(trace, L"\n");
 	fwprintf(trace, L"---------- states ----------\n");

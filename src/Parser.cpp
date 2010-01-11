@@ -60,7 +60,7 @@ void Parser::Get() {
 			break;
 		}
 		if (la->kind == 48) {
-				tab->SetDDT(la->val+1); 
+				Tab::SetDDT(la->val+1); 
 		}
 		if (la->kind == 49) {
 				tab->DispatchDirective(la->val+1); 

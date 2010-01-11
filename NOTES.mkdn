@@ -84,11 +84,13 @@ with the same syntax. For example,
 
 For some grammars, it may be desirable to suppress the automatically
 added expectation that the parser content ends with the end-of-file.
-The *eof* directive does this:
+The *explicitEOF* directive does this:
 
     COMPILER GramC
-    $eof=false
+    $explicitEOF=true
 
+This indicates that the grammar itself is responsible for explicitly
+checking for an *EOF*.
 
 Beyond this, there are directives for the *-lines* and the *-single*
 command-line options:

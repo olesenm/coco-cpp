@@ -38,17 +38,38 @@ namespace Coco {
 //! position of source code stretch (e.g. semantic action, resolver expressions)
 class Position {
 public:
-	int beg;        //!< start relative to the beginning of the file
-	int end;        //!< end of stretch
-	int col;        //!< column number of start position
-	int line;       //!< line number of beginning of source code stretch
+	int beg;     //!< start relative to the beginning of the file
+	int end;     //!< end of stretch
+	int col;     //!< column number of start position
+	int line;    //!< line number of beginning of source code stretch
 
+	//! Construct null
+	Position() :
+		beg(0),
+		end(0),
+		col(0),
+		line(0)
+	{}
+
+	//! Construct from components
 	Position(int begPos, int endPos, int colNr, int lineNr) :
 		beg(begPos),
 		end(endPos),
 		col(colNr),
 		line(lineNr)
 	{}
+
+	//! Return true if Position is empty
+	bool empty() const
+	{
+		return end <= beg;
+	}
+
+	//! Return the size of the region, zero for invalid regions
+	int size() const
+	{
+		return end <= beg ? 0 : (end - beg);
+	}
 
 };
 

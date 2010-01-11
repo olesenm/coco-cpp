@@ -55,6 +55,8 @@ class BitArray;
 //! Symbol Table Management
 class Tab {
 public:
+	// Constants
+
 	static const char CR = '\r';    //!< carriage-return character
 	static const char LF = '\n';    //!< line-feed character
 
@@ -69,12 +71,26 @@ public:
 	//! String for replacing the file prefix name
 	static const wchar_t* prefixMacro;
 
+	// Static data members
+
 	// miscellaneous generation controls
-	bool emitLines;         //!< emit line directives in generated parser
-	bool singleOutput;      //!< include the Scanner code in the Parser file
-	bool makeBackup;        //!< create .bak files for generated parser/scanner
-	bool explicitEof;       //!< user must explicitly add EOF in grammar
-	bool ddt[10];           //!< debug and test switches
+	static bool emitLines;         //!< emit line directives in generated parser
+	static bool singleOutput;      //!< include the Scanner code in the Parser file
+	static bool makeBackup;        //!< create .bak files for generated parser/scanner
+	static bool explicitEOF;       //!< user must explicitly add EOF in grammar
+	static bool ddt[10];           //!< debug and test switches
+
+	static wchar_t* srcDir;        //!< directory path of the atg file
+	static wchar_t* nsName;        //!< namespace for generated files
+	static wchar_t* prefixName;    //!< prefix for generated files
+	static wchar_t* frameDir;      //!< directory containing the frame files
+	static wchar_t* outDir;        //!< directory for generated files
+
+	static FILE* trace;            //!< trace file
+
+	// Data members
+
+	wchar_t* srcName;       //!< name of the atg file (including path)
 
 	Position *copyPos;      //!< position of verbatim copy (eg, copyright headers) in atg
 
@@ -85,20 +101,12 @@ public:
 	BitArray *allSyncSets;  //!< union of all synchronisation sets
 	HashTable<Symbol> literals;    //!< symbols that are used as literals
 
-	wchar_t* srcName;       //!< name of the atg file (including path)
-	wchar_t* srcDir;        //!< directory path of the atg file
-	wchar_t* nsName;        //!< namespace for generated files
-	wchar_t* prefixName;    //!< prefix for generated files
-	wchar_t* frameDir;      //!< directory containing the frame files
-	wchar_t* outDir;        //!< directory for generated files
 	BitArray *visited;      //!< mark list for graph traversals
 	Symbol *curSy;          //!< current symbol in computation of sets
 
 	Parser *parser;         //!< other Coco objects
 	Errors *errors;
 	Buffer *buffer;
-
-	FILE* trace;            //!< trace file
 
 	ArrayList<Symbol> terminals;
 	ArrayList<Symbol> pragmas;
@@ -267,7 +275,7 @@ public:
 	void DispatchDirective(const wchar_t* str);
 
 	//! Set trace flags
-	void SetDDT(const wchar_t* str);
+	static void SetDDT(const wchar_t* str);
 
 	//---------------------------------------------------------------------
 	//  Output file generation, common to DFA and ParserGen

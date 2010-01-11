@@ -43,15 +43,15 @@ public:
 	BitArray(const BitArray &copy);
 	virtual ~BitArray();
 
-	int getCount();
+	int getCount() const;
 
 	bool Get(const int index) const;
 	void Set(const int index, const bool value);
 	void SetAll(const bool value);
-	bool Equal(const BitArray *right ) const;
+	bool Equal(const BitArray *right) const;
 	bool operator[](const int index) const { return Get(index); };
 
-	const BitArray &operator=(const BitArray &right);
+	const BitArray& operator=(const BitArray &right);
 
 	void Not();
 	void And(const BitArray *value);

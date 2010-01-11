@@ -51,37 +51,41 @@ const char* Tab::tKind[] = {
 
 const wchar_t* Tab::prefixMacro = L"$PREFIX$";
 
+
+bool Tab::emitLines = false;
+bool Tab::singleOutput = false;
+bool Tab::makeBackup = false;
+bool Tab::explicitEOF = false;
+bool Tab::ddt[10] =
+	{ false, false, false, false, false, false, false, false, false, false };
+
+wchar_t* Tab::srcDir = NULL;
+wchar_t* Tab::nsName = NULL;
+wchar_t* Tab::prefixName = NULL;
+wchar_t* Tab::frameDir = NULL;
+wchar_t* Tab::outDir = NULL;
+
+FILE* Tab::trace = stderr;
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 Tab::Tab(Parser *theParser)
 :
-	emitLines(false),
-	singleOutput(false),
-	makeBackup(false),
-	explicitEof(false),
+	srcName(NULL),
 	copyPos(NULL),
 	ignored(new CharSet),
 	gramSy(NULL),
 	eofSy(NULL),
 	noSym(NULL),
 	allSyncSets(NULL),
-	srcName(NULL),
-	srcDir(NULL),
-	nsName(NULL),
-	prefixName(NULL),
-	frameDir(NULL),
-	outDir(NULL),
 	visited(NULL),
 	curSy(NULL),
 	parser(theParser),
 	errors(parser->errors),
 	buffer(parser->scanner->buffer),
-	trace(stderr),
 	dummyNode(NULL),
 	dummyName('A')
 {
-	for (int i=0; i<10; i++) ddt[i] = false;
-
 	eofSy = NewSym(Node::t, L"EOF", 0);
 	dummyNode = NewNode(Node::eps, reinterpret_cast<Symbol*>(0), 0);
 }
@@ -1250,13 +1254,13 @@ void Tab::DispatchDirective(const wchar_t* str)
 	{
 		SetDDT(strval);
 	}
-	else if (coco_string_equal(name, L"eof"))
+	else if (coco_string_equal(name, L"explicitEOF"))
 	{
 		const int boolval = coco_string_checkBool(strval);
 		if (boolval > 0) {
-			explicitEof = true;
+			Tab::explicitEOF = true;
 		} else if (!boolval) {
-			explicitEof = false;
+			Tab::explicitEOF = false;
 		}
 		else {
 			wprintf
@@ -1458,8 +1462,8 @@ bool Tab::CopyFramePart
 	wchar_t startCh = stop[0];
 	int endOfStopString = coco_string_length(stop)-1;
 
-	int endOfPrefixMacro = coco_string_length(this->prefixMacro)-1;
-	wchar_t startPrefixCh = this->prefixMacro[0];
+	int endOfPrefixMacro = coco_string_length(Tab::prefixMacro)-1;
+	wchar_t startPrefixCh = Tab::prefixMacro[0];
 	int isPrefixSet = coco_string_length(this->prefixName);
 
 	wchar_t ch = 0;
@@ -1491,7 +1495,7 @@ bool Tab::CopyFramePart
 				}
 				fwscanf(istr, L"%lc", &ch);
 				i++;
-			} while (ch == this->prefixMacro[i]);
+			} while (ch == Tab::prefixMacro[i]);
 			// prefixMacro[0..i-1] found; continue with last read character
 			if (found)
 			{
@@ -1504,7 +1508,7 @@ bool Tab::CopyFramePart
 			{
 				if (doOutput) {
 					for (int subI = 0; subI < i; ++subI) {
-						fwprintf(ostr, L"%lc", this->prefixMacro[subI]);
+						fwprintf(ostr, L"%lc", Tab::prefixMacro[subI]);
 					}
 				}
 			}

@@ -66,7 +66,7 @@ void Action::AddTargets(Action *a) {// add copy of a.targets to action.targets
 }
 
 
-CharSet* Action::Symbols(Tab *tab) {
+CharSet* Action::Symbols(Tab *tab) const {
 	CharSet *s;
 	if (typ == Node::clas) {
 		s = tab->CharClassSet(sym)->Clone();

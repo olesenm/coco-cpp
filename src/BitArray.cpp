@@ -56,7 +56,7 @@ BitArray::~BitArray()
 	Data = 0;
 }
 
-int BitArray::getCount() {
+int BitArray::getCount() const {
 	return Count;
 }
 
@@ -132,10 +132,10 @@ bool BitArray::Equal(const BitArray *right) const
 	return true;
 }
 
-const BitArray &BitArray::operator=(const BitArray &right)
+const BitArray& BitArray::operator=(const BitArray &right)
 {
-	if ( &right != this ) {         // avoid self assignment
-		delete [] Data;              // prevents memory leak
+	if (&right != this) {         // avoid self assignment
+		delete [] Data;       // prevents memory leak
 		Count  = right.Count;
 		Data = new unsigned char[ (Count+7)>>3 ];
 		memcpy(Data, right.Data, (Count+7)>>3);

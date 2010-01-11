@@ -199,14 +199,9 @@ int main(int argc, char *argv_[]) {
 		argv[i] = coco_string_create(argv_[i]);
 	}
 #endif
-	wprintf(L"Coco/R C++ (06 Jan 2010)\n");
+	wprintf(L"Coco/R C++ (11 Jan 2010)\n");
 
-	wchar_t *srcName = NULL, *nsName = NULL, *prefixName = NULL;
-	wchar_t *frameDir = NULL, *outDir = NULL;
-	wchar_t *ddtString = NULL;
-	bool emitLines = false;
-	bool singleOutput = false;
-	bool makeBackup = false;
+	wchar_t *srcName = NULL;
 	bool traceToFile = true;
 
 	for (int i = 1; i < argc; i++) {
@@ -220,21 +215,21 @@ int main(int argc, char *argv_[]) {
 				printUsage("missing parameter on -namespace");
 				return 1;
 			}
-			nsName = coco_string_create(argv[i]);
+			Tab::nsName = coco_string_create(argv[i]);
 		}
 		else if (coco_string_equal(argv[i], L"-prefix")) {
 			if (++i == argc) {
 				printUsage("missing parameter on -prefix");
 				return 1;
 			}
-			prefixName = coco_string_create(argv[i]);
+			Tab::prefixName = coco_string_create(argv[i]);
 		}
 		else if (coco_string_equal(argv[i], L"-frames")) {
 			if (++i == argc) {
 				printUsage("missing parameter on -frames");
 				return 1;
 			}
-			frameDir = coco_string_create(argv[i]);
+			Tab::frameDir = coco_string_create(argv[i]);
 		}
 		else if (coco_string_equal(argv[i], L"-trace")) {
 			if (++i == argc) {
@@ -242,8 +237,7 @@ int main(int argc, char *argv_[]) {
 				return 1;
 			}
 			traceToFile = true;
-			coco_string_delete(ddtString);
-			ddtString = coco_string_create(argv[i]);
+			Tab::SetDDT(argv[i]);
 		}
 		else if (coco_string_equal(argv[i], L"-trace2")) {
 			if (++i == argc) {
@@ -251,24 +245,23 @@ int main(int argc, char *argv_[]) {
 				return 1;
 			}
 			traceToFile = false;
-			coco_string_delete(ddtString);
-			ddtString = coco_string_create(argv[i]);
+			Tab::SetDDT(argv[i]);
 		}
 		else if (coco_string_equal(argv[i], L"-o")) {
 			if (++i == argc) {
 				printUsage("missing parameter on -o");
 				return 1;
 			}
-			outDir = coco_string_create_append(argv[i], L"/");
+			Tab::outDir = coco_string_create_append(argv[i], L"/");
 		}
 		else if (coco_string_equal(argv[i], L"-lines")) {
-			emitLines = true;
+			Tab::emitLines = true;
 		}
 		else if (coco_string_equal(argv[i], L"-single")) {
-			singleOutput = true;
+			Tab::singleOutput = true;
 		}
 		else if (coco_string_equal(argv[i], L"-bak")) {
-			makeBackup = true;
+			Tab::makeBackup = true;
 		}
 		else if (argv[i][0] == L'-') {
 			wprintf(L"\nError: unknown option: '%ls'\n\n", argv[i]);
@@ -296,26 +289,21 @@ int main(int argc, char *argv_[]) {
 		int pos = coco_string_lastindexof(srcName, '/');
 		if (pos < 0) pos = coco_string_lastindexof(srcName, '\\');
 		wchar_t* srcDir = coco_string_create(srcName, 0, pos+1);
+		Tab::srcDir     = srcDir;
+		if (Tab::outDir == NULL) {
+			Tab::outDir = Tab::srcDir;
+		}
 
 		Coco::Scanner *scanner = new Coco::Scanner(srcName);
 		Coco::Parser  *parser  = new Coco::Parser(scanner);
 		Coco::Tab     *tab     = new Coco::Tab(parser);
 
 		tab->srcName    = srcName;
-		tab->srcDir     = srcDir;
-		tab->nsName     = coco_string_create(nsName);
-		tab->prefixName = coco_string_create(prefixName);
-		tab->frameDir   = coco_string_create(frameDir);
-		tab->outDir     = (outDir != NULL ? outDir : srcDir);
-		tab->emitLines  = emitLines;
-		tab->makeBackup = makeBackup;
-		tab->singleOutput = singleOutput;
-		tab->SetDDT(ddtString);
 
-		wchar_t *traceFileName = coco_string_create_append(tab->outDir, L"trace.txt");
+		wchar_t *traceFileName = coco_string_create_append(Tab::outDir, L"trace.txt");
 		char *chTrFileName = coco_string_create_char(traceFileName);
 
-		if (traceToFile && (tab->trace = fopen(chTrFileName, "w")) == NULL) {
+		if (traceToFile && (Tab::trace = fopen(chTrFileName, "w")) == NULL) {
 			wprintf(L"-- cannot write trace file to %ls\n", traceFileName);
 			return 1;
 		}
@@ -329,13 +317,13 @@ int main(int argc, char *argv_[]) {
 
 		// see if anything was written
 		if (traceToFile) {
-			fclose(tab->trace);
+			fclose(Tab::trace);
 
 			// obtain the FileSize
-			tab->trace = fopen(chTrFileName, "r");
-			fseek(tab->trace, 0, SEEK_END);
-			long fileSize = ftell(tab->trace);
-			fclose(tab->trace);
+			Tab::trace = fopen(chTrFileName, "r");
+			fseek(Tab::trace, 0, SEEK_END);
+			long fileSize = ftell(Tab::trace);
+			fclose(Tab::trace);
 			if (fileSize == 0)
 				remove(chTrFileName);
 			else
@@ -347,9 +335,9 @@ int main(int argc, char *argv_[]) {
 			return 1;
 		}
 
-		coco_string_delete(tab->nsName);
-		coco_string_delete(tab->prefixName);
-		coco_string_delete(tab->frameDir);
+		coco_string_delete(Tab::nsName);
+		coco_string_delete(Tab::prefixName);
+		coco_string_delete(Tab::frameDir);
 
 		delete parser->pgen;
 		delete parser->dfa;
@@ -364,11 +352,6 @@ int main(int argc, char *argv_[]) {
 	}
 
 	coco_string_delete(srcName);
-	coco_string_delete(nsName);
-	coco_string_delete(prefixName);
-	coco_string_delete(frameDir);
-	coco_string_delete(outDir);
-	coco_string_delete(ddtString);
 
 	return 0;
 }

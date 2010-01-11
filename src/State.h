@@ -50,7 +50,9 @@ public:
 
 	State *next;
 
+	//! Construct null
 	State();
+
 	void AddAction(Action *);
 	void DetachAction(Action *);
 	void MeltWith(State *);

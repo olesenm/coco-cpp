@@ -41,14 +41,14 @@ namespace Coco {
 class Sets {
 public:
 	static int First(BitArray *s) {
-		int max = s->getCount();
+		const int max = s->getCount();
 		for (int i=0; i<max; i++)
 			if ((*s)[i]) return i;
 		return -1;
 	}
 
 	static int Elements(BitArray *s) {
-		int max = s->getCount();
+		const int max = s->getCount();
 		int n = 0;
 		for (int i=0; i<max; i++)
 			if ((*s)[i]) n++;
@@ -57,7 +57,7 @@ public:
 
 	//! Check: (a == b)?
 	static bool Equals(BitArray *a, BitArray *b) {
-		int max = a->getCount();
+		const int max = a->getCount();
 		for (int i=0; i<max; i++)
 			if ((*a)[i] != (*b)[i]) return false;
 		return true;
@@ -65,7 +65,7 @@ public:
 
 	//! Check: (a > b)?
 	static bool Includes(BitArray *a, BitArray *b) {
-		int max = a->getCount();
+		const int max = a->getCount();
 		for (int i=0; i<max; i++)
 			if ((*b)[i] && ! (*a)[i]) return false;
 		return true;
@@ -73,7 +73,7 @@ public:
 
 	//! Check: (a * b != {})
 	static bool Intersect(BitArray *a, BitArray *b) {
-		int max = a->getCount();
+		const int max = a->getCount();
 		for (int i=0; i<max; i++)
 			if ((*a)[i] && (*b)[i]) return true;
 		return false;

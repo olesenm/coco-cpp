@@ -70,7 +70,7 @@ void ParserGen::CopyFramePart(const wchar_t* stop, const bool doOutput) {
 
 void ParserGen::CopySourcePart(Position *pos, int indent) {
 	// Copy text described by pos from atg to gen
-	tab->CopySourcePart(gen, pos, indent, tab->emitLines);
+	tab->CopySourcePart(gen, pos, indent, Tab::emitLines);
 }
 
 
@@ -372,10 +372,10 @@ void ParserGen::WriteParser() {
 	CopyFramePart(L"-->begin", false);
 	tab->CopySourcePart(gen, tab->copyPos, 0);  // copy without emitLines
 	CopyFramePart(L"-->namespace_open");
-	if (tab->singleOutput) {
+	if (Tab::singleOutput) {
 		wchar_t* scannerCpp = coco_string_create_append
 		(
-			tab->prefixName,
+			Tab::prefixName,
 			L"Scanner.cpp"
 		);
 		fwprintf(gen, L"\n// quick hack to provide a single Make target:\n#include \"%ls\"\n\n", scannerCpp);
@@ -387,7 +387,7 @@ void ParserGen::WriteParser() {
 	CopyFramePart(L"-->productions"); GenProductions();
 	CopyFramePart(L"-->parseRoot");
 	fwprintf(gen, L"\t%ls();\n", tab->gramSy->name);
-	if (tab->explicitEof) {
+	if (Tab::explicitEOF) {
 		fwprintf(gen, L"\t// let grammar deal with end-of-file expectations\n");
 	}
 	else {
@@ -407,7 +407,7 @@ void ParserGen::WriteParser() {
 
 
 void ParserGen::PrintStatistics() const {
-	FILE* trace = tab->trace;
+	FILE* trace = Tab::trace;
 
 	fwprintf(trace, L"%d sets\n", symSet.Count);
 }

@@ -106,7 +106,7 @@ template<typename Type>
 typename HashTable<Type>::Iterator
 HashTable<Type>::GetIterator()
 {
-	return HashTable<Type>::Iterator(this);
+	return typename Coco::HashTable<Type>::Iterator(this);
 }
 
 

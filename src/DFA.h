@@ -30,7 +30,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_DFA_H__
 #define COCO_DFA_H__
 
-#include <stddef.h>
+#include <stdlib.h>
 
 #include "Comment.h"
 #include "State.h"

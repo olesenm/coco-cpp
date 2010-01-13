@@ -31,7 +31,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_SCANNER_H__
 #define COCO_SCANNER_H__
 
-#include <climits>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -50,7 +49,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #endif
 
 
-#define COCO_WCHAR_MAX    65535
+#define COCO_WCHAR_MAX    65535    // 0xFFFF = max unicode characters
 
 
 namespace Coco {
@@ -98,8 +97,8 @@ int   coco_string_hash(const wchar_t* str);
 //! Convert wide string to double
 double coco_string_toDouble(const wchar_t* str);
 
-//! Convert wide string to float
-float coco_string_toFloat(const wchar_t* str);
+//! Convert wide string to long
+long coco_string_toLong(const wchar_t* str);
 
 //
 // String handling, byte character

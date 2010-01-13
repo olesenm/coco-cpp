@@ -27,9 +27,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 -------------------------------------------------------------------------*/
 
 #include "State.h"
-
 #include "Action.h"
-#include "Symbol.h"
 
 namespace Coco {
 

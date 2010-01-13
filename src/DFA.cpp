@@ -29,6 +29,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 #include <stdlib.h>
 #include <wchar.h>
+
 #include "DFA.h"
 #include "Action.h"
 #include "Tab.h"

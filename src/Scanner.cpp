@@ -36,6 +36,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include <fcntl.h>
 #endif
 
+#include <climits>
 
 #include "Scanner.h"
 
@@ -133,9 +134,9 @@ double coco_string_toDouble(const wchar_t* str)
 	return str ? wcstod(str, NULL) : 0;
 }
 
-float coco_string_toFloat(const wchar_t* str)
+long coco_string_toLong(const wchar_t* str)
 {
-	return str ? wcstof(str, NULL) : 0;
+	return str ? wcstol(str, NULL, 10) : 0;
 }
 
 

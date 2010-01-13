@@ -86,7 +86,7 @@ private:
 		_badString=4,
 		_char=5,
 		_ddtSym=48,
-		_directive=49,
+		_directive=49
 	};
 	static const int maxT = 47;
 

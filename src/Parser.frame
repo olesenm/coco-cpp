@@ -113,9 +113,12 @@ public:
 -->implementation
 -->begin
 
-#include <wchar.h>
-#include "$PREFIX$Parser.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cwchar>
 
+#include "$PREFIX$Parser.h"
 
 -->namespace_open
 

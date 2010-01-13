@@ -31,7 +31,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_UTILS_H__
 #define COCO_UTILS_H__
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>

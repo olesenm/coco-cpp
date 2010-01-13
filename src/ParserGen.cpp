@@ -28,6 +28,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 -------------------------------------------------------------------------*/
 
 #include <ctype.h>
+
 #include "ArrayList.h"
 #include "ParserGen.h"
 #include "Parser.h"
@@ -246,7 +247,9 @@ void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked) {
 
 
 void ParserGen::GenTokensHeader() {
-	fwprintf(gen, L"\tenum {\n");
+	fwprintf(gen, L"\tenum {");
+
+	bool first = true;
 
 	// tokens
 	for (int i=0; i < tab->terminals.Count; i++) {
@@ -254,15 +257,30 @@ void ParserGen::GenTokensHeader() {
 		if (!isalpha(sym->name[0])) {
 			continue;
 		}
-		fwprintf(gen , L"\t\t_%ls=%d,\n", sym->name, sym->n);
+		if (first) {
+			first = false;
+		}
+		else {
+			fwprintf(gen, L",");   // finish previous enum
+		}
+		fwprintf(gen , L"\n\t\t_%ls=%d", sym->name, sym->n);
 	}
 
 	// pragmas
 	for (int i=0; i < tab->pragmas.Count; i++) {
 		Symbol* sym = tab->pragmas[i];
-		fwprintf(gen , L"\t\t_%ls=%d,\n", sym->name, sym->n);
+		if (first) {
+			first = false;
+		}
+		else {
+			fwprintf(gen, L",");   // finish previous enum
+		}
+		fwprintf(gen , L"\n\t\t_%ls=%d", sym->name, sym->n);
 	}
 
+	if (!first) {
+		fwprintf(gen, L"\n");    // finish final enum (w/o trailing comma)
+	}
 	fwprintf(gen, L"\t};\n");
 }
 

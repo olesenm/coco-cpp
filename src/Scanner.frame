@@ -159,20 +159,17 @@ protected:
 public:
 	static const int EoF = COCO_WCHAR_MAX + 1;
 
-	//! Attach buffer to a stdio stream.
+	//! @brief Attach buffer to a stdio stream.
 	//! User streams are not closed in the destructor
 	Buffer(FILE*, bool isUserStream = true);
 
-	//! Attach buffer to an STL std stream
+	//! @brief Attach buffer to an STL standard stream
 	//! User streams are not closed in the destructor
 	explicit Buffer(std::istream*, bool isUserStream = true);
 
-	//! Copy buffer contents from constant string
-	//! Handled internally as an istringstream
-	explicit Buffer(std::string&);
-
 	//! Copy buffer contents from constant character string
 	Buffer(const unsigned char* chars, int len);
+
 	//! Copy buffer contents from constant character string
 	Buffer(const char* chars, int len);
 
@@ -344,17 +341,21 @@ public:
 	//! The scanner buffer
 	Buffer *buffer;
 
-	//! Using an existing open file handle for the scanner
+	//! Attach scanner to an existing open file handle
 	Scanner(FILE*);
 
-	//! Using an existing open STL std stream
+	//! Attach scanner to an existing open STL standard stream
 	explicit Scanner(std::istream&);
+
+	//! Open a file for reading and attach scanner
+	explicit Scanner(const std::string& fileName);
 
 	//! Open a file for reading and attach scanner
 	explicit Scanner(const wchar_t* fileName);
 
 	//! Attach scanner to an existing character buffer
 	Scanner(const unsigned char* chars, int len);
+
 	//! Attach scanner to an existing character buffer
 	Scanner(const char* chars, int len);
 
@@ -615,20 +616,6 @@ Buffer::Buffer(std::istream* istr, bool isUserStream)
 }
 
 
-Buffer::Buffer(std::string& str)
-:
-	buf(NULL),
-	bufCapacity(0),
-	bufLen(0),
-	bufPos(0),
-	bufStart(0),
-	fileLen(0),
-	cStream(NULL),
-	stdStream(new std::istringstream(str)),
-	isUserStream_(false)
-{}
-
-
 Buffer::Buffer(const unsigned char* chars, int len)
 :
 	buf(new unsigned char[len]),
@@ -839,6 +826,17 @@ Scanner::Scanner(std::istream& istr)
 :
 	buffer(new Buffer(&istr, true))
 {
+	Init();
+}
+
+
+Scanner::Scanner(const std::string& fileName) {
+	FILE* istr;
+	if ((istr = fopen(fileName.c_str(), "rb")) == NULL) {
+		wprintf(L"--- Cannot open file %s\n", fileName.c_str());
+		::exit(1);
+	}
+	buffer = new Buffer(istr, false);
 	Init();
 }
 

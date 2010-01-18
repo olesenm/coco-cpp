@@ -161,20 +161,17 @@ protected:
 public:
 	static const int EoF = COCO_WCHAR_MAX + 1;
 
-	//! Attach buffer to a stdio stream.
+	//! @brief Attach buffer to a stdio stream.
 	//! User streams are not closed in the destructor
 	Buffer(FILE*, bool isUserStream = true);
 
-	//! Attach buffer to an STL std stream
+	//! @brief Attach buffer to an STL standard stream
 	//! User streams are not closed in the destructor
 	explicit Buffer(std::istream*, bool isUserStream = true);
 
-	//! Copy buffer contents from constant string
-	//! Handled internally as an istringstream
-	explicit Buffer(std::string&);
-
 	//! Copy buffer contents from constant character string
 	Buffer(const unsigned char* chars, int len);
+
 	//! Copy buffer contents from constant character string
 	Buffer(const char* chars, int len);
 
@@ -350,17 +347,21 @@ public:
 	//! The scanner buffer
 	Buffer *buffer;
 
-	//! Using an existing open file handle for the scanner
+	//! Attach scanner to an existing open file handle
 	Scanner(FILE*);
 
-	//! Using an existing open STL std stream
+	//! Attach scanner to an existing open STL standard stream
 	explicit Scanner(std::istream&);
+
+	//! Open a file for reading and attach scanner
+	explicit Scanner(const std::string& fileName);
 
 	//! Open a file for reading and attach scanner
 	explicit Scanner(const wchar_t* fileName);
 
 	//! Attach scanner to an existing character buffer
 	Scanner(const unsigned char* chars, int len);
+
 	//! Attach scanner to an existing character buffer
 	Scanner(const char* chars, int len);
 

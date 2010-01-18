@@ -269,20 +269,6 @@ Buffer::Buffer(std::istream* istr, bool isUserStream)
 }
 
 
-Buffer::Buffer(std::string& str)
-:
-	buf(NULL),
-	bufCapacity(0),
-	bufLen(0),
-	bufPos(0),
-	bufStart(0),
-	fileLen(0),
-	cStream(NULL),
-	stdStream(new std::istringstream(str)),
-	isUserStream_(false)
-{}
-
-
 Buffer::Buffer(const unsigned char* chars, int len)
 :
 	buf(new unsigned char[len]),
@@ -493,6 +479,17 @@ Scanner::Scanner(std::istream& istr)
 :
 	buffer(new Buffer(&istr, true))
 {
+	Init();
+}
+
+
+Scanner::Scanner(const std::string& fileName) {
+	FILE* istr;
+	if ((istr = fopen(fileName.c_str(), "rb")) == NULL) {
+		wprintf(L"--- Cannot open file %s\n", fileName.c_str());
+		::exit(1);
+	}
+	buffer = new Buffer(istr, false);
 	Init();
 }
 

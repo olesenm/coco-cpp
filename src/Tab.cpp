@@ -1377,45 +1377,46 @@ void Tab::GenNamespaceClose(FILE* ostr, int nrOfNs) {
 }
 
 
-FILE* Tab::OpenFrameFile(const wchar_t* frameName) const {
+FILE* Tab::OpenFrameFile(const wchar_t* frameName) const
+{
 	FILE* istr;
 
 	wchar_t *fr = coco_string_create(frameName);
-	char* chFr = coco_string_create_char(fr);
+	std::string chFr;
 
 	// 1: look in specified frameDir
-	if (coco_string_length(frameDir) != 0) {
-		coco_string_delete(chFr);
+	if (coco_string_length(frameDir) != 0)
+	{
 		coco_string_delete(fr);
 		fr = coco_string_create_append(frameDir, frameName);
-		chFr = coco_string_create_char(fr);
+		chFr = coco_string_stdStringASCII(fr);
 
-		if ((istr = fopen(chFr, "r")) != NULL) {
+		if ((istr = fopen(chFr.c_str(), "r")) != NULL)
+		{
 			goto Done;
 		}
 	}
 
 	// 2: look in local directory
-	coco_string_delete(chFr);
 	coco_string_delete(fr);
 	fr = coco_string_create(frameName);
-	chFr = coco_string_create_char(fr);
-	if ((istr = fopen(chFr, "r")) != NULL) {
+	chFr = coco_string_stdStringASCII(fr);
+	if ((istr = fopen(chFr.c_str(), "r")) != NULL)
+	{
 		goto Done;
 	}
 
 	// 3: look in srcDir
-	coco_string_delete(chFr);
 	coco_string_delete(fr);
 	fr = coco_string_create_append(srcDir, frameName);
-	chFr = coco_string_create_char(fr);
-	if ((istr = fopen(chFr, "r")) != NULL) {
+	chFr = coco_string_stdStringASCII(fr);
+	if ((istr = fopen(chFr.c_str(), "r")) != NULL)
+	{
 		goto Done;
 	}
 
 
 	Done:
-	coco_string_delete(chFr);
 	coco_string_delete(fr);
 
 	return istr;
@@ -1428,21 +1429,24 @@ FILE* Tab::OpenGenFile(const wchar_t* genName) const {
 	wchar_t* fn = coco_string_create_append(outDir, prefixName);
 	coco_string_merge(fn, genName);
 
-	char* chFn = coco_string_create_char(fn);
+	std::string chFn = coco_string_stdStringASCII(fn);
 
-	if (makeBackup && ((ostr = fopen(chFn, "r")) != NULL)) {
+	if
+	(
+	    makeBackup
+	 && ((ostr = fopen(chFn.c_str(), "r")) != NULL)
+	)
+	{
 		fclose(ostr);
 		wchar_t* oldName = coco_string_create_append(fn, L".bak");
-		char* chOldName = coco_string_create_char(oldName);
-		remove(chOldName);
-		rename(chFn, chOldName); // copy with overwrite
-		coco_string_delete(chOldName);
+		std::string chOldName = coco_string_stdStringASCII(oldName);
 		coco_string_delete(oldName);
+		remove(chOldName.c_str());
+		rename(chFn.c_str(), chOldName.c_str()); // copy with overwrite
 	}
-
-	ostr = fopen(chFn, "w");
-	coco_string_delete(chFn);
 	coco_string_delete(fn);
+
+	ostr = fopen(chFn.c_str(), "w");
 
 	return ostr;
 }

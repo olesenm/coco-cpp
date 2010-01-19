@@ -105,14 +105,12 @@ long coco_string_toLong(const wchar_t* str);
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //! Create a byte string by copying str
-char* coco_string_create_char(const wchar_t* str);
+//! Restrict to a ASCII (7bit) value
+std::string coco_string_stdStringASCII(const wchar_t* str);
 
 //! Create a byte substring of str starting at index and length characters long
-char* coco_string_create_char(const wchar_t* str, int index, int length);
-
-//! Free storage and nullify the argument
-void  coco_string_delete(char* &str);
-
+//! Restrict to a ASCII (7bit) value
+std::string coco_string_stdStringASCII(const wchar_t* str, int index, int length);
 
 // * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
 

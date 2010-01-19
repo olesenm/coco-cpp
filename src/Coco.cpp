@@ -308,9 +308,14 @@ int main(int argc, char *argv_[]) {
 		tab->srcName    = srcName;
 
 		wchar_t *traceFileName = coco_string_create_append(Tab::outDir, L"trace.txt");
-		char *chTrFileName = coco_string_create_char(traceFileName);
+		std::string chTrFileName = coco_string_stdStringASCII(traceFileName);
 
-		if (traceToFile && (Tab::trace = fopen(chTrFileName, "w")) == NULL) {
+		if
+		(
+		    traceToFile
+		 && (Tab::trace = fopen(chTrFileName.c_str(), "w")) == NULL
+		)
+		{
 			wprintf(L"-- cannot write trace file to %ls\n", traceFileName);
 			return 1;
 		}
@@ -323,18 +328,24 @@ int main(int argc, char *argv_[]) {
 		parser->Parse();
 
 		// see if anything was written
-		if (traceToFile) {
+		if (traceToFile)
+		{
 			fclose(Tab::trace);
 
 			// obtain the FileSize
-			Tab::trace = fopen(chTrFileName, "r");
+			Tab::trace = fopen(chTrFileName.c_str(), "r");
 			fseek(Tab::trace, 0, SEEK_END);
 			long fileSize = ftell(Tab::trace);
 			fclose(Tab::trace);
 			if (fileSize == 0)
-				remove(chTrFileName);
+			{
+				remove(chTrFileName.c_str());
+			}
 			else
+			{
 				wprintf(L"trace output is in %ls\n", traceFileName);
+			}
+
 		}
 
 		wprintf(L"%d errors detected\n", parser->errors->count);
@@ -351,7 +362,6 @@ int main(int argc, char *argv_[]) {
 		delete tab;
 		delete parser;
 		delete scanner;
-		coco_string_delete(chTrFileName);
 		coco_string_delete(traceFileName);
 		coco_string_delete(srcDir);
 	} else {

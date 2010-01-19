@@ -145,33 +145,34 @@ long coco_string_toLong(const wchar_t* str)
 // string handling, byte character
 //
 
-char* coco_string_create_char(const wchar_t* str) {
-	const int len = coco_string_length(str);
-	char* dest = new char[len + 1];
-	for (int i = 0; i < len; ++i)
-	{
-		dest[i] = char(str[i]);
-	}
-	dest[len] = 0;
-	return dest;
-}
+std::string coco_string_stdStringASCII(const wchar_t* str)
+{
+    const int len = coco_string_length(str);
+    std::string dest;
+    dest.reserve(len);
 
-char* coco_string_create_char(const wchar_t* str, int index, int length) {
-	const int len = (str && *str) ? length : 0;
-	char* dest = new char[len + 1];
-	for (int i = 0; i < len; ++i) {
-		dest[i] = char(str[index + i]);
-	}
-	dest[len] = 0;
-	return dest;
+    for (int i = 0; i < len; ++i)
+    {
+        dest += char(str[i] & 0x7F);
+    }
+
+    return dest;
 }
 
 
-void coco_string_delete(char* &str) {
-	delete [] str;
-	str = NULL;
-}
+std::string coco_string_stdStringASCII(const wchar_t* str, int index, int length)
+{
+    const int len = (str && *str) ? length : 0;
+    std::string dest;
+    dest.reserve(len);
 
+    for (int i = 0; i < len; ++i)
+    {
+        dest += char(str[index+i] & 0x7F);
+    }
+
+    return dest;
+}
 
 // * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
 
@@ -483,9 +484,11 @@ Scanner::Scanner(std::istream& istr)
 }
 
 
-Scanner::Scanner(const std::string& fileName) {
+Scanner::Scanner(const std::string& fileName)
+{
 	FILE* istr;
-	if ((istr = fopen(fileName.c_str(), "rb")) == NULL) {
+	if ((istr = fopen(fileName.c_str(), "rb")) == NULL)
+	{
 		wprintf(L"--- Cannot open file %s\n", fileName.c_str());
 		::exit(1);
 	}
@@ -494,14 +497,16 @@ Scanner::Scanner(const std::string& fileName) {
 }
 
 
-Scanner::Scanner(const wchar_t* fileName) {
-	char *chFileName = coco_string_create_char(fileName);
+Scanner::Scanner(const wchar_t* fileName)
+{
+	std::string chFileName = coco_string_stdStringASCII(fileName);
 	FILE* istr;
-	if ((istr = fopen(chFileName, "rb")) == NULL) {
+
+	if ((istr = fopen(chFileName.c_str(), "rb")) == NULL)
+	{
 		wprintf(L"--- Cannot open file %ls\n", fileName);
 		::exit(1);
 	}
-	coco_string_delete(chFileName);
 	buffer = new Buffer(istr, false);
 	Init();
 }

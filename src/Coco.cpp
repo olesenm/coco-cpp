@@ -270,7 +270,7 @@ int main(int argc, char *argv_[]) {
 		else if (coco_string_equal(argv[i], L"-bak")) {
 			Tab::makeBackup = true;
 		}
-		else if (argv[i][0] == L'-') {
+		else if (argv[i][0] == '-') {
 			wprintf(L"\nError: unknown option: '%ls'\n\n", argv[i]);
 			printUsage();
 			return 1;

@@ -460,12 +460,14 @@ void Parser::SimSet(CharSet* &s) {
 			wchar_t *name = tab->Unescape(subName2);
 			coco_string_delete(subName2);
 			const int len = coco_string_length(name);
-			for (int i=0; i < len; i++) {
-			  wchar_t ch = name[i];
-			  if (dfa->ignoreCase) {
-			    if ((L'A' <= ch) && (ch <= L'Z')) ch = ch - (L'A' - L'a'); // ch.ToLower()
-			  }
-			  s->Set(ch);
+			for (int i=0; i < len; i++)
+			{
+			    wchar_t ch = name[i];
+			    if (dfa->ignoreCase && ch >= 'A' && ch <= 'Z')
+			    {
+			        ch += ('a' - 'A'); // ch.ToLower()
+			    }
+			    s->Set(ch);
 			}
 			coco_string_delete(name);
 			
@@ -494,7 +496,10 @@ void Parser::Char(int &n) {
 		else SemErr(L"unacceptable character value");
 		coco_string_delete(name);
 		// n is int, we can create lowercase directly
-		if (dfa->ignoreCase && (n >= 'A') && (n <= 'Z')) n += 32;
+		if (dfa->ignoreCase && n >= 'A' && n <= 'Z')
+		{
+		    n += ('a' - 'A');
+		}
 		
 }
 
@@ -512,7 +517,7 @@ void Parser::Sym(wchar_t* &name, int &kind) {
 				coco_string_delete(name); name = coco_string_create(t->val);
 				const int len = coco_string_length(name);
 				// change surrounding single quotes to double quotes (does not escape '"')
-				name[0] = name[len-1] = L'"';
+				name[0] = name[len-1] = '"';
 				
 			}
 			kind = isLiteral;

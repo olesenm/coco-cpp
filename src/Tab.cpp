@@ -464,10 +464,10 @@ CharSet* Tab::CharClassSet(int i) {
 
 wchar_t* Tab::Ch(const wchar_t ch) {
 	wchar_t* format = new wchar_t[10];
-	if (ch < L' ' || ch >= 127 || ch == L'\'' || ch == L'\\') {
+	if (ch < 32 || ch >= 0x7F || ch == '\'' || ch == '\\') {
 		coco_swprintf(format, 10, L"%d", int(ch));
 	} else {
-		coco_swprintf(format, 10, L"'%lc'", ch);
+		coco_swprintf(format, 10, L"'%c'", int(ch));
 	}
 	return format;
 }
@@ -805,9 +805,9 @@ wchar_t Tab::Hex2Char(const wchar_t* s) {
 	const int len = coco_string_length(s);
 	for (int i = 0; i < len; i++) {
 		wchar_t ch = s[i];
-		if ('0' <= ch && ch <= '9') val = 16 * val + (ch - '0');
-		else if ('a' <= ch && ch <= 'f') val = 16 * val + (10 + ch - 'a');
-		else if ('A' <= ch && ch <= 'F') val = 16 * val + (10 + ch - 'A');
+		if (ch >= '0' && ch <= '9') val = 16 * val + (ch - '0');
+		else if (ch >= 'a' && ch <= 'f') val = 16 * val + (10 + ch - 'a');
+		else if (ch >= 'A' && ch <= 'F') val = 16 * val + (10 + ch - 'A');
 		else parser->SemErr(L"bad escape sequence in string or character");
 	}
 	if (val >= COCO_WCHAR_MAX) {/* pdt */
@@ -829,18 +829,18 @@ wchar_t* Tab::Unescape(const wchar_t* s) {
 	for (int i = 0; i < len; /*nil*/ ) {
 		if (s[i] == '\\') {
 			switch (s[i+1]) {
-				case L'\\': buf.Append(L'\\'); i += 2; break;
-				case L'\'': buf.Append(L'\''); i += 2; break;
-				case L'\"': buf.Append(L'\"'); i += 2; break;
-				case L'r': buf.Append(L'\r'); i += 2; break;
-				case L'n': buf.Append(L'\n'); i += 2; break;
-				case L't': buf.Append(L'\t'); i += 2; break;
-				case L'0': buf.Append(L'\0'); i += 2; break;
-				case L'a': buf.Append(L'\a'); i += 2; break;
-				case L'b': buf.Append(L'\b'); i += 2; break;
-				case L'f': buf.Append(L'\f'); i += 2; break;
-				case L'v': buf.Append(L'\v'); i += 2; break;
-				case L'u': case L'x':
+				case '\\': buf.Append(L'\\'); i += 2; break;
+				case '\'': buf.Append(L'\''); i += 2; break;
+				case '\"': buf.Append(L'\"'); i += 2; break;
+				case 'r': buf.Append(L'\r'); i += 2; break;
+				case 'n': buf.Append(L'\n'); i += 2; break;
+				case 't': buf.Append(L'\t'); i += 2; break;
+				case '0': buf.Append(L'\0'); i += 2; break;
+				case 'a': buf.Append(L'\a'); i += 2; break;
+				case 'b': buf.Append(L'\b'); i += 2; break;
+				case 'f': buf.Append(L'\f'); i += 2; break;
+				case 'v': buf.Append(L'\v'); i += 2; break;
+				case 'u': case 'x':
 					if (i + 6 <= coco_string_length(s)) {
 						wchar_t *subS = coco_string_create(s, i+2, 4);
 						buf.Append(Hex2Char(subS)); i += 6; break;
@@ -869,14 +869,14 @@ wchar_t* Tab::Escape(const wchar_t* s) {
 	for (int i=0; i < len; i++) {
 		wchar_t ch = s[i];
 		switch (ch) {
-			case L'\\': buf.Append(L"\\\\"); break;
-			case L'\'': buf.Append(L"\\'"); break;
-			case L'\"': buf.Append(L"\\\""); break;
-			case L'\t': buf.Append(L"\\t"); break;
-			case L'\r': buf.Append(L"\\r"); break;
-			case L'\n': buf.Append(L"\\n"); break;
+			case '\\': buf.Append(L"\\\\"); break;
+			case '\'': buf.Append(L"\\'"); break;
+			case '\"': buf.Append(L"\\\""); break;
+			case '\t': buf.Append(L"\\t"); break;
+			case '\r': buf.Append(L"\\r"); break;
+			case '\n': buf.Append(L"\\n"); break;
 			default:
-				if ((ch < L' ') || (ch > 0x7f)) {
+				if (ch < 32 || ch > 0x7F) {
 					wchar_t* res = Char2Hex(ch);
 					buf.Append(res);
 					delete [] res;
@@ -1217,7 +1217,7 @@ void Tab::XRef() {
 
 void Tab::DispatchDirective(const wchar_t* str)
 {
-	const int len1 = coco_string_indexof(str, L'=');
+	const int len1 = coco_string_indexof(str, '=');
 	const int len2 = coco_string_length(str) - len1 - 1;
 
 	if (len1 < 0 || len2 < 1)
@@ -1348,12 +1348,12 @@ int Tab::GenNamespaceOpen(FILE* ostr) const {
 	for (int startPos = 0; startPos < len; ++startPos)
 	{
 		// skip leading and multiple ':'
-		while (nsName[startPos] == L':')
+		while (nsName[startPos] == ':')
 		{
 			++startPos;
 		}
 
-		int curLen = coco_string_indexof(nsName + startPos, L':');
+		int curLen = coco_string_indexof(nsName + startPos, ':');
 		if (curLen == -1) {
 			curLen = len - startPos;
 		}

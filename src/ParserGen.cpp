@@ -82,7 +82,7 @@ void ParserGen::GenErrorMsg(ParserGen::errorType errTyp, Symbol *sym) {
 	coco_swprintf(format, formatLen, L"\t\t\tcase %d: s = coco_string_create(L\"", errorNr);
 	coco_string_merge(err, format);
 	if (errTyp == tErr) {
-		if (sym->name[0] == L'"') {
+		if (sym->name[0] == '"') {
 			coco_swprintf(format, formatLen, L"%ls expected", tab->Escape(sym->name));
 			coco_string_merge(err, format);
 		} else {

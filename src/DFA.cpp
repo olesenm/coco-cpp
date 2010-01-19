@@ -48,10 +48,10 @@ namespace Coco {
 //---------- Output primitives
 wchar_t* DFA::Ch(wchar_t ch) {
 	wchar_t* format = new wchar_t[10];
-	if (ch < L' ' || ch >= 127 || ch == L'\'' || ch == L'\\')
+	if (ch < 32 || ch >= 0x7F || ch == '\'' || ch == '\\')
 		coco_swprintf(format, 10, L"%d\0", int(ch));
 	else
-		coco_swprintf(format, 10, L"L'%lc'\0", int(ch));
+		coco_swprintf(format, 10, L"'%c'\0", int(ch));
 	return format;
 }
 
@@ -625,9 +625,12 @@ void DFA::CopyFramePart(const wchar_t* stop, const bool doOutput) {
 
 
 wchar_t* DFA::SymName(Symbol *sym) { // real name value is stored in Tab.literals
-	if (('a' <= sym->name[0] && sym->name[0] <= 'z') ||
-		('A' <= sym->name[0] && sym->name[0] <= 'Z')) { //Char::IsLetter(sym->name[0])
-
+	if   // Char::IsLetter(sym->name[0])
+	(
+	    (sym->name[0] >= 'a' && sym->name[0] <= 'z')
+	 || (sym->name[0] >= 'A' && sym->name[0] <= 'Z')
+	)
+	{
 		HashTable<Symbol>::Iterator iter = tab->literals.GetIterator();
 		while (iter.HasNext()) {
 			DictionaryEntry<Symbol> *e = iter.Next();
@@ -657,9 +660,9 @@ void DFA::GenLiterals() {
 
 				fwprintf(gen, L"\tkeywords.set(L");
 				// write keyword, escape non printable characters
-				for (int k = 0; name[k] != L'\0'; k++) {
+				for (int k = 0; name[k] != '\0'; k++) {
 					char c = name[k];
-					fwprintf(gen, (c >= 32 && c <= 127) ? L"%lc" : L"\\x%04x", c);
+					fwprintf(gen, (c >= 32 && c <= 0x7F) ? L"%lc" : L"\\x%04x", c);
 				}
 				fwprintf(gen, L", %d);\n", sym->n);
 
@@ -816,7 +819,7 @@ void DFA::WriteScanner() {
 	CopyFramePart(L"-->casing1");
 	if (ignoreCase) {
 		fwprintf(gen, L"\t\tvalCh = ch;\n");
-		fwprintf(gen, L"\t\tif ('A' <= ch && ch <= 'Z') ch = ch - 'A' + 'a'; // ch.ToLower()");
+		fwprintf(gen, L"\t\tif (ch >= 'A' && ch <= 'Z') ch += ('a' - 'A'); // ch.ToLower()");
 	}
 	CopyFramePart(L"-->casing2");
 	fwprintf(gen, L"\t\ttval[tlen++] = ");

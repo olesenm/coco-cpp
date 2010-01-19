@@ -434,14 +434,14 @@ wchar_t* coco_string_create_lower(const wchar_t* str, int index, int len) {
 
 	for (int i = 0; i < len; ++i) {
 		const wchar_t ch = str[index + i];
-		if ((L'A' <= ch) && (ch <= L'Z')) {
-			dest[i] = ch - (L'A' - L'a');
+		if ('A' <= ch && ch <= 'Z') {
+			dest[i] = ch + ('a' - 'A');   // lower-case
 		}
 		else {
 			dest[i] = ch;
 		}
 	}
-	dest[len] = L'\0';
+	dest[len] = '\0';
 	return dest;
 }
 
@@ -935,7 +935,7 @@ void Scanner::NextCh() {
 		ch = buffer->Read(); col++;
 		// replace isolated '\r' by '\n' in order to make
 		// eol handling uniform across Windows, Unix and Mac
-		if (ch == L'\r' && buffer->Peek() != L'\n') ch = EOL;
+		if (ch == '\r' && buffer->Peek() != '\n') ch = EOL;
 		if (ch == EOL) { line++; col = 0; }
 	}
 -->casing1
@@ -1030,7 +1030,7 @@ void Scanner::AppendVal(Token* tok) {
 
 	// copy the currently parsed tval into the token
 	wcsncpy(tok->val, tval, tlen);
-	tok->val[tlen] = L'\0';
+	tok->val[tlen] = '\0';
 }
 
 

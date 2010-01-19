@@ -206,7 +206,7 @@ int main(int argc, char *argv_[]) {
 		argv[i] = coco_string_create(argv_[i]);
 	}
 #endif
-	wprintf(L"Coco/R C++ (14 Jan 2010)\n");
+	wprintf(L"Coco/R C++ (19 Jan 2010)\n");
 
 	wchar_t *srcName = NULL;
 	bool traceToFile = true;
@@ -236,7 +236,7 @@ int main(int argc, char *argv_[]) {
 				printUsage("missing parameter on -frames");
 				return 1;
 			}
-			Tab::frameDir = coco_string_create(argv[i]);
+			Tab::frameDir = coco_string_create_append(argv[i], L"/");
 		}
 		else if (coco_string_equal(argv[i], L"-trace")) {
 			if (++i == argc) {

@@ -1387,9 +1387,7 @@ FILE* Tab::OpenFrameFile(const wchar_t* frameName) const {
 	if (coco_string_length(frameDir) != 0) {
 		coco_string_delete(chFr);
 		coco_string_delete(fr);
-		fr = coco_string_create(frameDir);
-		coco_string_merge(fr, L"/");
-		coco_string_merge(fr, frameName);
+		fr = coco_string_create_append(frameDir, frameName);
 		chFr = coco_string_create_char(fr);
 
 		if ((istr = fopen(chFr, "r")) != NULL) {

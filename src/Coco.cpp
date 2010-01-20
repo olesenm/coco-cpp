@@ -148,16 +148,10 @@ with the same syntax. For example,
 #include "Parser.h"
 #include "Utils.h"
 #include "Tab.h"
-#include "StaticAssert.h"
 
 //! @namespace Coco
 //! @brief Compiler Generator Coco/R, C++ version
 using namespace Coco;
-
-// static assertions
-
-// 65536 (0x01FF) is used for buffer EOF. Thus wchar_t requires > 2 bytes
-StaticAssert(sizeof(wchar_t) > 2);
 
 
 void printUsage(const char* message = NULL)

@@ -57,6 +57,18 @@ wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2);
 wchar_t* coco_string_create_append(const wchar_t* str1, const std::string& str2);
 
 
+//! Create by copying ASCII byte str
+std::wstring coco_stdWString(const std::string& str);
+
+
+//! Create by concatenating str1 and str2
+std::wstring coco_stdWString_append
+(
+    const std::wstring& str1,
+    const std::string& str2
+);
+
+
 //! Append str to dest
 void coco_string_merge(wchar_t* &dest, const wchar_t* str);
 

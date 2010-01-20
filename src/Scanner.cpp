@@ -92,12 +92,15 @@ wchar_t* coco_string_create_lower(const wchar_t* str, int index, int len)
 	if (!str) { return NULL; }
 	wchar_t* dest = new wchar_t[len + 1];
 
-	for (int i = 0; i < len; ++i) {
+	for (int i = 0; i < len; ++i)
+	{
 		const wchar_t ch = str[index + i];
-		if ('A' <= ch && ch <= 'Z') {
+		if (ch >= 'A' && ch <= 'Z')
+		{
 			dest[i] = ch + ('a' - 'A');   // lower-case
 		}
-		else {
+		else
+		{
 			dest[i] = ch;
 		}
 	}
@@ -108,36 +111,38 @@ wchar_t* coco_string_create_lower(const wchar_t* str, int index, int len)
 
 void coco_string_delete(wchar_t* &str)
 {
-	delete [] str;
+	delete[] str;
 	str = NULL;
 }
 
-int coco_string_length(const wchar_t* str) {
-	return str ? wcslen(str) : 0;
+
+bool coco_string_equal(const wchar_t* str1, const char* str2)
+{
+	const int str1Len = coco_string_length(str1);
+	const int str2Len = coco_string_length(str2);
+
+	if (str1Len != str2Len)
+	{
+		return false;
+	}
+
+	for (int i = 0; i < str1Len; ++i)
+	{
+		if (str1[i] != str2[i])
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
+
 
 int coco_string_indexof(const wchar_t* str, const wchar_t ch)
 {
 	const wchar_t* fnd = wcschr(str, ch);
 	return fnd ? (fnd - str) : -1;
 }
-
-bool coco_string_equal(const wchar_t* str1, const wchar_t* str2)
-{
-	return wcscmp(str1, str2) == 0;
-}
-
-
-double coco_string_toDouble(const wchar_t* str)
-{
-	return str ? wcstod(str, NULL) : 0;
-}
-
-long coco_string_toLong(const wchar_t* str)
-{
-	return str ? wcstol(str, NULL, 10) : 0;
-}
-
 
 
 //
@@ -159,7 +164,12 @@ std::string coco_string_stdStringASCII(const wchar_t* str)
 }
 
 
-std::string coco_string_stdStringASCII(const wchar_t* str, int index, int length)
+std::string coco_string_stdStringASCII
+(
+	const wchar_t* str,
+	int index,
+	int length
+)
 {
     const int len = (str && *str) ? length : 0;
     std::string dest;
@@ -234,7 +244,8 @@ Buffer::Buffer(FILE* istr, bool isUserStream)
 	_setmode(_fileno(cStream), _O_BINARY);
 #endif
 
-	if (CanSeek()) {
+	if (CanSeek())
+	{
 		fseek(cStream, 0, SEEK_END);
 		fileLen = ftell(cStream);
 		fseek(cStream, 0, SEEK_SET);
@@ -304,19 +315,22 @@ Buffer::Buffer(const char* chars, int len)
 Buffer::~Buffer() {
 	Close();
 	if (buf) {
-		delete [] buf;
+		delete[] buf;
 		buf = NULL;
 	}
 }
 
 
 void Buffer::Close() {
-	if (!isUserStream_) {
-		if (cStream) {
+	if (!isUserStream_)
+	{
+		if (cStream)
+		{
 			fclose(cStream);
 			cStream = NULL;
 		}
-		else if (stdStream) {
+		else if (stdStream)
+		{
 			delete stdStream;
 			stdStream = 0;
 		}
@@ -337,12 +351,15 @@ int Buffer::Read() {
 
 	if (bufPos < bufLen) {
 		return buf[bufPos++];
-	} else if (GetPos() < fileLen) {
+	}
+	else if (GetPos() < fileLen) {
 		SetPos(GetPos()); // shift buffer start to Pos
 		return buf[bufPos++];
-	} else if (cStream && !CanSeek() && (ReadNextStreamChunk() > 0)) {
+	}
+	else if (cStream && !CanSeek() && (ReadNextStreamChunk() > 0)) {
 		return buf[bufPos++];
-	} else {
+	}
+	else {
 		return EoF;
 	}
 }
@@ -444,7 +461,7 @@ int Buffer::ReadNextStreamChunk() {
 		bufCapacity = bufLen * 2;
 		unsigned char *newBuf = new unsigned char[bufCapacity];
 		memcpy(newBuf, buf, bufLen*sizeof(char));
-		delete [] buf;
+		delete[] buf;
 		buf = newBuf;
 		freeLen = bufLen;
 	}
@@ -495,20 +512,20 @@ Scanner::Scanner(const std::string& fileName)
 	Init();
 }
 
-
-Scanner::Scanner(const wchar_t* fileName)
+#ifdef _WIN32
+Scanner::Scanner(const std::wstring& fileName)
 {
-	std::string chFileName = coco_string_stdStringASCII(fileName);
 	FILE* istr;
 
-	if ((istr = fopen(chFileName.c_str(), "rb")) == NULL)
+	if ((istr = _wfopen(fileName.c_str(), L"rb")) == NULL)
 	{
-		wprintf(L"--- Cannot open file %ls\n", fileName);
+		wprintf(L"--- Cannot open file %ls\n", fileName.c_str());
 		::exit(1);
 	}
 	buffer = new Buffer(istr, false);
 	Init();
 }
+#endif
 
 
 Scanner::Scanner(const unsigned char* buf, int len)
@@ -535,7 +552,7 @@ Scanner::~Scanner() {
 		free(firstHeap);
 		firstHeap = cur;
 	}
-	delete [] tval;
+	delete[] tval;
 	delete buffer;
 }
 
@@ -621,7 +638,8 @@ void Scanner::Init() {
 }
 
 
-void Scanner::NextCh() {
+void Scanner::NextCh()
+{
 	if (oldEols > 0) {
 		ch = EOL;
 		oldEols--;
@@ -638,12 +656,13 @@ void Scanner::NextCh() {
 }
 
 
-void Scanner::AddCh() {
+void Scanner::AddCh()
+{
 	if (tlen >= tvalLength) {
 		tvalLength *= 2;
 		wchar_t *newBuf = new wchar_t[tvalLength];
 		memcpy(newBuf, tval, tlen*sizeof(wchar_t));
-		delete [] tval;
+		delete[] tval;
 		tval = newBuf;
 	}
 	if (ch != Buffer::EoF) {

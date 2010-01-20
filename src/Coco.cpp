@@ -194,56 +194,59 @@ void printUsage(const char* message = NULL)
 
 #ifdef _WIN32
 int wmain(int argc, wchar_t *argv[])
-{
 #else
-int main(int argc, char *argv_[])
-{
-	wchar_t** argv = new wchar_t*[argc];
-	for (int i = 0; i < argc; ++i)
-	{
-		argv[i] = coco_string_create(argv_[i]);
-	}
+int main(int argc, char *argv[])
 #endif
-	wprintf(L"Coco/R C++ (19 Jan 2010)\n");
+{
+	wprintf(L"Coco/R C++ (21 Jan 2010)\n");
 
-	wchar_t *srcName = NULL;
+	std::string srcName;
 	bool traceToFile = true;
 
 	for (int i = 1; i < argc; i++)
 	{
-		if (coco_string_equal(argv[i], L"-help"))
+		if (coco_string_equal(argv[i], "-help"))
 		{
 			printUsage();
 			return 0;
 		}
-		else if (coco_string_equal(argv[i], L"-namespace"))
+		else if (coco_string_equal(argv[i], "-namespace"))
 		{
 			if (++i == argc)
 			{
 				printUsage("missing parameter on -namespace");
 				return 1;
 			}
+#ifdef _WIN32
 			Tab::nsName = coco_string_stdStringASCII(argv[i]);
+#else
+			Tab::nsName = argv[i];
+#endif
 		}
-		else if (coco_string_equal(argv[i], L"-prefix"))
+		else if (coco_string_equal(argv[i], "-prefix"))
 		{
 			if (++i == argc)
 			{
 				printUsage("missing parameter on -prefix");
 				return 1;
 			}
+#ifdef _WIN32
 			Tab::prefixName = coco_string_stdStringASCII(argv[i]);
+#else
+			Tab::prefixName = argv[i];
+#endif
 		}
-		else if (coco_string_equal(argv[i], L"-frames"))
+		else if (coco_string_equal(argv[i], "-frames"))
 		{
 			if (++i == argc)
 			{
 				printUsage("missing parameter on -frames");
 				return 1;
 			}
-			Tab::frameDir = coco_string_create_append(argv[i], L"/");
+			Tab::frameDir = argv[i];
+			Tab::frameDir += '/';
 		}
-		else if (coco_string_equal(argv[i], L"-trace"))
+		else if (coco_string_equal(argv[i], "-trace"))
 		{
 			if (++i == argc)
 			{
@@ -251,9 +254,13 @@ int main(int argc, char *argv_[])
 				return 1;
 			}
 			traceToFile = true;
+#ifdef _WIN32
 			Tab::SetDDT(argv[i]);
+#else
+			Tab::SetDDT(coco_stdWString(argv[i]).c_str());
+#endif
 		}
-		else if (coco_string_equal(argv[i], L"-trace2"))
+		else if (coco_string_equal(argv[i], "-trace2"))
 		{
 			if (++i == argc)
 			{
@@ -261,62 +268,75 @@ int main(int argc, char *argv_[])
 				return 1;
 			}
 			traceToFile = false;
+#ifdef _WIN32
 			Tab::SetDDT(argv[i]);
+#else
+			Tab::SetDDT(coco_stdWString(argv[i]).c_str());
+#endif
 		}
-		else if (coco_string_equal(argv[i], L"-o"))
+		else if (coco_string_equal(argv[i], "-o"))
 		{
 			if (++i == argc)
 			{
 				printUsage("missing parameter on -o");
 				return 1;
 			}
-			Tab::outDir = coco_string_create_append(argv[i], L"/");
+			Tab::outDir = argv[i];
+			Tab::outDir += '/';
 		}
-		else if (coco_string_equal(argv[i], L"-lines"))
+		else if (coco_string_equal(argv[i], "-lines"))
 		{
 			Tab::emitLines = true;
 		}
-		else if (coco_string_equal(argv[i], L"-single"))
+		else if (coco_string_equal(argv[i], "-single"))
 		{
 			Tab::singleOutput = true;
 		}
-		else if (coco_string_equal(argv[i], L"-bak"))
+		else if (coco_string_equal(argv[i], "-bak"))
 		{
 			Tab::makeBackup = true;
 		}
 		else if (argv[i][0] == '-')
 		{
+#ifdef _WIN32
 			wprintf(L"\nError: unknown option: '%ls'\n\n", argv[i]);
+#else
+			wprintf(L"\nError: unknown option: '%s'\n\n", argv[i]);
+#endif
 			printUsage();
 			return 1;
 		}
-		else if (srcName != NULL)
+		else if (!srcName.empty())
 		{
 			printUsage("grammar can only be specified once");
 			return 1;
 		}
 		else
 		{
-			srcName = coco_string_create(argv[i]);
+			srcName = argv[i];
 		}
 	}
 
-#ifndef _WIN32
-	// deallocate the wide-character strings
-	for (int i = 0; i < argc; ++i)
+
+	if (srcName.empty())
 	{
-		coco_string_delete(argv[i]);
+		printUsage();
 	}
-	delete[] argv; argv = NULL;
+	else
+	{
+		// find last '/' - path separator
+		int pos = srcName.find_last_of('/');
+#ifdef _WIN32
+		// try '\\' separator (windows)
+		if (pos < 0) pos = srcName.find_last_of('\\');
 #endif
 
-	if (srcName != NULL)
-	{
-		int pos = coco_string_lastindexof(srcName, '/');
-		if (pos < 0) pos = coco_string_lastindexof(srcName, '\\');
-		wchar_t* srcDir = coco_string_create(srcName, 0, pos+1);
-		Tab::srcDir     = srcDir;
-		if (Tab::outDir == NULL)
+		if (pos >= 0)
+		{
+			Tab::srcDir = srcName.substr(0, pos+1);
+		}
+
+		if (Tab::outDir.empty())
 		{
 			Tab::outDir = Tab::srcDir;
 		}
@@ -327,18 +347,31 @@ int main(int argc, char *argv_[])
 
 		tab->srcName    = srcName;
 
-		wchar_t *traceFileName = coco_string_create_append(Tab::outDir, L"trace.txt");
-		std::string chTrFileName = coco_string_stdStringASCII(traceFileName);
-
+#ifdef _WIN32
+		std::wstring traceFileName = Tab::outDir;
+		traceFileName += L"trace.txt";
 		if
 		(
 		    traceToFile
-		 && (Tab::trace = fopen(chTrFileName.c_str(), "w")) == NULL
+		 && (Tab::trace = _wfopen(traceFileName.c_str(), L"w")) == NULL
 		)
 		{
-			wprintf(L"-- cannot write trace file to %ls\n", traceFileName);
+			wprintf(L"-- cannot write trace file to %ls\n", traceFileName.c_str());
 			return 1;
 		}
+#else
+		std::string traceFileName = Tab::outDir;
+		traceFileName += "trace.txt";
+		if
+		(
+		    traceToFile
+		 && (Tab::trace = fopen(traceFileName.c_str(), "w")) == NULL
+		)
+		{
+			wprintf(L"-- cannot write trace file to %s\n", traceFileName.c_str());
+			return 1;
+		}
+#endif
 
 		// attach Tab before creating Scanner/Parser generators
 		parser->tab  = tab;
@@ -352,20 +385,35 @@ int main(int argc, char *argv_[])
 		{
 			fclose(Tab::trace);
 
+#ifdef _WIN32
 			// obtain the FileSize
-			Tab::trace = fopen(chTrFileName.c_str(), "r");
+			Tab::trace = _wfopen(traceFileName.c_str(), "r");
 			fseek(Tab::trace, 0, SEEK_END);
 			long fileSize = ftell(Tab::trace);
 			fclose(Tab::trace);
 			if (fileSize == 0)
 			{
-				remove(chTrFileName.c_str());
+				_wremove(traceFileName.c_str());
 			}
 			else
 			{
-				wprintf(L"trace output is in %ls\n", traceFileName);
+				wprintf(L"trace output is in %ls\n", traceFileName.c_str());
 			}
-
+#else
+			// obtain the FileSize
+			Tab::trace = fopen(traceFileName.c_str(), "r");
+			fseek(Tab::trace, 0, SEEK_END);
+			long fileSize = ftell(Tab::trace);
+			fclose(Tab::trace);
+			if (fileSize == 0)
+			{
+				remove(traceFileName.c_str());
+			}
+			else
+			{
+				wprintf(L"trace output is in %s\n", traceFileName.c_str());
+			}
+#endif
 		}
 
 		wprintf(L"%d errors detected\n", parser->errors->count);
@@ -374,20 +422,12 @@ int main(int argc, char *argv_[])
 			return 1;
 		}
 
-		coco_string_delete(Tab::frameDir);
-
 		delete parser->pgen;
 		delete parser->dfa;
 		delete tab;
 		delete parser;
 		delete scanner;
-		coco_string_delete(traceFileName);
-		coco_string_delete(srcDir);
-	} else {
-		printUsage();
 	}
-
-	coco_string_delete(srcName);
 
 	return 0;
 }

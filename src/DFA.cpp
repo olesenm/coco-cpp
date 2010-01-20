@@ -63,7 +63,7 @@ wchar_t* DFA::ChCond(wchar_t ch)
 	wchar_t* format = new wchar_t[20];
 	wchar_t* res = Ch(ch);
 	coco_swprintf(format, 20, L"ch == %ls\0", res);
-	delete [] res;
+	delete[] res;
 	return format;
 }
 
@@ -76,21 +76,21 @@ void DFA::PutRange(CharSet *s)
 		{
 			wchar_t *from = Ch(r->from);
 			fwprintf(gen, L"ch == %ls", from);
-			delete [] from;
+			delete[] from;
 		}
 		else if (r->from == 0)
 		{
 			wchar_t *to = Ch(r->to);
 			fwprintf(gen, L"ch <= %ls", to);
-			delete [] to;
+			delete[] to;
 		}
 		else
 		{
 			wchar_t *from = Ch(r->from);
 			wchar_t *to = Ch(r->to);
 			fwprintf(gen, L"(ch >= %ls && ch <= %ls)", from, to);
-			delete [] from;
-			delete [] to;
+			delete[] from;
+			delete[] to;
 		}
 		if (r->next != NULL) fwprintf(gen, L" || ");
 	}
@@ -591,7 +591,7 @@ void DFA::PrintStates()
 			{
 				wchar_t* res = Ch(action->sym);
 				fwprintf(trace, L"%ls", res);
-				delete [] res;
+				delete[] res;
 			}
 			for (Target *targ = action->target; targ != NULL; targ = targ->next)
 			{
@@ -770,7 +770,7 @@ void DFA::GenComBody(Comment *com)
 	wchar_t* res = ChCond(com->stop[0]);
 	fwprintf(gen, L"\t\t\tif (%ls) ", res);
 	fwprintf(gen, L"{\n");
-	delete [] res;
+	delete[] res;
 
 	if (coco_string_length(com->stop) == 1)
 	{
@@ -783,7 +783,7 @@ void DFA::GenComBody(Comment *com)
 		fwprintf(gen, L"\t\t\t\tNextCh();\n");
 		wchar_t* res = ChCond(com->stop[1]);
 		fwprintf(gen, L"\t\t\t\tif (%ls) {\n", res);
-		delete [] res;
+		delete[] res;
 		fwprintf(gen, L"\t\t\t\t\tlevel--;\n");
 		fwprintf(gen, L"\t\t\t\t\tif (level == 0) { oldEols = line - line0; NextCh(); return true; }\n");
 		fwprintf(gen, L"\t\t\t\t\tNextCh();\n");
@@ -794,7 +794,7 @@ void DFA::GenComBody(Comment *com)
 			fwprintf(gen, L"\t\t\t}");
 			wchar_t* res = ChCond(com->start[0]);
 			fwprintf(gen, L" else if (%ls) ", res);
-			delete [] res;
+			delete[] res;
 			fwprintf(gen, L"{\n");
 		if (coco_string_length(com->stop) == 1)
 		{
@@ -805,7 +805,7 @@ void DFA::GenComBody(Comment *com)
 			fwprintf(gen, L"\t\t\t\tNextCh();\n");
 			wchar_t* res = ChCond(com->start[1]);
 			fwprintf(gen, L"\t\t\t\tif (%ls) ", res);
-			delete [] res;
+			delete[] res;
 			fwprintf(gen, L"{\n");
 			fwprintf(gen, L"\t\t\t\t\tlevel++; NextCh();\n");
 			fwprintf(gen, L"\t\t\t\t}\n");
@@ -839,7 +839,7 @@ void DFA::GenComment(Comment *com, int i)
 		fwprintf(gen, L"\tNextCh();\n");
 		wchar_t* res = ChCond(com->start[1]);
 		fwprintf(gen, L"\tif (%ls) ", res);
-		delete [] res;
+		delete[] res;
 		fwprintf(gen, L"{\n");
 
 		fwprintf(gen, L"\t\tNextCh();\n");
@@ -959,7 +959,7 @@ void DFA::WriteState(State *state)
 		{
 			wchar_t* res = ChCond(wchar_t(action->sym));
 			fwprintf(gen, L"%ls", res);
-			delete [] res;
+			delete[] res;
 		}
 		else
 		{
@@ -1045,10 +1045,10 @@ void DFA::WriteScanner()
 {
 	int oldPos = tab->buffer->GetPos();  // Pos is modified by CopySourcePart
 
-	fram = tab->OpenFrameFile(L"Scanner.frame");
+	fram = tab->OpenFrameFile("Scanner.frame");
 	if (fram == NULL)
 	{
-		errors->Exception(L"-- Cannot open Scanner.frame.\n");
+		errors->Exception(L"-- Cannot open Scanner frame.\n");
 	}
 
 
@@ -1060,7 +1060,7 @@ void DFA::WriteScanner()
 	gen = tab->OpenGenFile("Scanner.h");
 	if (gen == NULL)
 	{
-		errors->Exception(L"-- Cannot generate scanner header");
+		errors->Exception(L"-- Cannot generate Scanner header");
 	}
 
 	CopyFramePart(L"-->begin", false);
@@ -1096,7 +1096,7 @@ void DFA::WriteScanner()
 	gen = tab->OpenGenFile("Scanner.cpp");
 	if (gen == NULL)
 	{
-		errors->Exception(L"-- Cannot generate scanner source");
+		errors->Exception(L"-- Cannot generate Scanner source");
 	}
 
 	CopyFramePart(L"-->begin", false);
@@ -1146,7 +1146,7 @@ void DFA::WriteScanner()
 		{
 			wchar_t* res = ChCond(com->start[0]);
 			fwprintf(gen, L"(%ls && Comment%d())", res, i);
-			delete [] res;
+			delete[] res;
 			if (com->next != NULL)
 			{
 				fwprintf(gen, L" || ");
@@ -1169,7 +1169,7 @@ void DFA::WriteScanner()
 		WriteState(state);
 	}
 
-	delete [] existLabel;
+	delete[] existLabel;
 
 	CopyFramePart(L"-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);

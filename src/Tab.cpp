@@ -67,9 +67,9 @@ bool Tab::ddt[10] =
 std::string Tab::nsName;
 std::string Tab::prefixName;
 
-wchar_t* Tab::srcDir = NULL;
-wchar_t* Tab::frameDir = NULL;
-wchar_t* Tab::outDir = NULL;
+std::string Tab::srcDir;
+std::string Tab::frameDir;
+std::string Tab::outDir;
 
 FILE* Tab::trace = stderr;
 
@@ -77,7 +77,6 @@ FILE* Tab::trace = stderr;
 
 Tab::Tab(Parser *theParser)
 :
-	srcName(NULL),
 	copyPos(NULL),
 	ignored(new CharSet),
 	gramSy(NULL),
@@ -576,12 +575,12 @@ void Tab::WriteCharSet(CharSet *s)
 	{
 		wchar_t *from = Ch(r->from);
 		fwprintf(trace, L" %ls", from);
-		delete [] from;
+		delete[] from;
 		if (r->from < r->to)
 		{
 			wchar_t *to = Ch(r->to);
 			fwprintf(trace, L" .. %ls", to);
-			delete [] to;
+			delete[] to;
 		}
 	}
 }
@@ -1102,7 +1101,7 @@ wchar_t* Tab::Escape(const wchar_t* s)
 				{
 					wchar_t* res = Char2Hex(ch);
 					buf.Append(res);
-					delete [] res;
+					delete[] res;
 				}
 				else
 				{
@@ -1739,47 +1738,76 @@ void Tab::GenNamespaceClose(FILE* ostr, int nrOfNs)
 }
 
 
-FILE* Tab::OpenFrameFile(const wchar_t* frameName) const
+FILE* Tab::OpenFrameFile(const std::string& frameName) const
 {
-	FILE* istr;
+	FILE* istr = NULL;
 
-	wchar_t *fr = coco_string_create(frameName);
-	std::string chFr;
+#ifdef _WIN32
+	// On windows systems, wmain() passes 16bit unicode wide characters
+	// from the command-line. Use the corresponding wide file open/close
+	// routines
+	std::wstring fullName;
 
 	// 1: look in specified frameDir
-	if (coco_string_length(frameDir) != 0)
+	if (!frameDir.empty())
 	{
-		coco_string_delete(fr);
-		fr = coco_string_create_append(frameDir, frameName);
-		chFr = coco_string_stdStringASCII(fr);
+		fullName = frameDir;
+		fullName += coco_stdWString(frameName);
 
-		if ((istr = fopen(chFr.c_str(), "r")) != NULL)
+		if ((istr = _wfopen(fullName.c_str(), L"r")) != NULL)
 		{
-			goto Done;
+			return istr;
 		}
 	}
 
 	// 2: look in local directory
-	coco_string_delete(fr);
-	fr = coco_string_create(frameName);
-	chFr = coco_string_stdStringASCII(fr);
-	if ((istr = fopen(chFr.c_str(), "r")) != NULL)
+	fullName = coco_stdWString(frameName);
+	if ((istr = _wfopen(fullName.c_str(), L"r")) != NULL)
 	{
-		goto Done;
+		return istr;
 	}
 
 	// 3: look in srcDir
-	coco_string_delete(fr);
-	fr = coco_string_create_append(srcDir, frameName);
-	chFr = coco_string_stdStringASCII(fr);
-	if ((istr = fopen(chFr.c_str(), "r")) != NULL)
+	fullName = srcDir;
+	fullName += coco_stdWString(frameName);
+
+	if ((istr = _wfopen(fullName.c_str(), L"r")) != NULL)
 	{
-		goto Done;
+		return istr;
+	}
+#else
+	// Other systems simply maintain the same character encoding
+	// as the operating system (often UTF8)
+	std::string fullName;
+
+	// 1: look in specified frameDir
+	if (!frameDir.empty())
+	{
+		fullName = frameDir;
+		fullName += frameName;
+
+		if ((istr = fopen(fullName.c_str(), "r")) != NULL)
+		{
+			return istr;
+		}
 	}
 
+	// 2: look in local directory
+	fullName = frameName;
+	if ((istr = fopen(fullName.c_str(), "r")) != NULL)
+	{
+		return istr;
+	}
 
-	Done:
-	coco_string_delete(fr);
+	// 3: look in srcDir
+	fullName = srcDir;
+	fullName += frameName;
+
+	if ((istr = fopen(fullName.c_str(), "r")) != NULL)
+	{
+		return istr;
+	}
+#endif
 
 	return istr;
 }
@@ -1787,29 +1815,51 @@ FILE* Tab::OpenFrameFile(const wchar_t* frameName) const
 
 FILE* Tab::OpenGenFile(const std::string& genName) const
 {
-	FILE* ostr;
-
-	wchar_t* fn = coco_string_create_append(outDir, prefixName);
-	coco_string_merge(fn, genName);
-
-	std::string chFn = coco_string_stdStringASCII(fn);
+	FILE* ostr = NULL;
+#ifdef _WIN32
+	std::wstring fullName = outDir;
+	if (prefixName.size())
+	{
+		fullName += coco_stdWString(prefixName);
+	}
+	fullName += coco_stdWString(genName);
 
 	if
 	(
 	    makeBackup
-	 && ((ostr = fopen(chFn.c_str(), "r")) != NULL)
+	 && ((ostr = _wfopen(fullName.c_str(), L"r")) != NULL)
 	)
 	{
 		fclose(ostr);
-		wchar_t* oldName = coco_string_create_append(fn, L".bak");
-		std::string chOldName = coco_string_stdStringASCII(oldName);
-		coco_string_delete(oldName);
-		remove(chOldName.c_str());
-		rename(chFn.c_str(), chOldName.c_str()); // copy with overwrite
+		std::wstring bakName = fullName + L".bak";
+		_wremove(bakName.c_str());
+		_wrename(fullName.c_str(), bakName.c_str()); // copy with overwrite
 	}
-	coco_string_delete(fn);
 
-	ostr = fopen(chFn.c_str(), "w");
+	ostr = _wfopen(fullName.c_str(), L"w");
+
+#else
+	std::string fullName = outDir;
+	if (prefixName.size())
+	{
+		fullName += prefixName;
+	}
+	fullName += genName;
+
+	if
+	(
+	    makeBackup
+	 && ((ostr = fopen(fullName.c_str(), "r")) != NULL)
+	)
+	{
+		fclose(ostr);
+		std::string bakName = fullName + ".bak";
+		remove(bakName.c_str());
+		rename(fullName.c_str(), bakName.c_str()); // copy with overwrite
+	}
+
+	ostr = fopen(fullName.c_str(), "w");
+#endif
 
 	return ostr;
 }
@@ -1908,7 +1958,11 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool emitLines)
 		buffer->SetPos(pos->beg); ch = buffer->Read();
 		if (emitLines && pos->line)
 		{
-			fwprintf(dest, L"\n#line %d \"%ls\"\n", pos->line, srcName);
+#ifdef _WIN32
+			fwprintf(dest, L"\n#line %d \"%ls\"\n", pos->line, srcName.c_str());
+#else
+			fwprintf(dest, L"\n#line %d \"%s\"\n", pos->line, srcName.c_str());
+#endif
 		}
 		for (int t=0; t < indent; ++t) fwprintf(dest, L"\t");
 		while (buffer->GetPos() <= pos->end)

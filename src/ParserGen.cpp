@@ -445,10 +445,10 @@ void ParserGen::WriteParser()
 	int oldPos = tab->buffer->GetPos();  // Pos is modified by CopySourcePart
 	symSet.Add(tab->allSyncSets);
 
-	fram = tab->OpenFrameFile(L"Parser.frame");
+	fram = tab->OpenFrameFile("Parser.frame");
 	if (fram == NULL)
 	{
-		errors->Exception(L"-- Cannot open Parser.frame.\n");
+		errors->Exception(L"-- Cannot open Parser frame.\n");
 	}
 
 	//

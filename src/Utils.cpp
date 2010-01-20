@@ -46,7 +46,11 @@ wchar_t* coco_string_create(const char* str)
 }
 
 
-wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2)
+wchar_t* coco_string_create_append
+(
+    const wchar_t* str1,
+    const wchar_t* str2
+)
 {
     const int str1Len = coco_string_length(str1);
     const int str2Len = coco_string_length(str2);
@@ -67,7 +71,11 @@ wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2)
 }
 
 
-wchar_t* coco_string_create_append(const wchar_t* str1, const std::string& str2)
+wchar_t* coco_string_create_append
+(
+    const wchar_t* str1,
+    const std::string& str2
+)
 {
     const int str1Len = coco_string_length(str1);
     const int str2Len = str2.size();
@@ -85,6 +93,47 @@ wchar_t* coco_string_create_append(const wchar_t* str1, const std::string& str2)
     }
 
     dest[str1Len + str2Len] = 0;
+    return dest;
+}
+
+
+
+std::wstring coco_stdWString(const std::string& str)
+{
+    std::wstring dest;
+
+    const int len = str.size();
+    if (len)
+    {
+        dest.reserve(len);
+        for (int i = 0; i < len; ++i)
+        {
+            dest += str[i];
+        }
+    }
+
+    return dest;
+}
+
+
+std::wstring coco_stdWString_append
+(
+    const std::wstring& str1,
+    const std::string& str2
+)
+{
+    std::wstring dest = str1;
+    const int str2Len = str2.size();
+
+    if (str2Len)
+    {
+        dest.reserve(dest.size() + str2Len);
+        for (int i = 0; i < str2Len; ++i)
+        {
+            dest += str2[i];
+        }
+    }
+
     return dest;
 }
 

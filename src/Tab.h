@@ -82,18 +82,28 @@ public:
 	static bool explicitEOF;       //!< user must explicitly add EOF in grammar
 	static bool ddt[10];           //!< debug and test switches
 
+	static FILE* trace;            //!< trace file
+
 	static std::string nsName;     //!< namespace for generated files
 	static std::string prefixName; //!< prefix for generated files
 
-	static wchar_t* srcDir;        //!< directory path of the atg file
-	static wchar_t* frameDir;      //!< directory containing the frame files
-	static wchar_t* outDir;        //!< directory for generated files
+#ifdef _WIN32
+	static std::wstring srcDir;    //!< directory path of the atg file
+	static std::wstring frameDir;  //!< directory containing the frame files
+	static std::wstring outDir;    //!< directory for generated files
 
-	static FILE* trace;            //!< trace file
+	// Data member
+	std::wstring srcName;          //!< name of the atg file (including path)
+#else
+	static std::string srcDir;     //!< directory path of the atg file
+	static std::string frameDir;   //!< directory containing the frame files
+	static std::string outDir;     //!< directory for generated files
+
+	// Data member
+	std::string srcName;           //!< name of the atg file (including path)
+#endif
 
 	// Data members
-
-	wchar_t* srcName;       //!< name of the atg file (including path)
 
 	Position *copyPos;      //!< position of verbatim copy (eg, copyright headers) in atg
 
@@ -290,7 +300,7 @@ public:
 	static void GenNamespaceClose(FILE*, int nrOfNs);
 
 	//! Open a frame file for reading, return NULL on failure
-	FILE* OpenFrameFile(const wchar_t* frameName) const;
+	FILE* OpenFrameFile(const std::string& frameName) const;
 
 	//! Open a generated file (.h or .cpp), return NULL on failure
 	FILE* OpenGenFile(const std::string& genName) const;

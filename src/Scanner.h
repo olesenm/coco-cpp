@@ -78,14 +78,32 @@ wchar_t* coco_string_create_lower(const wchar_t* str, int index, int length);
 void  coco_string_delete(wchar_t* &str);
 
 //! The length of the str, or 0 if the str is NULL
-int   coco_string_length(const wchar_t* str);
+inline int coco_string_length(const wchar_t* str)
+{
+	return str ? wcslen(str) : 0;
+}
 
-//! Return the index of the first occurrence of ch.
-//  Return -1 if nothing is found.
-int   coco_string_indexof(const wchar_t* str, const wchar_t ch);
+//! The length of the str, or 0 if the str is NULL
+inline int coco_string_length(const char* str)
+{
+	return str ? strlen(str) : 0;
+}
 
 //! Compare strings, return true if they are equal
-bool  coco_string_equal(const wchar_t* str1, const wchar_t* str2);
+inline bool coco_string_equal(const wchar_t* str1, const wchar_t* str2)
+{
+	return !wcscmp(str1, str2);
+}
+
+//! Compare strings, return true if they are equal
+inline bool coco_string_equal(const char* str1, const char* str2)
+{
+	return !strcmp(str1, str2);
+}
+
+//! Compare string contents, return true if they are equal
+bool  coco_string_equal(const wchar_t* str1, const char* str2);
+
 
 //! Simple string hashing function
 template<class CharT>
@@ -103,16 +121,28 @@ inline int coco_string_hash(const CharT* str)
 	return h < 0 ? -h : h;
 }
 
+//! Return the index of the first occurrence of ch.
+//  Return -1 if nothing is found.
+int coco_string_indexof(const wchar_t* str, const wchar_t ch);
+
 
 //
 // String conversions
 // ~~~~~~~~~~~~~~~~~~
 
 //! Convert wide string to double
-double coco_string_toDouble(const wchar_t* str);
+inline double coco_string_toDouble(const wchar_t* str)
+{
+	return str ? wcstod(str, NULL) : 0;
+}
+
 
 //! Convert wide string to long
-long coco_string_toLong(const wchar_t* str);
+inline long coco_string_toLong(const wchar_t* str)
+{
+	return str ? wcstol(str, NULL, 10) : 0;
+}
+
 
 //
 // String handling, byte character
@@ -234,26 +264,31 @@ public:
 		memset(tab, 0, 128*sizeof(Elem*));
 	}
 
-	virtual ~StartStates() {
-		for (int i = 0; i < 128; ++i) {
+	virtual ~StartStates()
+	{
+		for (int i = 0; i < 128; ++i)
+		{
 			Elem *e = tab[i];
-			while (e) {
+			while (e)
+			{
 				Elem *next = e->next;
 				delete e;
 				e = next;
 			}
 		}
-		delete [] tab;
+		delete[] tab;
 	}
 
-	void set(int key, int val) {
+	void set(int key, int val)
+	{
 		Elem *e = new Elem(key, val);
 		const int k = unsigned(key) % 128;
 		e->next = tab[k];
 		tab[k] = e;
 	}
 
-	int state(int key) {
+	int state(int key)
+	{
 		Elem *e = tab[unsigned(key) % 128];
 		while (e && e->key != key) e = e->next;
 		return e ? e->val : 0;
@@ -276,7 +311,8 @@ class KeywordMap
 		Elem(const wchar_t *k, int v) :
 			key(coco_string_create(k)), val(v), next(0)
 		{}
-		virtual ~Elem() {
+		virtual ~Elem()
+		{
 			coco_string_delete(key);
 		}
 	};
@@ -284,32 +320,38 @@ class KeywordMap
 	Elem **tab;
 
 public:
-	KeywordMap() :
+	KeywordMap()
+	:
 		tab(new Elem*[128])
 	{
 		memset(tab, 0, 128*sizeof(Elem*));
 	}
 
-	virtual ~KeywordMap() {
-		for (int i = 0; i < 128; ++i) {
+	virtual ~KeywordMap()
+	{
+		for (int i = 0; i < 128; ++i)
+		{
 			Elem *e = tab[i];
-			while (e) {
+			while (e)
+			{
 				Elem *next = e->next;
 				delete e;
 				e = next;
 			}
 		}
-		delete [] tab;
+		delete[] tab;
 	}
 
-	void set(const wchar_t *key, int val) {
+	void set(const wchar_t *key, int val)
+	{
 		Elem *e = new Elem(key, val);
 		const int k = coco_string_hash(key) % 128;
 		e->next = tab[k];
 		tab[k] = e;
 	}
 
-	int get(const wchar_t *key, int defaultVal) {
+	int get(const wchar_t *key, int defaultVal)
+	{
 		Elem *e = tab[coco_string_hash(key) % 128];
 		while (e && !coco_string_equal(e->key, key)) e = e->next;
 		return e ? e->val : defaultVal;
@@ -375,8 +417,10 @@ public:
 	//! Open a file for reading and attach scanner
 	explicit Scanner(const std::string& fileName);
 
-	//! Open a file for reading and attach scanner
-	explicit Scanner(const wchar_t* fileName);
+#ifdef _WIN32
+	//! Open a file for reading and attach scanner - Windows only
+	explicit Scanner(const std::wstring& fileName);
+#endif
 
 	//! Attach scanner to an existing character buffer
 	Scanner(const unsigned char* chars, int len);

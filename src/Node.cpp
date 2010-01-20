@@ -31,7 +31,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Node.h"
 #include "Symbol.h"
 
-namespace Coco {
+namespace Coco
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -47,13 +47,15 @@ public:
 	wchar_t* name;  //!< class name
 	CharSet* set;   //!< the CharSet representing the class
 
-	CharClass(const wchar_t* className, CharSet* s) :
+	CharClass(const wchar_t* className, CharSet* s)
+	:
 		n(0),
 		name(coco_string_create(className)),
 		set(s)
 	{}
 
-	virtual ~CharClass() {
+	virtual ~CharClass()
+	{
 		coco_string_delete(name);
 	}
 

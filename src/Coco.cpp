@@ -156,7 +156,8 @@ using namespace Coco;
 
 void printUsage(const char* message = NULL)
 {
-	if (message) {
+	if (message)
+	{
 		wprintf(L"\nError: %s\n\n", message);
 	}
 
@@ -192,11 +193,14 @@ void printUsage(const char* message = NULL)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef _WIN32
-int wmain(int argc, wchar_t *argv[]) {
+int wmain(int argc, wchar_t *argv[])
+{
 #else
-int main(int argc, char *argv_[]) {
+int main(int argc, char *argv_[])
+{
 	wchar_t** argv = new wchar_t*[argc];
-	for (int i = 0; i < argc; ++i) {
+	for (int i = 0; i < argc; ++i)
+	{
 		argv[i] = coco_string_create(argv_[i]);
 	}
 #endif
@@ -205,93 +209,115 @@ int main(int argc, char *argv_[]) {
 	wchar_t *srcName = NULL;
 	bool traceToFile = true;
 
-	for (int i = 1; i < argc; i++) {
+	for (int i = 1; i < argc; i++)
+	{
 		if (coco_string_equal(argv[i], L"-help"))
 		{
 			printUsage();
 			return 0;
 		}
-		else if (coco_string_equal(argv[i], L"-namespace")) {
-			if (++i == argc) {
+		else if (coco_string_equal(argv[i], L"-namespace"))
+		{
+			if (++i == argc)
+			{
 				printUsage("missing parameter on -namespace");
 				return 1;
 			}
 			Tab::nsName = coco_string_stdStringASCII(argv[i]);
 		}
-		else if (coco_string_equal(argv[i], L"-prefix")) {
-			if (++i == argc) {
+		else if (coco_string_equal(argv[i], L"-prefix"))
+		{
+			if (++i == argc)
+			{
 				printUsage("missing parameter on -prefix");
 				return 1;
 			}
 			Tab::prefixName = coco_string_stdStringASCII(argv[i]);
 		}
-		else if (coco_string_equal(argv[i], L"-frames")) {
-			if (++i == argc) {
+		else if (coco_string_equal(argv[i], L"-frames"))
+		{
+			if (++i == argc)
+			{
 				printUsage("missing parameter on -frames");
 				return 1;
 			}
 			Tab::frameDir = coco_string_create_append(argv[i], L"/");
 		}
-		else if (coco_string_equal(argv[i], L"-trace")) {
-			if (++i == argc) {
+		else if (coco_string_equal(argv[i], L"-trace"))
+		{
+			if (++i == argc)
+			{
 				printUsage("missing parameter on -trace");
 				return 1;
 			}
 			traceToFile = true;
 			Tab::SetDDT(argv[i]);
 		}
-		else if (coco_string_equal(argv[i], L"-trace2")) {
-			if (++i == argc) {
+		else if (coco_string_equal(argv[i], L"-trace2"))
+		{
+			if (++i == argc)
+			{
 				printUsage("missing parameter on -trace2");
 				return 1;
 			}
 			traceToFile = false;
 			Tab::SetDDT(argv[i]);
 		}
-		else if (coco_string_equal(argv[i], L"-o")) {
-			if (++i == argc) {
+		else if (coco_string_equal(argv[i], L"-o"))
+		{
+			if (++i == argc)
+			{
 				printUsage("missing parameter on -o");
 				return 1;
 			}
 			Tab::outDir = coco_string_create_append(argv[i], L"/");
 		}
-		else if (coco_string_equal(argv[i], L"-lines")) {
+		else if (coco_string_equal(argv[i], L"-lines"))
+		{
 			Tab::emitLines = true;
 		}
-		else if (coco_string_equal(argv[i], L"-single")) {
+		else if (coco_string_equal(argv[i], L"-single"))
+		{
 			Tab::singleOutput = true;
 		}
-		else if (coco_string_equal(argv[i], L"-bak")) {
+		else if (coco_string_equal(argv[i], L"-bak"))
+		{
 			Tab::makeBackup = true;
 		}
-		else if (argv[i][0] == '-') {
+		else if (argv[i][0] == '-')
+		{
 			wprintf(L"\nError: unknown option: '%ls'\n\n", argv[i]);
 			printUsage();
 			return 1;
 		}
-		else if (srcName != NULL) {
+		else if (srcName != NULL)
+		{
 			printUsage("grammar can only be specified once");
 			return 1;
 		}
-		else {
+		else
+		{
 			srcName = coco_string_create(argv[i]);
 		}
 	}
 
 #ifndef _WIN32
 	// deallocate the wide-character strings
-	for (int i = 0; i < argc; ++i) {
+	for (int i = 0; i < argc; ++i)
+	{
 		coco_string_delete(argv[i]);
 	}
-	delete [] argv; argv = NULL;
+	delete[] argv; argv = NULL;
 #endif
 
-	if (srcName != NULL) {
+	if (srcName != NULL)
+	{
 		int pos = coco_string_lastindexof(srcName, '/');
 		if (pos < 0) pos = coco_string_lastindexof(srcName, '\\');
 		wchar_t* srcDir = coco_string_create(srcName, 0, pos+1);
 		Tab::srcDir     = srcDir;
-		if (Tab::outDir == NULL) {
+		if (Tab::outDir == NULL)
+		{
 			Tab::outDir = Tab::srcDir;
 		}
 
@@ -343,7 +369,8 @@ int main(int argc, char *argv_[]) {
 		}
 
 		wprintf(L"%d errors detected\n", parser->errors->count);
-		if (parser->errors->count != 0) {
+		if (parser->errors->count != 0)
+		{
 			return 1;
 		}
 

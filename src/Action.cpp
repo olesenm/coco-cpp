@@ -31,7 +31,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Tab.h"
 #include "Target.h"
 
-namespace Coco {
+namespace Coco
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,10 +46,12 @@ Action::Action(Node::nodeType theTyp, int symNr, Node::transitionType trans)
 {}
 
 
-void Action::AddTarget(Target *t) { // add t to the action.targets
+void Action::AddTarget(Target *t)  // add t to the action.targets
+{
 	Target *last = NULL;
 	Target *p = target;
-	while (p != NULL && t->state->nr >= p->state->nr) {
+	while (p != NULL && t->state->nr >= p->state->nr)
+	{
 		if (t->state == p->state) return;
 		last = p; p = p->next;
 	}
@@ -57,8 +60,10 @@ void Action::AddTarget(Target *t) { // add t to the action.targets
 }
 
 
-void Action::AddTargets(Action *a) {// add copy of a.targets to action.targets
-	for (Target *p = a->target; p != NULL; p = p->next) {
+void Action::AddTargets(Action *a) // add copy of a.targets to action.targets
+{
+	for (Target *p = a->target; p != NULL; p = p->next)
+	{
 		Target *t = new Target(p->state);
 		AddTarget(t);
 	}
@@ -66,12 +71,15 @@ void Action::AddTargets(Action *a) {// add copy of a.targets to action.targets
 }
 
 
-CharSet* Action::Symbols(Tab *tab) const {
+CharSet* Action::Symbols(Tab *tab) const
+{
 	CharSet *s;
-	if (typ == Node::clas) {
+	if (typ == Node::clas)
+	{
 		s = tab->CharClassSet(sym)->Clone();
 	}
-	else {
+	else
+	{
 		s = new CharSet();
 		s->Set(sym);
 	}
@@ -79,11 +87,14 @@ CharSet* Action::Symbols(Tab *tab) const {
 }
 
 
-void Action::ShiftWith(CharSet *s, Tab *tab) {
-	if (s->Elements() == 1) {
+void Action::ShiftWith(CharSet *s, Tab *tab)
+{
+	if (s->Elements() == 1)
+	{
 		typ = Node::chr; sym = s->First();
 	}
-	else {
+	else
+	{
 		CharClass *c = tab->FindCharClass(s);
 		if (c == NULL) c = tab->NewCharClass(L"#", s); // class with dummy name
 		typ = Node::clas; sym = c->n;

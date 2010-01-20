@@ -29,7 +29,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_STATE_H__
 #define COCO_STATE_H__
 
-namespace Coco {
+namespace Coco
+{
 
 // forward declarations
 class Action;

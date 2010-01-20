@@ -632,8 +632,9 @@ wchar_t* DFA::SymName(Symbol *sym) { // real name value is stored in Tab.literal
 	)
 	{
 		HashTable<Symbol>::Iterator iter = tab->literals.GetIterator();
-		while (iter.HasNext()) {
-			DictionaryEntry<Symbol> *e = iter.Next();
+		while (iter.HasNext())
+		{
+			HashTable<Symbol>::Entry *e = iter.Next();
 			if (e->val == sym) { return e->key; }
 		}
 	}

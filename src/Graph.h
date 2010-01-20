@@ -31,14 +31,16 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 #include "Node.h"
 
-namespace Coco {
+namespace Coco
+{
 
 /*---------------------------------------------------------------------------*\
                             Class Graph Declaration
 \*---------------------------------------------------------------------------*/
 
 //! A connection of nodes
-class Graph {
+class Graph
+{
 public:
 	Node *l;   //!< left end of graph = head
 	Node *r;   //!< right end of graph = list of nodes to be linked to successor graph

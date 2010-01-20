@@ -32,7 +32,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Position.h"
 #include "State.h"
 
-namespace Coco {
+namespace Coco
+{
 
 // forward declarations
 class Symbol;
@@ -43,10 +44,12 @@ class BitArray;
 \*---------------------------------------------------------------------------*/
 
 //! ...
-class Node {
+class Node
+{
 public:
 	//! Enumeration for the types of nodes
-	enum nodeType {
+	enum nodeType
+	{
 		t    =  1,  //!< terminal symbol
 		pr   =  2,  //!< pragma
 		nt   =  3,  //!< nonterminal symbol
@@ -65,7 +68,8 @@ public:
 	};
 
 	//! Enumeration for the types of transitions
-	enum transitionType {
+	enum transitionType
+	{
 		normalTrans  = 0,  //!< normal transition
 		contextTrans = 1   //!< context transition
 	};

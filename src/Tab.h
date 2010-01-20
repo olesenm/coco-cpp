@@ -42,7 +42,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "CharClass.h"
 
 
-namespace Coco {
+namespace Coco
+{
 
 // forward declarations
 class Errors;
@@ -53,7 +54,8 @@ class BitArray;
                              Class Tab Declaration
 \*---------------------------------------------------------------------------*/
 //! Symbol Table Management
-class Tab {
+class Tab
+{
 public:
 	// Constants
 

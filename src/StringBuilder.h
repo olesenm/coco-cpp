@@ -29,7 +29,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_STRINGBUILDER_H__
 #define COCO_STRINGBUILDER_H__
 
-namespace Coco {
+namespace Coco
+{
 
 /*---------------------------------------------------------------------------*\
                         Class StringBuilder Declaration

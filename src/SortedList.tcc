@@ -29,7 +29,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "SortedList.h"
 #include "Tab.h"
 
-namespace Coco {
+namespace Coco
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,7 +59,7 @@ SortedList<Type>::~SortedList()
 template<class Type>
 int SortedList<Type>::Compare(Symbol *x, Symbol *y)
 {
-	return coco_string_compareto(x->name, y->name);
+	return coco_string_compare(x->name, y->name);
 }
 
 
@@ -66,9 +67,12 @@ template<class Type>
 bool SortedList<Type>::Find(Symbol* key)
 {
 	Entry* curr = Data_;
-	while (curr) {
+	while (curr)
+	{
 		if (!this->Compare(curr->Key, key))
+		{
 			return true;
+		}
 		curr = curr->next;
 	}
 	return false;
@@ -78,25 +82,33 @@ bool SortedList<Type>::Find(Symbol* key)
 template<class Type>
 void SortedList<Type>::Set(Symbol *key, Type *value)
 {
-	if (!this->Find(key)) {
+	if (!this->Find(key))
+	{
 		// new entry
 		Entry* curr = Data_;
 		Entry* prev = 0;
 		Entry* newEntry = new Entry(key, value);
-		if (curr) {
+		if (curr)
+		{
 			// insert
 
-			if (this->Compare(curr->Key, key) > 0) {  // before the first
+			if (this->Compare(curr->Key, key) > 0)
+			{
+				// before the first
 				newEntry->next = Data_;
 				Data_ = newEntry;
 			}
-			else {
-				while (curr) {
-					if (this->Compare(curr->Key, key) < 0) {
+			else
+			{
+				while (curr)
+				{
+					if (this->Compare(curr->Key, key) < 0)
+					{
 						prev = curr;
 						curr = curr->next;
 					}
-					else {
+					else
+					{
 						break;
 					}
 				}
@@ -104,15 +116,18 @@ void SortedList<Type>::Set(Symbol *key, Type *value)
 				newEntry->next = curr;
 			}
 		}
-		else {
+		else
+		{
 			Data_ = newEntry;             // first entry
 		}
 		Count++;
 	}
-	else {
+	else
+	{
 		// existing entry - overwrite
 		Entry* curr = Data_;
-		while (this->Compare(curr->Key, key)) {
+		while (this->Compare(curr->Key, key))
+		{
 			curr = curr->next;
 		}
 		curr->Value = value;
@@ -123,9 +138,12 @@ template<class Type>
 Type* SortedList<Type>::Get(Symbol* key) const // Value
 {
 	Entry* curr = Data_;
-	while (curr) {
+	while (curr)
+	{
 		if (!this->Compare(curr->Key, key))
+		{
 			return curr->Value;
+		}
 		curr = curr->next;
 	}
 	return 0;
@@ -135,14 +153,17 @@ Type* SortedList<Type>::Get(Symbol* key) const // Value
 template<class Type>
 Symbol* SortedList<Type>::GetKey(int index) const // Key
 {
-	if (0 <= index && index < Count) {
+	if (0 <= index && index < Count)
+	{
 		Entry* curr = Data_;
-		for (int i=0; i < index; i++) {
+		for (int i=0; i < index; i++)
+		{
 			curr = curr->next;
 		}
 		return curr->Key;
 	}
-	else {
+	else
+	{
 		return 0;
 	}
 }

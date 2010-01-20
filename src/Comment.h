@@ -31,7 +31,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 #include "Utils.h"
 
-namespace Coco {
+namespace Coco
+{
 
 /*---------------------------------------------------------------------------*\
                            Class Comment Declaration
@@ -47,14 +48,16 @@ public:
 	Comment *next;
 
 	//! Construct from components - default to unnested comments
-	Comment(wchar_t* startStr, wchar_t* stopStr, bool isNested = false) :
+	Comment(wchar_t* startStr, wchar_t* stopStr, bool isNested = false)
+	:
 		start(coco_string_create(startStr)),
 		stop(coco_string_create(stopStr)),
 		nested(isNested),
 		next(0)
        {}
 
-	virtual ~Comment() {
+	virtual ~Comment()
+	{
 		coco_string_delete(start);
 		coco_string_delete(stop);
 	}

@@ -29,39 +29,38 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_HASHTABLE_H__
 #define COCO_HASHTABLE_H__
 
-namespace Coco {
+namespace Coco
+{
 
 /*---------------------------------------------------------------------------*\
-                       Class DictionaryEntry Declaration
+	                      Class HashTable Declaration
 \*---------------------------------------------------------------------------*/
-//! An entry for the HashTable
-template<class Type>
-class DictionaryEntry {
-public:
-	wchar_t *key;
-	Type *val;
-	DictionaryEntry *next;
-};
 
-
-/*---------------------------------------------------------------------------*\
-                          Class HashTable Declaration
-\*---------------------------------------------------------------------------*/
 //! A simple HashTable implementation
 template<class Type>
 class HashTable
 {
-	typedef DictionaryEntry<Type> Entry;
-
 public:
 	class Iterator;            //!< Forward declaration of iterators
 	friend class Iterator;     //!< Declare friendship with the iterator
 
+	//! An entry within the HashTable
+	struct Entry
+	{
+		wchar_t *key;
+		Type *val;
+		Entry *next;
+	};
+
+
+	//! Construct with a default size
 	HashTable(int size = 128);
+
 	~HashTable();
 
-	class Iterator {
-	private:
+	//! An iterator for HashTable
+	class Iterator
+	{
 		HashTable *ht;
 		int pos;
 		Entry* cur;
@@ -69,13 +68,21 @@ public:
 	public:
 		Iterator(HashTable<Type> *ht);
 		bool HasNext();
-		DictionaryEntry<Type>* Next();
+		Entry* Next();
 	};
 
 	void Set(wchar_t *key, Type *value);
+
 	Type* Get(const wchar_t *key) const;
-	inline  Type* operator[](wchar_t *key) const { return Get(key); };
+
+	//! Return an Iterator to the first entry
 	Iterator GetIterator();
+
+	//! Same as the Get() method
+	inline Type* operator[](const wchar_t *key) const
+	{
+		return Get(key);
+	}
 
 private:
 	int size;

@@ -32,14 +32,16 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "CharSet.h"
 #include "Utils.h"
 
-namespace Coco {
+namespace Coco
+{
 
 /*---------------------------------------------------------------------------*\
                           Class CharClass Declaration
 \*---------------------------------------------------------------------------*/
 
 //! names character classes
-class CharClass {
+class CharClass
+{
 public:
 	int n;          //!< class number
 	wchar_t* name;  //!< class name

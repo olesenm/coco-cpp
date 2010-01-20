@@ -33,18 +33,21 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Utils.h"
 #include "SortedList.h"
 
-namespace Coco {
+namespace Coco
+{
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-const char* Tab::nTyp[] = {
+const char* Tab::nTyp[] =
+{
 	"    ", "t   ", "pr  ", "nt  ",
 	"clas", "chr ", "wt  ", "any ",
 	"eps ", "sync", "sem ", "alt ",
 	"iter", "opt ", "rslv"
 };
 
-const char* Tab::tKind[] = {
+const char* Tab::tKind[] =
+{
 	"fixedToken", "classToken", "litToken", "classLitToken"
 };
 
@@ -56,7 +59,10 @@ bool Tab::singleOutput = false;
 bool Tab::makeBackup = false;
 bool Tab::explicitEOF = false;
 bool Tab::ddt[10] =
-	{ false, false, false, false, false, false, false, false, false, false };
+{
+	false, false, false, false, false,
+	false, false, false, false, false
+};
 
 std::string Tab::nsName;
 std::string Tab::prefixName;
@@ -176,8 +182,9 @@ void Tab::PrintSymbolTable() {
 	fwprintf(trace, L"--------------\n");
 
 	HashTable<Symbol>::Iterator iter = literals.GetIterator();
-	while (iter.HasNext()) {
-		DictionaryEntry<Symbol> *e = iter.Next();
+	while (iter.HasNext())
+	{
+		HashTable<Symbol>::Entry *e = iter.Next();
 		fwprintf(trace, L"_%ls =  %ls.\n", e->val->name, e->key);
 	}
 	fwprintf(trace, L"\n");
@@ -353,21 +360,29 @@ bool Tab::DelSubGraph(Node* p) {
 
 
 bool Tab::DelNode(Node* p) {
-	if (p->typ == Node::nt) {
+	if (p->typ == Node::nt)
+	{
 		return p->sym->deletable;
 	}
-	else if (p->typ == Node::alt) {
+	else if (p->typ == Node::alt)
+	{
 		return DelSubGraph(p->sub) || (p->down != NULL && DelSubGraph(p->down));
 	}
-	else {
-		return p->typ == Node::iter || p->typ == Node::opt || p->typ == Node::sem
-				|| p->typ == Node::eps || p->typ == Node::rslv || p->typ == Node::sync;
+	else
+	{
+		return p->typ == Node::iter
+			|| p->typ == Node::opt
+			|| p->typ == Node::sem
+			|| p->typ == Node::eps
+			|| p->typ == Node::rslv
+			|| p->typ == Node::sync;
 	}
 }
 
 //----------------- graph printing ----------------------
 
-int Tab::Ptr(Node *p, bool up) {
+int Tab::Ptr(Node *p, bool up)
+{
 	if (p == NULL) return 0;
 	else if (up) return -(p->n);
 	else return p->n;

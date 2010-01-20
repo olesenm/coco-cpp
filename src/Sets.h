@@ -31,23 +31,28 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 #include "BitArray.h"
 
-namespace Coco {
+namespace Coco
+{
 
 /*---------------------------------------------------------------------------*\
                             Class Sets Declaration
 \*---------------------------------------------------------------------------*/
 
 //! Functions for BitArray operations
-class Sets {
+class Sets
+{
 public:
-	static int First(BitArray *s) {
+	static int First(BitArray *s)
+	{
 		const int max = s->getCount();
 		for (int i=0; i<max; i++)
 			if ((*s)[i]) return i;
 		return -1;
 	}
 
-	static int Elements(BitArray *s) {
+
+	static int Elements(BitArray *s)
+	{
 		const int max = s->getCount();
 		int n = 0;
 		for (int i=0; i<max; i++)
@@ -55,32 +60,40 @@ public:
 		return n;
 	}
 
+
 	//! Check: (a == b)?
-	static bool Equals(BitArray *a, BitArray *b) {
+	static bool Equals(BitArray *a, BitArray *b)
+	{
 		const int max = a->getCount();
 		for (int i=0; i<max; i++)
 			if ((*a)[i] != (*b)[i]) return false;
 		return true;
 	}
 
+
 	//! Check: (a > b)?
-	static bool Includes(BitArray *a, BitArray *b) {
+	static bool Includes(BitArray *a, BitArray *b)
+	{
 		const int max = a->getCount();
 		for (int i=0; i<max; i++)
 			if ((*b)[i] && ! (*a)[i]) return false;
 		return true;
 	}
 
+
 	//! Check: (a * b != {})
-	static bool Intersect(BitArray *a, BitArray *b) {
+	static bool Intersect(BitArray *a, BitArray *b)
+	{
 		const int max = a->getCount();
 		for (int i=0; i<max; i++)
 			if ((*a)[i] && (*b)[i]) return true;
 		return false;
 	}
 
+
 	//! Operation: a = a - b
-	static void Subtract(BitArray *a, BitArray *b) {
+	static void Subtract(BitArray *a, BitArray *b)
+	{
 		BitArray *c = b->Clone();
 		c->Not();
 		a->And(c);

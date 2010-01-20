@@ -47,7 +47,7 @@ namespace Coco
 // string handling, wide character
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//! Create by copying byte str
+//! Create by copying ASCII byte str
 wchar_t* coco_string_create(const char* str);
 
 //! Create a string by concatenating str1 and str2
@@ -63,8 +63,19 @@ void coco_string_merge(wchar_t* &dest, const wchar_t* str);
 //! Append str to dest
 void coco_string_merge(wchar_t* &dest, const std::string& str);
 
+
 //! Compare strings, return 0 if they are equal
-int coco_string_compareto(const wchar_t* str1, const wchar_t* str2);
+inline int coco_string_compare(const wchar_t* str1, const wchar_t* str2)
+{
+    return wcscmp(str1, str2);
+}
+
+//! Compare strings, return 0 if they are equal
+inline int coco_string_compare(const char* str1, const char* str2)
+{
+    return strcmp(str1, str2);
+}
+
 
 //! Return the index of the last occurrence of ch.
 //! Return -1 if nothing is found.

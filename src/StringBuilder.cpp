@@ -32,7 +32,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "StringBuilder.h"
 #include "Utils.h"
 
-namespace Coco {
+namespace Coco
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

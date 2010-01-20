@@ -29,13 +29,14 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_SORTEDLIST_H__
 #define COCO_SORTEDLIST_H__
 
-namespace Coco {
+namespace Coco
+{
 
 // forward declarations
 class Symbol;
 
 /*---------------------------------------------------------------------------*\
-                         Class SortedList Declaration
+	                     Class SortedList Declaration
 \*---------------------------------------------------------------------------*/
 
 //! Key/value pairs that are sorted by the keys, accessible by key and by index.

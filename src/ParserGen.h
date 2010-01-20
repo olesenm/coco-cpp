@@ -36,7 +36,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Utils.h"
 #include "DFA.h"
 
-namespace Coco {
+namespace Coco
+{
 
 // forward declarations
 class Errors;

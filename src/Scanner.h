@@ -88,7 +88,21 @@ int   coco_string_indexof(const wchar_t* str, const wchar_t ch);
 bool  coco_string_equal(const wchar_t* str1, const wchar_t* str2);
 
 //! Simple string hashing function
-int   coco_string_hash(const wchar_t* str);
+template<class CharT>
+inline int coco_string_hash(const CharT* str)
+{
+	int h = 0;
+	if (str)
+	{
+		while (*str != 0)
+		{
+			h = (h * 7) ^ *str;
+			++str;
+		}
+	}
+	return h < 0 ? -h : h;
+}
+
 
 //
 // String conversions
@@ -138,7 +152,8 @@ public:
 //!    -# whole stream in buffer
 //!    -# part of stream in buffer
 //! -# non seekable stream (network, console)
-class Buffer {
+class Buffer
+{
 private:
 	unsigned char *buf; //!< input buffer
 	int bufCapacity;    //!< capacity of buf
@@ -186,7 +201,8 @@ public:
 
 
 //! A Scanner buffer that handles UTF-8 characters
-class UTF8Buffer : public Buffer {
+class UTF8Buffer : public Buffer
+{
 public:
 	UTF8Buffer(Buffer* b) : Buffer(b) {}
 	virtual int Read();
@@ -197,8 +213,10 @@ public:
 // StartStates
 //------------------------------------------------------------------------------
 //! maps characters (integers) to start states of tokens
-class StartStates {
-	class Elem {
+class StartStates
+{
+	class Elem
+	{
 	public:
 		int key, val;
 		Elem *next;
@@ -247,8 +265,10 @@ public:
 // KeywordMap
 //------------------------------------------------------------------------------
 //! maps strings to integers (identifiers to keyword kinds)
-class KeywordMap {
-	class Elem {
+class KeywordMap
+{
+	class Elem
+	{
 	public:
 		wchar_t *key;
 		int val;
@@ -298,7 +318,8 @@ public:
 
 
 //! A Coco/R Scanner
-class Scanner {
+class Scanner
+{
 private:
 	static const int maxT = 47;
 	static const int noSym = 47;

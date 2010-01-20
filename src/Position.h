@@ -29,14 +29,16 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_POSITION_H__
 #define COCO_POSITION_H__
 
-namespace Coco {
+namespace Coco
+{
 
 /*---------------------------------------------------------------------------*\
                           Class Position Declaration
 \*---------------------------------------------------------------------------*/
 
 //! position of source code stretch (e.g. semantic action, resolver expressions)
-class Position {
+class Position
+{
 public:
 	int beg;     //!< start relative to the beginning of the file
 	int end;     //!< end of stretch
@@ -44,7 +46,8 @@ public:
 	int line;    //!< line number of beginning of source code stretch
 
 	//! Construct null
-	Position() :
+	Position()
+	:
 		beg(0),
 		end(0),
 		col(0),
@@ -52,7 +55,8 @@ public:
 	{}
 
 	//! Construct from components
-	Position(int begPos, int endPos, int colNr, int lineNr) :
+	Position(int begPos, int endPos, int colNr, int lineNr)
+	:
 		beg(begPos),
 		end(endPos),
 		col(colNr),

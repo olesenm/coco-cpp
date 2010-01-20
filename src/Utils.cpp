@@ -53,8 +53,14 @@ wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2)
 
     wchar_t* dest = new wchar_t[str1Len + str2Len + 1];
 
-    if (str1Len) { wcscpy(dest, str1); }
-    if (str2Len) { wcscpy(dest + str1Len, str2); }
+    if (str1Len)
+    {
+        wcscpy(dest, str1);
+    }
+    if (str2Len)
+    {
+        wcscpy(dest + str1Len, str2);
+    }
 
     dest[str1Len + str2Len] = 0;
     return dest;
@@ -68,7 +74,10 @@ wchar_t* coco_string_create_append(const wchar_t* str1, const std::string& str2)
 
     wchar_t* dest = new wchar_t[str1Len + str2Len + 1];
 
-    if (str1Len) { wcscpy(dest, str1); }
+    if (str1Len)
+    {
+        wcscpy(dest, str1);
+    }
 
     for (int i = 0; i < str2Len; ++i)
     {
@@ -95,12 +104,6 @@ void coco_string_merge(wchar_t* &dest, const std::string& str)
     wchar_t* newstr = coco_string_create_append(dest, str);
     delete[] dest;
     dest = newstr;
-}
-
-
-int coco_string_compareto(const wchar_t* str1, const wchar_t* str2)
-{
-    return wcscmp(str1, str2);
 }
 
 

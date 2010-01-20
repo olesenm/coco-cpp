@@ -29,7 +29,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "State.h"
 #include "Action.h"
 
-namespace Coco {
+namespace Coco
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -43,7 +44,8 @@ State::State()
 {}
 
 
-void State::AddAction(Action *act) {
+void State::AddAction(Action *act)
+{
 	Action *lasta = 0;
 	Action *a = firstAction;
 
@@ -59,7 +61,8 @@ void State::AddAction(Action *act) {
 }
 
 
-void State::DetachAction(Action *act) {
+void State::DetachAction(Action *act)
+{
 	Action *lasta = 0;
 	Action *a = firstAction;
 	while (a && a != act) { lasta = a; a = a->next; }
@@ -74,7 +77,8 @@ void State::DetachAction(Action *act) {
 }
 
 
-void State::MeltWith(State *s) { // copy actions of s to state
+void State::MeltWith(State *s) // copy actions of s to state
+{
 	for (Action *action = s->firstAction; action; action = action->next) {
 		Action *a = new Action(action->typ, action->sym, action->tc);
 		a->AddTargets(action);

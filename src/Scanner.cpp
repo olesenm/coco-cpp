@@ -54,20 +54,25 @@ namespace Coco {
 
 // string handling, wide character
 
-wchar_t* coco_string_create(const wchar_t* str) {
+wchar_t* coco_string_create(const wchar_t* str)
+{
 	const int len = coco_string_length(str);
 	wchar_t* dest = new wchar_t[len + 1];
-	if (len) {
+	if (len)
+	{
 		wcsncpy(dest, str, len);
 	}
 	dest[len] = 0;
 	return dest;
 }
 
-wchar_t* coco_string_create(const wchar_t* str, int index, int length) {
+
+wchar_t* coco_string_create(const wchar_t* str, int index, int length)
+{
 	const int len = (str && *str) ? length : 0;
 	wchar_t* dest = new wchar_t[len + 1];
-	if (len) {
+	if (len)
+	{
 		wcsncpy(dest, &(str[index]), len);
 	}
 	dest[len] = 0;
@@ -75,13 +80,15 @@ wchar_t* coco_string_create(const wchar_t* str, int index, int length) {
 }
 
 
-wchar_t* coco_string_create_lower(const wchar_t* str) {
+wchar_t* coco_string_create_lower(const wchar_t* str)
+{
 	if (!str) { return NULL; }
 	return coco_string_create_lower(str, 0, wcslen(str));
 }
 
 
-wchar_t* coco_string_create_lower(const wchar_t* str, int index, int len) {
+wchar_t* coco_string_create_lower(const wchar_t* str, int index, int len)
+{
 	if (!str) { return NULL; }
 	wchar_t* dest = new wchar_t[len + 1];
 
@@ -99,7 +106,8 @@ wchar_t* coco_string_create_lower(const wchar_t* str, int index, int len) {
 }
 
 
-void coco_string_delete(wchar_t* &str) {
+void coco_string_delete(wchar_t* &str)
+{
 	delete [] str;
 	str = NULL;
 }
@@ -108,24 +116,15 @@ int coco_string_length(const wchar_t* str) {
 	return str ? wcslen(str) : 0;
 }
 
-int coco_string_indexof(const wchar_t* str, const wchar_t ch) {
+int coco_string_indexof(const wchar_t* str, const wchar_t ch)
+{
 	const wchar_t* fnd = wcschr(str, ch);
 	return fnd ? (fnd - str) : -1;
 }
 
-bool coco_string_equal(const wchar_t* str1, const wchar_t* str2) {
+bool coco_string_equal(const wchar_t* str1, const wchar_t* str2)
+{
 	return wcscmp(str1, str2) == 0;
-}
-
-int coco_string_hash(const wchar_t* str) {
-	int h = 0;
-	if (!str) { return 0; }
-	while (*str != 0) {
-		h = (h * 7) ^ *str;
-		++str;
-	}
-	if (h < 0) { h = -h; }
-	return h;
 }
 
 

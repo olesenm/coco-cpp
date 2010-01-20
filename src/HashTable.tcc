@@ -31,9 +31,10 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "HashTable.h"
 #include "Utils.h"
 
-namespace Coco {
+namespace Coco
+{
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
 HashTable<Type>::HashTable(int sz)
@@ -45,12 +46,16 @@ HashTable<Type>::HashTable(int sz)
 }
 
 
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
 template<class Type>
 HashTable<Type>::~HashTable()
 {
-	for (int i = 0; i < size; ++i) {
+	for (int i = 0; i < size; ++i)
+	{
 		Entry *o = data[i];
-		while (o) {
+		while (o)
+		{
 			Entry *del = o;
 			o = o->next;
 			delete del;
@@ -61,13 +66,16 @@ HashTable<Type>::~HashTable()
 }
 
 
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
 template<class Type>
-DictionaryEntry<Type>*
+typename HashTable<Type>::Entry*
 HashTable<Type>::GetObj(const wchar_t *key) const
 {
 	const int k = coco_string_hash(key) % size;
 	Entry *o = data[k];
-	while (o && !coco_string_equal(key, o->key)) {
+	while (o && !coco_string_equal(key, o->key))
+	{
 		o = o->next;
 	}
 	return o;
@@ -78,11 +86,13 @@ template<class Type>
 void HashTable<Type>::Set(wchar_t *key, Type *val)
 {
 	Entry *o = GetObj(key);
-	if (o) {
+	if (o)
+	{
 		// existing entry - overwrite
 		o->val = val;
 	}
-	else {
+	else
+	{
 		// new entry
 		const int k = coco_string_hash(key) % size;
 		o = new Entry();
@@ -110,8 +120,11 @@ HashTable<Type>::GetIterator()
 }
 
 
+// * * * * * * * * * * * * * * * * Iterator  * * * * * * * * * * * * * * * * //
+
 template<class Type>
-HashTable<Type>::Iterator::Iterator(HashTable<Type> *htbl) :
+HashTable<Type>::Iterator::Iterator(HashTable<Type> *htbl)
+:
 	ht(htbl),
 	pos(0),
 	cur(0)
@@ -121,7 +134,8 @@ HashTable<Type>::Iterator::Iterator(HashTable<Type> *htbl) :
 template<class Type>
 bool HashTable<Type>::Iterator::HasNext()
 {
-	while (!cur && pos < ht->size) {
+	while (!cur && pos < ht->size)
+	{
 		cur = ht->data[pos];
 		++pos;
 	}
@@ -130,13 +144,14 @@ bool HashTable<Type>::Iterator::HasNext()
 
 
 template<class Type>
-DictionaryEntry<Type>*
+typename HashTable<Type>::Entry*
 HashTable<Type>::Iterator::Next()
 {
-	if (!HasNext()) {
+	if (!HasNext())
+	{
 		return NULL;
 	}
-	DictionaryEntry<Type> *next = cur;
+	Entry *next = cur;
 	cur = cur->next;
 	return next;
 }

@@ -40,7 +40,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Tab.h"
 #include "Target.h"
 
-namespace Coco {
+namespace Coco
+{
 
 // forward declarations
 class Action;

@@ -32,7 +32,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "State.h"
 #include "Utils.h"
 
-namespace Coco {
+namespace Coco
+{
 
 // forward declarations
 class BitArray;
@@ -49,7 +50,8 @@ public:
 	State *state;   //!< new state
 	Melted *next;   //!< next Melted
 
-	Melted(BitArray *oldStates, State *newState) :
+	Melted(BitArray *oldStates, State *newState)
+	:
 		set(oldStates),
 		state(newState),
 		next(0)

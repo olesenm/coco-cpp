@@ -33,7 +33,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Position.h"
 #include "Utils.h"
 
-namespace Coco {
+namespace Coco
+{
 
 // forward declarations
 class Node;
@@ -44,7 +45,8 @@ class BitArray;
 \*---------------------------------------------------------------------------*/
 
 //! ...
-class Symbol {
+class Symbol
+{
 public:
 	//! Enumeration for the kind of tokens
 	enum symbolType {

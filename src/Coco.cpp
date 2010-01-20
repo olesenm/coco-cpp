@@ -193,7 +193,8 @@ void printUsage(const char* message = NULL)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef _WIN32
-int wmain(int argc, wchar_t *argv[])
+// Special handling for Windows - see notes in CocoWin32Main.h
+# include "CocoWin32Main.h"
 #else
 int main(int argc, char *argv[])
 #endif

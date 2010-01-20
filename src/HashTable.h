@@ -37,7 +37,7 @@ namespace Coco
 \*---------------------------------------------------------------------------*/
 
 //! A simple HashTable implementation
-template<class Type>
+template<class Type, class CharT=wchar_t>
 class HashTable
 {
 public:
@@ -47,8 +47,8 @@ public:
 	//! An entry within the HashTable
 	struct Entry
 	{
-		wchar_t *key;
-		Type *val;
+		CharT *key;
+		Type  *val;
 		Entry *next;
 	};
 
@@ -61,33 +61,37 @@ public:
 	//! An iterator for HashTable
 	class Iterator
 	{
-		HashTable *ht;
-		int pos;
-		Entry* cur;
+		HashTable<Type, CharT> *hashTable_;
+		int pos_;
+		Entry* cur_;
 
 	public:
-		Iterator(HashTable<Type> *ht);
+		explicit Iterator(HashTable<Type, CharT> *ht);
+
 		bool HasNext();
 		Entry* Next();
 	};
 
-	void Set(wchar_t *key, Type *value);
 
-	Type* Get(const wchar_t *key) const;
+	//! Insert a new Entry
+	void Set(CharT *key, Type *value);
+
+	//- Find and return the value associated with the hashed Entry
+	Type* Get(const CharT *key) const;
 
 	//! Return an Iterator to the first entry
 	Iterator GetIterator();
 
 	//! Same as the Get() method
-	inline Type* operator[](const wchar_t *key) const
+	inline Type* operator[](const CharT *key) const
 	{
 		return Get(key);
 	}
 
 private:
-	int size;
-	Entry** data;
-	Entry* GetObj(const wchar_t *key) const;
+	int size_;
+	Entry** data_;
+	Entry* GetObj(const CharT *key) const;
 
 };
 

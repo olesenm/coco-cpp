@@ -55,7 +55,7 @@ public:
 	void Delete();              //!< Delete all pointers in the list
 	void Clear();               //!< Reduce size to zero, does not delete pointers
 
-	//! Return pointer correspond to the index, return NULL for out-of-range
+	//! Return pointer corresponding to the index, return NULL for out-of-range
 	Type* operator[](int index);
 
 };

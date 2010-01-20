@@ -36,24 +36,24 @@ namespace Coco
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<class Type>
-HashTable<Type>::HashTable(int sz)
+template<class Type, class CharT>
+HashTable<Type, CharT>::HashTable(int sz)
 :
-	size(sz),
-	data(new Entry*[size])
+	size_(sz),
+	data_(new Entry*[size_])
 {
-	memset(data, 0, size * sizeof(Entry*));
+	memset(data_, 0, size_ * sizeof(Entry*));
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-template<class Type>
-HashTable<Type>::~HashTable()
+template<class Type, class CharT>
+HashTable<Type, CharT>::~HashTable()
 {
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < size_; ++i)
 	{
-		Entry *o = data[i];
+		Entry *o = data_[i];
 		while (o)
 		{
 			Entry *del = o;
@@ -61,19 +61,19 @@ HashTable<Type>::~HashTable()
 			delete del;
 		}
 	}
-	delete[] data;
-	data = 0;
+	delete[] data_;
+	data_ = 0;
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-template<class Type>
-typename HashTable<Type>::Entry*
-HashTable<Type>::GetObj(const wchar_t *key) const
+template<class Type, class CharT>
+typename HashTable<Type, CharT>::Entry*
+HashTable<Type, CharT>::GetObj(const CharT *key) const
 {
-	const int k = coco_string_hash(key) % size;
-	Entry *o = data[k];
+	const int k = coco_string_hash(key) % size_;
+	Entry *o = data_[k];
 	while (o && !coco_string_equal(key, o->key))
 	{
 		o = o->next;
@@ -82,8 +82,8 @@ HashTable<Type>::GetObj(const wchar_t *key) const
 }
 
 
-template<class Type>
-void HashTable<Type>::Set(wchar_t *key, Type *val)
+template<class Type, class CharT>
+void HashTable<Type, CharT>::Set(CharT *key, Type *val)
 {
 	Entry *o = GetObj(key);
 	if (o)
@@ -94,66 +94,72 @@ void HashTable<Type>::Set(wchar_t *key, Type *val)
 	else
 	{
 		// new entry
-		const int k = coco_string_hash(key) % size;
+		const int k = coco_string_hash(key) % size_;
 		o = new Entry();
 		o->key = key;
 		o->val = val;
-		o->next = data[k];
-		data[k] = o;
+		o->next = data_[k];
+		data_[k] = o;
 	}
 }
 
 
-template<class Type>
-Type* HashTable<Type>::Get(const wchar_t *key) const
+template<class Type, class CharT>
+Type* HashTable<Type, CharT>::Get(const CharT *key) const
 {
 	Entry *o = GetObj(key);
 	return o ? o->val : NULL;
 }
 
 
-template<class Type>
-typename HashTable<Type>::Iterator
-HashTable<Type>::GetIterator()
+template<class Type, class CharT>
+typename HashTable<Type, CharT>::Iterator
+HashTable<Type, CharT>::GetIterator()
 {
-	return typename HashTable<Type>::Iterator(this);
+	return typename HashTable<Type, CharT>::Iterator(this);
 }
 
 
 // * * * * * * * * * * * * * * * * Iterator  * * * * * * * * * * * * * * * * //
 
-template<class Type>
-HashTable<Type>::Iterator::Iterator(HashTable<Type> *htbl)
+template<class Type, class CharT>
+HashTable<Type, CharT>::Iterator::Iterator
+(
+	HashTable<Type, CharT> *ht
+)
 :
-	ht(htbl),
-	pos(0),
-	cur(0)
+	hashTable_(ht),
+	pos_(0),
+	cur_(0)
 {}
 
 
-template<class Type>
-bool HashTable<Type>::Iterator::HasNext()
+template<class Type, class CharT>
+bool HashTable<Type, CharT>::Iterator::HasNext()
 {
-	while (!cur && pos < ht->size)
+	while (!cur_ && pos_ < hashTable_->size_)
 	{
-		cur = ht->data[pos];
-		++pos;
+		cur_ = hashTable_->data_[pos_];
+		++pos_;
 	}
-	return cur != NULL;
+	return cur_ != NULL;
 }
 
 
-template<class Type>
-typename HashTable<Type>::Entry*
-HashTable<Type>::Iterator::Next()
+template<class Type, class CharT>
+typename HashTable<Type, CharT>::Entry*
+HashTable<Type, CharT>::Iterator::Next()
 {
-	if (!HasNext())
+	if (HasNext())
+	{
+		Entry *next = cur_;
+		cur_ = cur_->next;
+		return next;
+	}
+	else
 	{
 		return NULL;
 	}
-	Entry *next = cur;
-	cur = cur->next;
-	return next;
 }
 
 

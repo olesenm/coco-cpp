@@ -43,6 +43,7 @@ class Symbol;
 template<class Type>
 class SortedList
 {
+	//! An entry within the SortedList
 	struct Entry
 	{
 		Symbol* Key;

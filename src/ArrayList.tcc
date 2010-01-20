@@ -77,7 +77,7 @@ bool ArrayList<Type>::Remove(Type *ptr)
 	{
 		if (data_[i] == ptr)
 		{
-			for (int j=i+1; j<Count; j++)
+			for (int j=i+1; j < Count; j++)
 			{
 				data_[j-1] = data_[j]; // copy down
 			}

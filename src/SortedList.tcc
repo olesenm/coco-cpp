@@ -33,7 +33,7 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<typename Type>
+template<class Type>
 SortedList<Type>::Entry::Entry(Symbol* k, Type* v)
 :
 	Key(k),
@@ -42,7 +42,7 @@ SortedList<Type>::Entry::Entry(Symbol* k, Type* v)
 {}
 
 
-template<typename Type>
+template<class Type>
 SortedList<Type>::SortedList()
 :
 	Data_(0),
@@ -50,19 +50,19 @@ SortedList<Type>::SortedList()
 {}
 
 
-template<typename Type>
+template<class Type>
 SortedList<Type>::~SortedList()
 {}
 
 
-template<typename Type>
+template<class Type>
 int SortedList<Type>::Compare(Symbol *x, Symbol *y)
 {
 	return coco_string_compareto(x->name, y->name);
 }
 
 
-template<typename Type>
+template<class Type>
 bool SortedList<Type>::Find(Symbol* key)
 {
 	Entry* curr = Data_;
@@ -75,7 +75,7 @@ bool SortedList<Type>::Find(Symbol* key)
 }
 
 
-template<typename Type>
+template<class Type>
 void SortedList<Type>::Set(Symbol *key, Type *value)
 {
 	if (!this->Find(key)) {
@@ -119,7 +119,7 @@ void SortedList<Type>::Set(Symbol *key, Type *value)
 	}
 }
 
-template<typename Type>
+template<class Type>
 Type* SortedList<Type>::Get(Symbol* key) const // Value
 {
 	Entry* curr = Data_;
@@ -132,7 +132,7 @@ Type* SortedList<Type>::Get(Symbol* key) const // Value
 }
 
 
-template<typename Type>
+template<class Type>
 Symbol* SortedList<Type>::GetKey(int index) const // Key
 {
 	if (0 <= index && index < Count) {

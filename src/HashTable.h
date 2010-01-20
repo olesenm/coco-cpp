@@ -35,7 +35,7 @@ namespace Coco {
                        Class DictionaryEntry Declaration
 \*---------------------------------------------------------------------------*/
 //! An entry for the HashTable
-template<typename Type>
+template<class Type>
 class DictionaryEntry {
 public:
 	wchar_t *key;
@@ -48,7 +48,7 @@ public:
                           Class HashTable Declaration
 \*---------------------------------------------------------------------------*/
 //! A simple HashTable implementation
-template<typename Type>
+template<class Type>
 class HashTable
 {
 	typedef DictionaryEntry<Type> Entry;
@@ -73,14 +73,14 @@ public:
 	};
 
 	void Set(wchar_t *key, Type *value);
-	Type* Get(wchar_t *key) const;
+	Type* Get(const wchar_t *key) const;
 	inline  Type* operator[](wchar_t *key) const { return Get(key); };
 	Iterator GetIterator();
 
 private:
 	int size;
 	Entry** data;
-	Entry* GetObj(wchar_t *key) const;
+	Entry* GetObj(const wchar_t *key) const;
 
 };
 

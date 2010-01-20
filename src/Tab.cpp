@@ -58,9 +58,10 @@ bool Tab::explicitEOF = false;
 bool Tab::ddt[10] =
 	{ false, false, false, false, false, false, false, false, false, false };
 
+std::string Tab::nsName;
+std::string Tab::prefixName;
+
 wchar_t* Tab::srcDir = NULL;
-wchar_t* Tab::nsName = NULL;
-wchar_t* Tab::prefixName = NULL;
 wchar_t* Tab::frameDir = NULL;
 wchar_t* Tab::outDir = NULL;
 
@@ -427,11 +428,13 @@ void Tab::PrintNodes() {
 
 CharClass* Tab::NewCharClass(const wchar_t* name, CharSet *s) {
 	CharClass *c;
-	if (coco_string_equal(name, L"#")) {
-		wchar_t* temp = coco_string_create_append(name, wchar_t(dummyName++));
-		c = new CharClass(temp, s);
-		coco_string_delete(temp);
-	} else {
+	if (coco_string_equal(name, L"#"))
+	{
+		wchar_t autoName[3] = { '#', wchar_t(dummyName++), '\0' };
+		c = new CharClass(autoName, s);
+	}
+	else
+	{
 		c = new CharClass(name, s);
 	}
 	c->n = classes.Count;
@@ -750,7 +753,7 @@ void Tab::CompDeletableSymbols() {
 	for (int i=0; i < nonterminals.Count; i++) {
 		Symbol *sym = nonterminals[i];
 		if (sym->deletable)
-			wprintf(L"  %ls deletable\n",  sym->name);
+			wprintf(L"  %ls deletable\n", sym->name);
 	}
 }
 
@@ -1230,24 +1233,20 @@ void Tab::DispatchDirective(const wchar_t* str)
 	if (coco_string_equal(name, L"namespace"))
 	{
 		// set namespace if not already set
-		const int oldLen = coco_string_length(nsName);
-		if (!oldLen)
+		if (nsName.empty())
 		{
-			coco_string_delete(nsName);
-			nsName = coco_string_create(strval, 0, len2);
+			nsName = coco_string_stdStringASCII(strval, 0, len2);
 		}
-		wprintf(L"using namespace: '%ls'\n", nsName);
+		wprintf(L"using namespace: '%s'\n", nsName.c_str());
 	}
 	else if (coco_string_equal(name, L"prefix"))
 	{
 		// set prefix if not already set
-		const int oldLen = coco_string_length(prefixName);
-		if (!oldLen)
+		if (prefixName.empty())
 		{
-			coco_string_delete(prefixName);
-			prefixName = coco_string_create(strval, 0, len2);
+			prefixName = coco_string_stdStringASCII(strval, 0, len2);
 		}
-		wprintf(L"using prefix: '%ls'\n", prefixName);
+		wprintf(L"using prefix: '%s'\n", prefixName.c_str());
 	}
 	else if (coco_string_equal(name, L"trace"))
 	{
@@ -1310,24 +1309,30 @@ void Tab::DispatchDirective(const wchar_t* str)
 }
 
 
-void Tab::SetDDT(const wchar_t* str) {
+void Tab::SetDDT(const wchar_t* str)
+{
 	const int len = (str && *str) ? coco_string_length(str) : 0;
 
-	for (int i = 0; i < len; i++) {
+	for (int i = 0; i < len; i++)
+	{
 		char ch = str[i];
-		if ('0' <= ch && ch <= '9') {
+		if (ch >= '0' && ch <= '9')
+		{
 			ddt[ch - '0'] = true;
 		}
-		else switch (ch) {
-			case 'A': case 'a': ddt[0] = true; break; // trace automaton
-			case 'F': case 'f': ddt[1] = true; break; // list first/follow sets
-			case 'G': case 'g': ddt[2] = true; break; // print syntax graph
-			case 'I': case 'i': ddt[3] = true; break; // trace computation of first sets
-			case 'J': case 'j': ddt[4] = true; break; // print ANY and SYNC sets
-			case 'P': case 'p': ddt[8] = true; break; // print statistics
-			case 'S': case 's': ddt[6] = true; break; // list symbol table
-			case 'X': case 'x': ddt[7] = true; break; // list cross reference table
-			default: break;
+		else
+		{
+			switch (ch) {
+			 case 'A': case 'a': ddt[0] = true; break; // trace automaton
+			 case 'F': case 'f': ddt[1] = true; break; // list first/follow sets
+			 case 'G': case 'g': ddt[2] = true; break; // print syntax graph
+			 case 'I': case 'i': ddt[3] = true; break; // trace computation of first sets
+			 case 'J': case 'j': ddt[4] = true; break; // print ANY and SYNC sets
+			 case 'P': case 'p': ddt[8] = true; break; // print statistics
+			 case 'S': case 's': ddt[6] = true; break; // list symbol table
+			 case 'X': case 'x': ddt[7] = true; break; // list cross reference table
+			 default: break;
+			}
 		}
 	}
 }
@@ -1338,14 +1343,17 @@ void Tab::SetDDT(const wchar_t* str) {
 //
 // reduce multiple '::' -> ':', skip initial ':'
 //
-int Tab::GenNamespaceOpen(FILE* ostr) const {
-	if (nsName == NULL || coco_string_length(nsName) == 0) {
+int Tab::GenNamespaceOpen(FILE* ostr) const
+{
+	const std::string::size_type len = nsName.size();
+
+	if (!nsName.size())
+	{
 		return 0;
 	}
-	const int len = coco_string_length(nsName);
-	int nrOfNs = 0;
 
-	for (int startPos = 0; startPos < len; ++startPos)
+	int nrOfNs = 0;
+	for (std::string::size_type startPos = 0; startPos < len; ++startPos)
 	{
 		// skip leading and multiple ':'
 		while (nsName[startPos] == ':')
@@ -1353,14 +1361,20 @@ int Tab::GenNamespaceOpen(FILE* ostr) const {
 			++startPos;
 		}
 
-		int curLen = coco_string_indexof(nsName + startPos, ':');
-		if (curLen == -1) {
-			curLen = len - startPos;
+		std::string::size_type curLen = nsName.find(':', startPos);
+		if (curLen == std::string::npos)
+		{
+			curLen = len;
 		}
-		if (curLen) {
-			wchar_t *curNs = coco_string_create(nsName, startPos, curLen);
-			fwprintf(ostr, L"namespace %ls {\n", curNs);
-			coco_string_delete(curNs);
+		curLen -= startPos;
+
+		if (curLen)
+		{
+			fwprintf
+			(
+				ostr, L"namespace %s {\n",
+				nsName.substr(startPos, curLen).c_str()
+			);
 			++nrOfNs;
 		}
 		startPos += curLen;
@@ -1370,8 +1384,10 @@ int Tab::GenNamespaceOpen(FILE* ostr) const {
 }
 
 
-void Tab::GenNamespaceClose(FILE* ostr, int nrOfNs) {
-	for (int i = 0; i < nrOfNs; ++i) {
+void Tab::GenNamespaceClose(FILE* ostr, int nrOfNs)
+{
+	for (int i = 0; i < nrOfNs; ++i)
+	{
 		fwprintf(ostr, L"} // End namespace\n");
 	}
 }
@@ -1423,7 +1439,7 @@ FILE* Tab::OpenFrameFile(const wchar_t* frameName) const
 }
 
 
-FILE* Tab::OpenGenFile(const wchar_t* genName) const {
+FILE* Tab::OpenGenFile(const std::string& genName) const {
 	FILE* ostr;
 
 	wchar_t* fn = coco_string_create_append(outDir, prefixName);
@@ -1465,7 +1481,7 @@ bool Tab::CopyFramePart
 
 	int endOfPrefixMacro = coco_string_length(Tab::prefixMacro)-1;
 	wchar_t startPrefixCh = Tab::prefixMacro[0];
-	int isPrefixSet = coco_string_length(this->prefixName);
+	const bool isPrefixSet = !prefixName.empty();
 
 	wchar_t ch = 0;
 	fwscanf(istr, L"%lc", &ch); //	istr.ReadByte();
@@ -1500,8 +1516,9 @@ bool Tab::CopyFramePart
 			// prefixMacro[0..i-1] found; continue with last read character
 			if (found)
 			{
-				if (doOutput && isPrefixSet) {
-						fwprintf(ostr, L"%ls", this->prefixName);
+				if (doOutput && isPrefixSet)
+				{
+					fwprintf(ostr, L"%s", prefixName.c_str());
 				}
 				fwscanf(istr, L"%lc", &ch);
 			}

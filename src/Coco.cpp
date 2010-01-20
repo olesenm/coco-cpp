@@ -222,14 +222,14 @@ int main(int argc, char *argv_[]) {
 				printUsage("missing parameter on -namespace");
 				return 1;
 			}
-			Tab::nsName = coco_string_create(argv[i]);
+			Tab::nsName = coco_string_stdStringASCII(argv[i]);
 		}
 		else if (coco_string_equal(argv[i], L"-prefix")) {
 			if (++i == argc) {
 				printUsage("missing parameter on -prefix");
 				return 1;
 			}
-			Tab::prefixName = coco_string_create(argv[i]);
+			Tab::prefixName = coco_string_stdStringASCII(argv[i]);
 		}
 		else if (coco_string_equal(argv[i], L"-frames")) {
 			if (++i == argc) {
@@ -353,8 +353,6 @@ int main(int argc, char *argv_[]) {
 			return 1;
 		}
 
-		coco_string_delete(Tab::nsName);
-		coco_string_delete(Tab::prefixName);
 		coco_string_delete(Tab::frameDir);
 
 		delete parser->pgen;

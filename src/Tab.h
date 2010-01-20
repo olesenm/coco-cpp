@@ -80,9 +80,10 @@ public:
 	static bool explicitEOF;       //!< user must explicitly add EOF in grammar
 	static bool ddt[10];           //!< debug and test switches
 
+	static std::string nsName;     //!< namespace for generated files
+	static std::string prefixName; //!< prefix for generated files
+
 	static wchar_t* srcDir;        //!< directory path of the atg file
-	static wchar_t* nsName;        //!< namespace for generated files
-	static wchar_t* prefixName;    //!< prefix for generated files
 	static wchar_t* frameDir;      //!< directory containing the frame files
 	static wchar_t* outDir;        //!< directory for generated files
 
@@ -290,7 +291,7 @@ public:
 	FILE* OpenFrameFile(const wchar_t* frameName) const;
 
 	//! Open a generated file (.h or .cpp), return NULL on failure
-	FILE* OpenGenFile(const wchar_t* genName) const;
+	FILE* OpenGenFile(const std::string& genName) const;
 
 	//! Copy frame part from istr, to ostr until stop mark is seen
 	//  Return true on success. Optionally possible to suppress output.

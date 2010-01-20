@@ -350,7 +350,7 @@ void ParserGen::WriteParser() {
 	//
 	// Header
 	//
-	gen = tab->OpenGenFile(L"Parser.h");
+	gen = tab->OpenGenFile("Parser.h");
 	if (gen == NULL) {
 		errors->Exception(L"-- Cannot generate Parser header\n");
 	}
@@ -382,7 +382,7 @@ void ParserGen::WriteParser() {
 	//
 	// Source
 	//
-	gen = tab->OpenGenFile(L"Parser.cpp");
+	gen = tab->OpenGenFile("Parser.cpp");
 	if (gen == NULL) {
 		errors->Exception(L"-- Cannot generate Parser source\n");
 	}
@@ -390,14 +390,15 @@ void ParserGen::WriteParser() {
 	CopyFramePart(L"-->begin", false);
 	tab->CopySourcePart(gen, tab->copyPos, 0);  // copy without emitLines
 	CopyFramePart(L"-->namespace_open");
-	if (Tab::singleOutput) {
-		wchar_t* scannerCpp = coco_string_create_append
+	if (Tab::singleOutput)
+	{
+		const std::string scannerCpp = Tab::prefixName + "Scanner.cpp";
+		fwprintf
 		(
-			Tab::prefixName,
-			L"Scanner.cpp"
+			gen,
+			L"\n// quick hack to provide a single Make target:\n#include \"%s\"\n\n",
+			scannerCpp.c_str()
 		);
-		fwprintf(gen, L"\n// quick hack to provide a single Make target:\n#include \"%ls\"\n\n", scannerCpp);
-		coco_string_delete(scannerCpp);
 	}
 	nrOfNs = tab->GenNamespaceOpen(gen);
 

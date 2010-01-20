@@ -30,47 +30,51 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<typename Type>
+template<class Type>
 ArrayList<Type>::ArrayList(int size)
 :
-	Capacity(size),
-	Data_(new Type*[Capacity]),
+	capacity_(size),
+	data_(new Type*[capacity_]),
 	Count(0)
 {}
 
 
-template<typename Type>
+template<class Type>
 ArrayList<Type>::~ArrayList()
 {
-	delete[] Data_;
+	delete[] data_;
 }
 
 
-template<typename Type>
+template<class Type>
 void ArrayList<Type>::Add(Type *ptr)
 {
-	if (Count >= Capacity) {
-		Capacity *= 2;
-		Type** newData = new Type*[Capacity];
-		for (int i=0; i < Count; i++) {
-			newData[i] = Data_[i];   // copy
+	if (Count >= capacity_)
+	{
+		capacity_ *= 2;
+		Type** newData = new Type*[capacity_];
+		for (int i=0; i < Count; i++)
+		{
+			newData[i] = data_[i];   // copy
 		}
-		delete[] Data_;
-		Data_ = newData;
+		delete[] data_;
+		data_ = newData;
 	}
 
-	Data_[Count++] = ptr;
+	data_[Count++] = ptr;
 }
 
 
-template<typename Type>
+template<class Type>
 bool ArrayList<Type>::Remove(Type *ptr)
 {
-	for (int i=0; i < Count; i++) {
-		if (Data_[i] == ptr) {
+	for (int i=0; i < Count; i++)
+	{
+		if (data_[i] == ptr)
+		{
 			for (int j=i+1; j<Count; j++)
 			{
-				Data_[j-1] = Data_[j]; // copy down
+				data_[j-1] = data_[j]; // copy down
 			}
 			Count--;
 			return true;
@@ -80,31 +84,31 @@ bool ArrayList<Type>::Remove(Type *ptr)
 }
 
 
-template<typename Type>
+template<class Type>
 void ArrayList<Type>::Delete()
 {
-	for (int i=0; i < Count; i++) {
-		delete Data_[i];
-		Data_[i] = 0;
+	for (int i=0; i < Count; i++)
+	{
+		delete data_[i];
+		data_[i] = 0;
 	}
 	Count = 0;
 }
 
 
-template<typename Type>
+template<class Type>
 void ArrayList<Type>::Clear()
 {
 	Count = 0;
 }
 
 
-template<typename Type>
+template<class Type>
 Type* ArrayList<Type>::operator[](int index)
 {
-	if (0 <= index && index < Count)
-		return Data_[index];
-	else
-		return reinterpret_cast<Type*>(0);
+	return (index >= 0 && index < Count)
+		? data_[index]
+		: reinterpret_cast<Type*>(0);
 }
 
 

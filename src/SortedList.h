@@ -39,7 +39,7 @@ class Symbol;
 \*---------------------------------------------------------------------------*/
 
 //! Key/value pairs that are sorted by the keys, accessible by key and by index.
-template<typename Type>
+template<class Type>
 class SortedList
 {
 	struct Entry

@@ -36,11 +36,11 @@ namespace Coco {
 \*---------------------------------------------------------------------------*/
 
 //! An array of pointers
-template<typename Type>
+template<class Type>
 class ArrayList
 {
-	int Capacity;
-	Type** Data_;
+	int capacity_;
+	Type** data_;
 
 public:
 	int Count;

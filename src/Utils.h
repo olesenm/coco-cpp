@@ -53,11 +53,15 @@ wchar_t* coco_string_create(const char* str);
 //! Create a string by concatenating str1 and str2
 wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2);
 
-//! Create a string by concatenating a character to the end of str
-wchar_t* coco_string_create_append(const wchar_t* str, const wchar_t ch);
+//! Create a string by concatenating str1 and str2
+wchar_t* coco_string_create_append(const wchar_t* str1, const std::string& str2);
+
 
 //! Append str to dest
 void coco_string_merge(wchar_t* &dest, const wchar_t* str);
+
+//! Append str to dest
+void coco_string_merge(wchar_t* &dest, const std::string& str);
 
 //! Compare strings, return 0 if they are equal
 int coco_string_compareto(const wchar_t* str1, const wchar_t* str2);

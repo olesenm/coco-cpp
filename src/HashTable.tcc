@@ -35,7 +35,7 @@ namespace Coco {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<typename Type>
+template<class Type>
 HashTable<Type>::HashTable(int sz)
 :
 	size(sz),
@@ -45,7 +45,7 @@ HashTable<Type>::HashTable(int sz)
 }
 
 
-template<typename Type>
+template<class Type>
 HashTable<Type>::~HashTable()
 {
 	for (int i = 0; i < size; ++i) {
@@ -61,9 +61,9 @@ HashTable<Type>::~HashTable()
 }
 
 
-template<typename Type>
+template<class Type>
 DictionaryEntry<Type>*
-HashTable<Type>::GetObj(wchar_t *key) const
+HashTable<Type>::GetObj(const wchar_t *key) const
 {
 	const int k = coco_string_hash(key) % size;
 	Entry *o = data[k];
@@ -74,7 +74,7 @@ HashTable<Type>::GetObj(wchar_t *key) const
 }
 
 
-template<typename Type>
+template<class Type>
 void HashTable<Type>::Set(wchar_t *key, Type *val)
 {
 	Entry *o = GetObj(key);
@@ -94,15 +94,15 @@ void HashTable<Type>::Set(wchar_t *key, Type *val)
 }
 
 
-template<typename Type>
-Type* HashTable<Type>::Get(wchar_t *key) const
+template<class Type>
+Type* HashTable<Type>::Get(const wchar_t *key) const
 {
 	Entry *o = GetObj(key);
 	return o ? o->val : NULL;
 }
 
 
-template<typename Type>
+template<class Type>
 typename HashTable<Type>::Iterator
 HashTable<Type>::GetIterator()
 {
@@ -110,7 +110,7 @@ HashTable<Type>::GetIterator()
 }
 
 
-template<typename Type>
+template<class Type>
 HashTable<Type>::Iterator::Iterator(HashTable<Type> *htbl) :
 	ht(htbl),
 	pos(0),
@@ -118,7 +118,7 @@ HashTable<Type>::Iterator::Iterator(HashTable<Type> *htbl) :
 {}
 
 
-template<typename Type>
+template<class Type>
 bool HashTable<Type>::Iterator::HasNext()
 {
 	while (!cur && pos < ht->size) {
@@ -129,7 +129,7 @@ bool HashTable<Type>::Iterator::HasNext()
 }
 
 
-template<typename Type>
+template<class Type>
 DictionaryEntry<Type>*
 HashTable<Type>::Iterator::Next()
 {

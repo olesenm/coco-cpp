@@ -768,7 +768,7 @@ void DFA::WriteScanner() {
 	//
 	// Header
 	//
-	gen = tab->OpenGenFile(L"Scanner.h");
+	gen = tab->OpenGenFile("Scanner.h");
 	if (gen == NULL) {
 		errors->Exception(L"-- Cannot generate scanner header");
 	}
@@ -801,7 +801,7 @@ void DFA::WriteScanner() {
 	//
 	// Source
 	//
-	gen = tab->OpenGenFile(L"Scanner.cpp");
+	gen = tab->OpenGenFile("Scanner.cpp");
 	if (gen == NULL) {
 		errors->Exception(L"-- Cannot generate scanner source");
 	}

@@ -331,22 +331,21 @@ int main(int argc, char *argv[])
 		// try '\\' separator (windows)
 		if (pos < 0) pos = srcName.find_last_of('\\');
 #endif
-
 		if (pos >= 0)
 		{
 			Tab::srcDir = srcName.substr(0, pos+1);
 		}
-
 		if (Tab::outDir.empty())
 		{
 			Tab::outDir = Tab::srcDir;
 		}
 
-		Coco::Scanner *scanner = new Coco::Scanner(srcName);
-		Coco::Parser  *parser  = new Coco::Parser(scanner);
-		Coco::Tab     *tab     = new Coco::Tab(parser);
+		// create Scanner/Parser and attach Tab, DFA and ParserGen
+		Coco::Scanner scanner(srcName);
+		Coco::Parser  parser(&scanner);
+		Coco::Tab     tab(&parser);
 
-		tab->srcName    = srcName;
+		tab.srcName   = srcName;
 
 #ifdef _WIN32
 		std::wstring traceFileName = Tab::outDir;
@@ -375,11 +374,11 @@ int main(int argc, char *argv[])
 #endif
 
 		// attach Tab before creating Scanner/Parser generators
-		parser->tab  = tab;
-		parser->dfa  = new Coco::DFA(parser);
-		parser->pgen = new Coco::ParserGen(parser);
+		parser.tab  = &tab;
+		parser.dfa  = new Coco::DFA(&parser);
+		parser.pgen = new Coco::ParserGen(&parser);
 
-		parser->Parse();
+		parser.Parse();
 
 		// see if anything was written
 		if (traceToFile)
@@ -417,17 +416,14 @@ int main(int argc, char *argv[])
 #endif
 		}
 
-		wprintf(L"%d errors detected\n", parser->errors->count);
-		if (parser->errors->count != 0)
+		wprintf(L"%d errors detected\n", parser.errors->count);
+		if (parser.errors->count != 0)
 		{
 			return 1;
 		}
 
-		delete parser->pgen;
-		delete parser->dfa;
-		delete tab;
-		delete parser;
-		delete scanner;
+		delete parser.pgen;
+		delete parser.dfa;
 	}
 
 	return 0;

@@ -58,10 +58,12 @@ void Parser::SemErr(const wchar_t* msg)
 
 void Parser::Get()
 {
-	for (;;) {
+	for (;;)
+	{
 		t = la;
 		la = scanner->Scan();
-		if (la->kind <= maxT) {
+		if (la->kind <= maxT)
+		{
 			++errDist;
 			break;
 		}
@@ -72,7 +74,8 @@ void Parser::Get()
 				tab->DispatchDirective(la->val+1); 
 		}
 
-		if (dummyToken != t) {
+		if (dummyToken != t)
+		{
 			dummyToken->kind = t->kind;
 			dummyToken->pos = t->pos;
 			dummyToken->col = t->col;
@@ -89,10 +92,12 @@ void Parser::Get()
 
 void Parser::Expect(int n)
 {
-	if (la->kind == n) {
+	if (la->kind == n)
+	{
 		Get();
 	}
-	else {
+	else
+	{
 		SynErr(n);
 	}
 }
@@ -100,12 +105,15 @@ void Parser::Expect(int n)
 
 void Parser::ExpectWeak(int n, int follow)
 {
-	if (la->kind == n) {
+	if (la->kind == n)
+	{
 		Get();
 	}
-	else {
+	else
+	{
 		SynErr(n);
-		while (!StartOf(follow)) {
+		while (!StartOf(follow))
+		{
 			Get();
 		}
 	}
@@ -114,16 +122,20 @@ void Parser::ExpectWeak(int n, int follow)
 
 bool Parser::WeakSeparator(int n, int syFol, int repFol)
 {
-	if (la->kind == n) {
+	if (la->kind == n)
+	{
 		Get();
 		return true;
 	}
-	else if (StartOf(repFol)) {
+	else if (StartOf(repFol))
+	{
 		return false;
 	}
-	else {
+	else
+	{
 		SynErr(n);
-		while (!(StartOf(syFol) || StartOf(repFol) || StartOf(0))) {
+		while (!(StartOf(syFol) || StartOf(repFol) || StartOf(0)))
+		{
 			Get();
 		}
 		return StartOf(syFol);
@@ -779,9 +791,7 @@ void Parser::TokenFactor(Graph* &g) {
 void Parser::Parse()
 {
 	t = NULL;
-	if (dummyToken) {    // safety: someone might call Parse() twice
-		delete dummyToken;
-	}
+	if (dummyToken) { delete dummyToken; } // safety: might call Parse() twice
 	la = dummyToken = new Token();
 	la->val = coco_string_create(L"Dummy Token");
 	Get();
@@ -801,7 +811,8 @@ Parser::Parser(Scanner* scan, Errors* err)
 	t(NULL),
 	la(NULL)
 {
-	if (!errors) {   // add in default error handling
+	if (!errors)    // add in default error handling
+	{
 		errors = new Errors();
 	}
 	// user-defined initialization:

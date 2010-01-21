@@ -80,7 +80,11 @@ wchar_t* coco_string_create_lower(const wchar_t* str);
 wchar_t* coco_string_create_lower(const wchar_t* str, int index, int length);
 
 //! Free storage and nullify the argument
-void  coco_string_delete(wchar_t* &str);
+inline void coco_string_delete(wchar_t* &str)
+{
+	delete[] str;
+	str = NULL;
+}
 
 //! The length of the str, or 0 if the str is NULL
 inline int coco_string_length(const wchar_t* str)
@@ -218,10 +222,10 @@ public:
 	explicit Buffer(std::istream*, bool isUserStream = true);
 
 	//! Copy buffer contents from constant character string
-	Buffer(const unsigned char* chars, int len);
+	Buffer(const char* chars, int len);
 
 	//! Copy buffer contents from constant character string
-	Buffer(const char* chars, int len);
+	Buffer(const unsigned char* chars, int len);
 
 	//! Close stream (but not user streams) and free buf (if any)
 	virtual ~Buffer();
@@ -250,30 +254,32 @@ public:
 //! maps characters (integers) to start states of tokens
 class StartStates
 {
-	class Elem
+	struct Elem
 	{
-	public:
 		int key, val;
 		Elem *next;
-		Elem(int k, int v) :
+
+		Elem(int k, int v)
+		:
 			key(k), val(v), next(0)
 		{}
 	};
 
-	Elem **tab;
+	Elem **table_;
 
 public:
-	StartStates() :
-		tab(new Elem*[128])
+	StartStates()
+	:
+		table_(new Elem*[128])
 	{
-		memset(tab, 0, 128*sizeof(Elem*));
+		memset(table_, 0, 128*sizeof(Elem*));
 	}
 
 	virtual ~StartStates()
 	{
 		for (int i = 0; i < 128; ++i)
 		{
-			Elem *e = tab[i];
+			Elem *e = table_[i];
 			while (e)
 			{
 				Elem *next = e->next;
@@ -281,20 +287,20 @@ public:
 				e = next;
 			}
 		}
-		delete[] tab;
+		delete[] table_;
 	}
 
 	void set(int key, int val)
 	{
-		Elem *e = new Elem(key, val);
 		const int k = unsigned(key) % 128;
-		e->next = tab[k];
-		tab[k] = e;
+		Elem *e = new Elem(key, val);
+		e->next = table_[k];
+		table_[k] = e;
 	}
 
 	int state(int key)
 	{
-		Elem *e = tab[unsigned(key) % 128];
+		Elem *e = table_[unsigned(key) % 128];
 		while (e && e->key != key) e = e->next;
 		return e ? e->val : 0;
 	}
@@ -307,36 +313,38 @@ public:
 //! maps strings to integers (identifiers to keyword kinds)
 class KeywordMap
 {
-	class Elem
+	struct Elem
 	{
-	public:
 		wchar_t *key;
 		int val;
 		Elem *next;
-		Elem(const wchar_t *k, int v) :
+
+		Elem(const wchar_t *k, int v)
+		:
 			key(coco_string_create(k)), val(v), next(0)
 		{}
+
 		virtual ~Elem()
 		{
 			coco_string_delete(key);
 		}
 	};
 
-	Elem **tab;
+	Elem **table_;
 
 public:
 	KeywordMap()
 	:
-		tab(new Elem*[128])
+		table_(new Elem*[128])
 	{
-		memset(tab, 0, 128*sizeof(Elem*));
+		memset(table_, 0, 128*sizeof(Elem*));
 	}
 
 	virtual ~KeywordMap()
 	{
 		for (int i = 0; i < 128; ++i)
 		{
-			Elem *e = tab[i];
+			Elem *e = table_[i];
 			while (e)
 			{
 				Elem *next = e->next;
@@ -344,20 +352,20 @@ public:
 				e = next;
 			}
 		}
-		delete[] tab;
+		delete[] table_;
 	}
 
 	void set(const wchar_t *key, int val)
 	{
-		Elem *e = new Elem(key, val);
 		const int k = coco_string_hash(key) % 128;
-		e->next = tab[k];
-		tab[k] = e;
+		Elem *e = new Elem(key, val);
+		e->next = table_[k];
+		table_[k] = e;
 	}
 
 	int get(const wchar_t *key, int defaultVal)
 	{
-		Elem *e = tab[coco_string_hash(key) % 128];
+		Elem *e = table_[coco_string_hash(key) % 128];
 		while (e && !coco_string_equal(e->key, key)) e = e->next;
 		return e ? e->val : defaultVal;
 	}

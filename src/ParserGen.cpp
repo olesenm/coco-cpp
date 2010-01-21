@@ -512,6 +512,9 @@ void ParserGen::WriteParser()
 	}
 	nrOfNs = tab->GenNamespaceOpen(gen);
 
+	// insert extra user-defined code
+	CopySourcePart(extraCodePos, 0);
+
 	CopyFramePart(L"-->pragmas"); GenCodePragmas();
 	CopyFramePart(L"-->productions"); GenProductions();
 	CopyFramePart(L"-->parseRoot");
@@ -551,6 +554,7 @@ ParserGen::ParserGen(Parser *parser)
 	semDeclPos(NULL),
 	initCodePos(NULL),
 	deinitCodePos(NULL),
+	extraCodePos(NULL),
 	errorNr(-1),
 	curSy(NULL),
 	fram(NULL),
@@ -567,6 +571,7 @@ ParserGen::~ParserGen()
 	if (semDeclPos) { delete semDeclPos; }
 	if (initCodePos) { delete initCodePos; }
 	if (deinitCodePos) { delete deinitCodePos; }
+	if (extraCodePos) { delete extraCodePos; }
 }
 
 

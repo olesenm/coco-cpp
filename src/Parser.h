@@ -47,7 +47,8 @@ namespace Coco {
 
 
 //! Parser error handing
-class Errors {
+class Errors
+{
 public:
 	int count;      //!< The number of errors detected
 
@@ -76,7 +77,8 @@ public:
 
 
 //! A Coco/R Parser
-class Parser {
+class Parser
+{
 private:
 	enum {
 		_EOF=0,
@@ -85,10 +87,10 @@ private:
 		_string=3,
 		_badString=4,
 		_char=5,
-		_ddtSym=48,
-		_directive=49
+		_ddtSym=50,
+		_directive=51
 	};
-	static const int maxT = 47;
+	static const int maxT = 49;
 
 	static const int minErrDist = 2; //!< min. distance before reporting errors
 

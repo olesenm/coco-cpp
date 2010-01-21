@@ -146,6 +146,14 @@ Coco                            (. Symbol *sym; Graph *g; wchar_t* grammarName =
     "[/destroy]"
   ]
 
+  // this section can be used to add code to the Parser.cpp
+  [ "[code]"
+    [ ANY                       (. int beg = t->pos; int line = t->line; .)
+      { ANY }                   (. pgen->extraCodePos = new Position(beg, la->pos, 0, line); .)
+    ]
+    "[/code]"
+  ]
+
   [ "IGNORECASE"                (. dfa->ignoreCase = true; .) ]   /* pdt */
   [ "CHARACTERS" { SetDecl }]
   [ "TOKENS"  { TokenDecl<Node::t> }]

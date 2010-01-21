@@ -363,8 +363,8 @@ public:
 class Scanner
 {
 private:
-	static const int maxT = 47;
-	static const int noSym = 47;
+	static const int maxT = 49;
+	static const int noSym = 49;
 
 	static const int eofSym = 0;    //!< end-of-file token id
 	static const char EOL = '\n';   //!< end-of-line character

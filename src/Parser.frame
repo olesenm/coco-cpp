@@ -38,7 +38,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 -->namespace_open
 
 //! Parser error handing
-class Errors {
+class Errors
+{
 public:
 	int count;      //!< The number of errors detected
 
@@ -67,7 +68,8 @@ public:
 
 
 //! A Coco/R Parser
-class Parser {
+class Parser
+{
 private:
 -->constantsheader
 	static const int minErrDist = 2; //!< min. distance before reporting errors
@@ -126,19 +128,22 @@ public:
 // Parser Implementation
 // ----------------------------------------------------------------------------
 
-void Parser::SynErr(int n) {
+void Parser::SynErr(int n)
+{
 	if (errDist >= minErrDist) errors->SynErr(la->line, la->col, n);
 	errDist = 0;
 }
 
 
-void Parser::SemErr(const wchar_t* msg) {
+void Parser::SemErr(const wchar_t* msg)
+{
 	if (errDist >= minErrDist) errors->Error(t->line, t->col, msg);
 	errDist = 0;
 }
 
 
-void Parser::Get() {
+void Parser::Get()
+{
 	for (;;) {
 		t = la;
 		la = scanner->Scan();
@@ -162,7 +167,8 @@ void Parser::Get() {
 }
 
 
-void Parser::Expect(int n) {
+void Parser::Expect(int n)
+{
 	if (la->kind == n) {
 		Get();
 	}
@@ -172,7 +178,8 @@ void Parser::Expect(int n) {
 }
 
 
-void Parser::ExpectWeak(int n, int follow) {
+void Parser::ExpectWeak(int n, int follow)
+{
 	if (la->kind == n) {
 		Get();
 	}
@@ -185,7 +192,8 @@ void Parser::ExpectWeak(int n, int follow) {
 }
 
 
-bool Parser::WeakSeparator(int n, int syFol, int repFol) {
+bool Parser::WeakSeparator(int n, int syFol, int repFol)
+{
 	if (la->kind == n) {
 		Get();
 		return true;
@@ -205,7 +213,8 @@ bool Parser::WeakSeparator(int n, int syFol, int repFol) {
 
 -->productions
 
-void Parser::Parse() {
+void Parser::Parse()
+{
 	t = NULL;
 	if (dummyToken) {    // safety: someone might call Parse() twice
 		delete dummyToken;
@@ -235,7 +244,8 @@ Parser::Parser(Scanner* scan, Errors* err)
 }
 
 
-bool Parser::StartOf(int s) {
+bool Parser::StartOf(int s)
+{
 	const bool T = true;
 	const bool x = false;
 
@@ -245,10 +255,9 @@ bool Parser::StartOf(int s) {
 }
 
 
-Parser::~Parser() {
-	if (deleteErrorsDestruct_) {    // delete default error handling
-		delete errors;
-	}
+Parser::~Parser()
+{
+	if (deleteErrorsDestruct_) { delete errors; } // delete default error handling
 	delete dummyToken;
 	// user-defined destruction:
 -->destructor
@@ -269,7 +278,8 @@ Errors::~Errors()
 {}
 
 
-void Errors::clear() {
+void Errors::clear()
+{
 	count = 0;
 }
 
@@ -291,30 +301,35 @@ wchar_t* Errors::strerror(int n)
 }
 
 
-void Errors::Warning(const wchar_t* msg) {
+void Errors::Warning(const wchar_t* msg)
+{
 	wprintf(L"%ls\n", msg);
 }
 
 
-void Errors::Warning(int line, int col, const wchar_t* msg) {
+void Errors::Warning(int line, int col, const wchar_t* msg)
+{
 	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
 }
 
 
-void Errors::Error(int line, int col, const wchar_t* msg) {
+void Errors::Error(int line, int col, const wchar_t* msg)
+{
 	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
 	count++;
 }
 
 
-void Errors::SynErr(int line, int col, int n) {
+void Errors::SynErr(int line, int col, int n)
+{
 	wchar_t* msg = this->strerror(n);
 	this->Error(line, col, msg);
 	coco_string_delete(msg);
 }
 
 
-void Errors::Exception(const wchar_t* msg) {
+void Errors::Exception(const wchar_t* msg)
+{
 	wprintf(L"%ls", msg);
 	::exit(1);
 }

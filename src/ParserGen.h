@@ -64,6 +64,7 @@ public:
 	Position *semDeclPos;    //!< position of global semantic declarations
 	Position *initCodePos;   //!< position of initialization code
 	Position *deinitCodePos; //!< position of de-initialization (destructor) code
+	Position *extraCodePos;  //!< position of extra code for the Parser.cpp
 
 	int errorNr;            //!< highest parser error number
 	Symbol *curSy;          //!< symbol whose production is currently generated

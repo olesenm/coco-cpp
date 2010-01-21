@@ -201,7 +201,11 @@ int main(int argc, char *argv[])
 {
 	wprintf(L"Coco/R C++ (21 Jan 2010)\n");
 
+#ifdef _WIN32
+	std::wstring srcName;
+#else
 	std::string srcName;
+#endif
 	bool traceToFile = true;
 
 	for (int i = 1; i < argc; i++)
@@ -387,7 +391,7 @@ int main(int argc, char *argv[])
 
 #ifdef _WIN32
 			// obtain the FileSize
-			Tab::trace = _wfopen(traceFileName.c_str(), "r");
+			Tab::trace = _wfopen(traceFileName.c_str(), L"r");
 			fseek(Tab::trace, 0, SEEK_END);
 			long fileSize = ftell(Tab::trace);
 			fclose(Tab::trace);

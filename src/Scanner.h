@@ -39,15 +39,20 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include <fstream>
 #include <iostream>
 
-#if _MSC_VER >= 1400
-#define coco_swprintf swprintf_s
-#elif _MSC_VER >= 1300
-#define coco_swprintf _snwprintf
-#else
-// assume every other compiler knows swprintf
-#define coco_swprintf swprintf
+#ifdef _WIN32
+# if _MSC_VER >= 1400
+#  define coco_swprintf swprintf_s
+# elif _MSC_VER >= 1300
+#  define coco_swprintf _snwprintf
+# elif defined (__MINGW32__)        // MINGW has(had) wrong swprintf args
+#  define coco_swprintf _snwprintf
+# endif
 #endif
 
+// assume every other compiler knows swprintf
+#ifndef coco_swprintf
+# define coco_swprintf swprintf
+#endif
 
 #define COCO_WCHAR_MAX    65535    // 0xFFFF = max unicode characters
 

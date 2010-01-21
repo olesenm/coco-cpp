@@ -64,12 +64,19 @@ bool Tab::ddt[10] =
 	false, false, false, false, false
 };
 
-std::string Tab::nsName;
-std::string Tab::prefixName;
 
+#ifdef _WIN32
+std::wstring Tab::srcDir;
+std::wstring Tab::frameDir;
+std::wstring Tab::outDir;
+#else
 std::string Tab::srcDir;
 std::string Tab::frameDir;
 std::string Tab::outDir;
+#endif
+
+std::string Tab::nsName;
+std::string Tab::prefixName;
 
 FILE* Tab::trace = stderr;
 

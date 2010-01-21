@@ -48,7 +48,8 @@ int __cdecl CocoWin32Main(int argc, wchar_t *argv[]);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#ifdef __GNUC__
+// this might apply to other compilers too:
+#ifdef __MINGW32__
 # include <stdio.h>
 # include <windows.h>
 # include <shellapi.h>
@@ -67,7 +68,7 @@ int __cdecl main()
         return 1;
     }
 
-    int exitCode = unicode16main(argc, argv);
+    int exitCode = CocoWin32Main(argc, argv);
     LocalFree(argv);
     return exitCode;
 }

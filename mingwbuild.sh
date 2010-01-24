@@ -1,6 +1,8 @@
 #!/bin/sh
 # cross-compile coco-cpp for windows using mingw32
 # be pedantic about warnings
+
+cd ${0%/*} || exit 1    # run from this directory
 set -x
 
 /opt/cross/bin/i386-mingw32msvc-g++ \

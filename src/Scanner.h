@@ -159,11 +159,18 @@ inline long coco_string_toLong(const wchar_t* str)
 
 //! Create a byte string by copying str
 //! Restrict to a ASCII (7bit) value
-std::string coco_string_stdStringASCII(const wchar_t* str);
+std::string coco_stdStringASCII(const wchar_t* str);
 
 //! Create a byte substring of str starting at index and length characters long
 //! Restrict to a ASCII (7bit) value
-std::string coco_string_stdStringASCII(const wchar_t* str, int index, int length);
+std::string coco_stdStringASCII(const wchar_t* str, int index, int length);
+
+
+//! Create a UTF8 byte string by copying str
+std::string coco_stdStringUTF8(const wchar_t* str);
+
+//! Create a UTF8 byte substring starting at index and length characters long
+std::string coco_stdStringUTF8(const wchar_t* str, int index, int length);
 
 // * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
 

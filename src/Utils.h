@@ -35,6 +35,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include <string.h>
 #include <wchar.h>
 #include <string>
+#include <iostream>
 
 #include "Scanner.h"
 
@@ -95,6 +96,16 @@ int coco_string_lastindexof(const wchar_t* str, const wchar_t ch);
 
 //! Check for bool values. Return 1 for 'true', 0 for 'false' and -1 for unknown
 int coco_string_checkBool(const wchar_t* str);
+
+
+//! Output wchar_t as UTF8.
+std::ostream& operator<<(std::ostream& os, const wchar_t wc);
+
+//! Output a wchar_t string as UTF8.
+std::ostream& operator<<(std::ostream& os, const wchar_t* ws);
+
+//! Output std::wstring as UTF8.
+std::ostream& operator<<(std::ostream& os, const std::wstring&);
 
 
 // * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //

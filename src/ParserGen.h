@@ -53,7 +53,8 @@ class ParserGen
 {
 public:
 	//! Type of errors
-	enum errorType {
+	enum errorType
+	{
 		tErr    = 0,   //!< terminal error
 		altErr  = 1,   //!< alt error
 		syncErr = 2,   //!< sync error

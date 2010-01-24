@@ -49,7 +49,8 @@ class Symbol
 {
 public:
 	//! Enumeration for the kind of tokens
-	enum symbolType {
+	enum symbolType
+	{
 		fixedToken    = 0,  //!< eg, 'a' ('b' | 'c') (structure of literals)
 		classToken    = 1,  //!< eg, digit {digit}   (at least one char class)
 		litToken      = 2,  //!< eg, "while"

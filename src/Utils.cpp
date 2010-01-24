@@ -171,6 +171,107 @@ int coco_string_checkBool(const wchar_t* str)
 }
 
 
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+std::ostream& operator<<(std::ostream& os, const wchar_t wc)
+{
+    if (!(wc & ~0x0000007F))
+    {
+        // 0x00000000 - 0x0000007F [min. 8bit storage, 1-byte encoding)
+        // 0aaaaaaa
+        os.put(char(wc));
+    }
+    else if (!(wc & ~0x000007FF))
+    {
+        // 0x00000080 - 0x000007FF [min. 16bit storage, 2-byte encoding]
+        // 110bbbaa 10aaaaaa
+        os.put(char(0xC0 | ((wc >> 6) & 0x1F)));
+        os.put(char(0x80 | ((wc) & 0x3F)));
+    }
+    else if (!(wc & ~0x0000FFFF))
+    {
+        // 0x00000800 - 0x0000FFFF [min. 16bit storage, 3-byte encoding]
+        // 1110bbbb 10bbbbaa 10aaaaaa
+        os.put(char(0xE0 | ((wc >> 12) & 0x0F)));
+        os.put(char(0x80 | ((wc >> 6) & 0x3F)));
+        os.put(char(0x80 | ((wc) & 0x3F)));
+    }
+    else if (!(wc & ~0x001FFFFF))
+    {
+        // 0x00010000 - 0x001FFFFF [min. 24bit storage, 4-byte encoding]
+        // 11110ccc 10ccbbbb 10bbbbaa 10aaaaaa
+        os.put(char(0xF0 | ((wc >> 18) & 0x07)));
+        os.put(char(0x80 | ((wc >> 12) & 0x3F)));
+        os.put(char(0x80 | ((wc >> 6) & 0x3F)));
+        os.put(char(0x80 | ((wc) & 0x3F)));
+    }
+//
+// Not (yet) used - wchar_t storage is limited to 16bit on windows
+// This also corresponds to the unicode BMP (Basic Multilingual Plane)
+//
+//    else if (!(wc & ~0x03FFFFFF))
+//    {
+//        // 0x00200000 - 0x03FFFFFF [min. 32bit storage, 5-byte encoding]
+//        // 111110dd 10cccccc 10ccbbbb 10bbbbaa 10aaaaaa
+//        os.put(char(0xF8 | ((wc >> 24) & 0x03)));
+//        os.put(char(0x80 | ((wc >> 18) & 0x3F)));
+//        os.put(char(0x80 | ((wc >> 12) & 0x3F)));
+//        os.put(char(0x80 | ((wc >> 6) & 0x3F)));
+//        os.put(char(0x80 | ((wc) & 0x3F)));
+//    }
+//    else if (!(wc & ~0x7FFFFFFF))
+//    {
+//        // 0x04000000 - 0x7FFFFFFF [min. 32bit storage, 6-byte encoding]
+//        // 1111110d 10dddddd 10cccccc 10ccbbbb 10bbbbaa 10aaaaaa
+//        os.put(char(0xFC | ((wc >> 30) & 0x01)));
+//        os.put(char(0x80 | ((wc >> 24) & 0x3F)));
+//        os.put(char(0x80 | ((wc >> 18) & 0x3F)));
+//        os.put(char(0x80 | ((wc >> 12) & 0x3F)));
+//        os.put(char(0x80 | ((wc >> 6) & 0x3F)));
+//        os.put(char(0x80 | ((wc) & 0x3F)));
+//    }
+//
+    else
+    {
+        // report anything unknown/invalid as replacement character U+FFFD
+        os.put(char(0xEF));
+        os.put(char(0xBF));
+        os.put(char(0xBD));
+    }
+
+    return os;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const wchar_t* ws)
+{
+    if (ws)
+    {
+        for (const wchar_t* p = ws; *p; ++p)
+        {
+            os  << *p;
+        }
+    }
+
+    return os;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const std::wstring& ws)
+{
+    for
+    (
+        std::wstring::const_iterator iter = ws.begin();
+        iter != ws.end();
+        ++iter
+    )
+    {
+        os  << *iter;
+    }
+
+    return os;
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Coco

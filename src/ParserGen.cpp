@@ -93,14 +93,13 @@ void ParserGen::GenErrorMsg(ParserGen::errorType errTyp, Symbol *sym)
 	{
 		if (sym->name[0] == '"')
 		{
-			coco_swprintf(format, formatLen, L"%ls expected", tab->Escape(sym->name));
-			coco_string_merge(err, format);
+			coco_swprintf(format, formatLen, L"%ls expected", Tab::Escape(sym->name).c_str());
 		}
 		else
 		{
 			coco_swprintf(format, formatLen, L"%ls expected", sym->name);
-			coco_string_merge(err, format);
 		}
+		coco_string_merge(err, format);
 	}
 	else if (errTyp == altErr)
 	{
@@ -567,6 +566,7 @@ ParserGen::ParserGen(Parser *parser)
 
 ParserGen::~ParserGen()
 {
+	coco_string_delete(err);
 	if (preamblePos) { delete preamblePos; }
 	if (semDeclPos) { delete semDeclPos; }
 	if (initCodePos) { delete initCodePos; }

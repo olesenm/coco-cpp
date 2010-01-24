@@ -1010,10 +1010,10 @@ void Tab::CompSymbolSets()
 //  String handling
 //---------------------------------------------------------------------
 
-wchar_t Tab::Hex2Char(const wchar_t* s)
+wchar_t Tab::Hex2Char(const wchar_t* s, const int len)
 {
 	int val = 0;
-	const int len = coco_string_length(s);
+
 	for (int i = 0; i < len; i++)
 	{
 		wchar_t ch = s[i];
@@ -1030,9 +1030,9 @@ wchar_t Tab::Hex2Char(const wchar_t* s)
 }
 
 
-wchar_t* Tab::Char2Hex(const wchar_t ch)
+std::wstring Tab::Char2Hex(const wchar_t ch)
 {
-	wchar_t* format = new wchar_t[10];
+	wchar_t format[10];
 	coco_swprintf(format, 10, L"\\0x%04x", ch);
 	return format;
 }
@@ -1040,84 +1040,91 @@ wchar_t* Tab::Char2Hex(const wchar_t ch)
 
 wchar_t* Tab::Unescape(const wchar_t* s)
 {
-	/* replaces escape sequences in s by their Unicode values. */
-	StringBuilder buf = StringBuilder();
 	const int len = coco_string_length(s);
-	for (int i = 0; i < len; /*nil*/ )
+	std::wstring buf;
+	buf.reserve(len);
+
+	for (int i = 0; i < len; ++i)
 	{
 		if (s[i] == '\\')
 		{
-			switch (s[i+1])
+			++i;            // skip backslash
+			switch (s[i])
 			{
-				case '\\': buf.Append(L'\\'); i += 2; break;
-				case '\'': buf.Append(L'\''); i += 2; break;
-				case '\"': buf.Append(L'\"'); i += 2; break;
-				case 'r': buf.Append(L'\r'); i += 2; break;
-				case 'n': buf.Append(L'\n'); i += 2; break;
-				case 't': buf.Append(L'\t'); i += 2; break;
-				case '0': buf.Append(L'\0'); i += 2; break;
-				case 'a': buf.Append(L'\a'); i += 2; break;
-				case 'b': buf.Append(L'\b'); i += 2; break;
-				case 'f': buf.Append(L'\f'); i += 2; break;
-				case 'v': buf.Append(L'\v'); i += 2; break;
-				case 'u': case 'x':
-					if (i + 6 <= coco_string_length(s))
+				case '\\':
+				case '\'':
+				case '\"':
+					buf += s[i];   // escaped char is itself
+					break;
+				case 'r':  buf += L'\r'; break;
+				case 'n':  buf += L'\n'; break;
+				case 't':  buf += L'\t'; break;
+				case '0':  buf += L'\0'; break;
+				case 'a':  buf += L'\a'; break;
+				case 'b':  buf += L'\b'; break;
+				case 'f':  buf += L'\f'; break;
+				case 'v':  buf += L'\v'; break;
+
+				case 'u': case 'x':   // unicode/hex encoding
+					if (i + 5 <= len)
 					{
-						wchar_t *subS = coco_string_create(s, i+2, 4);
-						buf.Append(Hex2Char(subS)); i += 6; break;
-						coco_string_delete(subS);
+						buf += Hex2Char(s+i+1, 4);
+						i += 4;
+						break;
 					}
 					else
 					{
 						parser->SemErr(L"bad escape sequence in string or character");
-						i = coco_string_length(s); break;
+						i = len;
+						break;
 					}
 				default:
 					parser->SemErr(L"bad escape sequence in string or character");
-					i += 2; break;
+					break;
 			}
 		}
 		else
 		{
-			buf.Append(s[i]);
-			i++;
+			buf += s[i];
 		}
 	}
 
-	return buf.ToString();
+	return coco_string_create(buf.c_str());
 }
 
 
-wchar_t* Tab::Escape(const wchar_t* s)
+std::wstring Tab::Escape(const wchar_t* s)
 {
-	StringBuilder buf = StringBuilder();
 	const int len = coco_string_length(s);
+
+	std::wstring buf;
+	buf.reserve(len);
+
 	for (int i=0; i < len; i++)
 	{
 		wchar_t ch = s[i];
 		switch (ch)
 		{
-			case '\\': buf.Append(L"\\\\"); break;
-			case '\'': buf.Append(L"\\'"); break;
-			case '\"': buf.Append(L"\\\""); break;
-			case '\t': buf.Append(L"\\t"); break;
-			case '\r': buf.Append(L"\\r"); break;
-			case '\n': buf.Append(L"\\n"); break;
+			case '\\':  buf += L"\\\\"; break;
+			case '\'':  buf += L"\\'";  break;
+			case '\"':  buf += L"\\\""; break;
+			case '\t':  buf += L"\\t";  break;
+			case '\r':  buf += L"\\r";  break;
+			case '\n':  buf += L"\\n";  break;
 			default:
 				if (ch < 32 || ch > 0x7F)
 				{
-					wchar_t* res = Char2Hex(ch);
-					buf.Append(res);
-					delete[] res;
+					buf += Char2Hex(ch);
 				}
 				else
 				{
-					buf.Append(ch);
+					buf += ch;
 				}
 				break;
 		}
 	}
-	return buf.ToString();
+
+	return buf;
 }
 
 
@@ -1574,7 +1581,7 @@ void Tab::DispatchDirective(const wchar_t* str)
 		// set namespace if not already set
 		if (nsName.empty())
 		{
-			nsName = coco_string_stdStringASCII(strval, 0, len2);
+			nsName = coco_stdStringASCII(strval, 0, len2);
 		}
 		wprintf(L"using namespace: '%s'\n", nsName.c_str());
 	}
@@ -1583,7 +1590,7 @@ void Tab::DispatchDirective(const wchar_t* str)
 		// set prefix if not already set
 		if (prefixName.empty())
 		{
-			prefixName = coco_string_stdStringASCII(strval, 0, len2);
+			prefixName = coco_stdStringASCII(strval, 0, len2);
 		}
 		wprintf(L"using prefix: '%s'\n", prefixName.c_str());
 	}

@@ -32,7 +32,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 #include "ArrayList.h"
 #include "HashTable.h"
-#include "StringBuilder.h"
 #include "Utils.h"
 #include "Position.h"
 #include "Symbol.h"
@@ -226,10 +225,12 @@ public:
 	//  String handling
 	//---------------------------------------------------------------------
 
-	wchar_t  Hex2Char(const wchar_t* s);
-	static wchar_t* Char2Hex(const wchar_t ch);
+	wchar_t  Hex2Char(const wchar_t* s, const int len);
+	static std::wstring Char2Hex(const wchar_t ch);
+
+	//! replaces escape sequences in s by their Unicode values.
 	wchar_t* Unescape(const wchar_t* s);
-	static wchar_t* Escape(const wchar_t* s);
+	static std::wstring Escape(const wchar_t* s);
 
 	//---------------------------------------------------------------------
 	//  Grammar checks

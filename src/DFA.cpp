@@ -47,9 +47,9 @@ namespace Coco
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 //---------- Output primitives
-wchar_t* DFA::Ch(wchar_t ch)
+std::wstring DFA::Ch(wchar_t ch)
 {
-	wchar_t* format = new wchar_t[10];
+	wchar_t format[10];
 	if (ch < 32 || ch >= 0x7F || ch == '\'' || ch == '\\')
 		coco_swprintf(format, 10, L"%d\0", int(ch));
 	else
@@ -58,13 +58,9 @@ wchar_t* DFA::Ch(wchar_t ch)
 }
 
 
-wchar_t* DFA::ChCond(wchar_t ch)
+std::wstring DFA::ChCond(wchar_t ch)
 {
-	wchar_t* format = new wchar_t[20];
-	wchar_t* res = Ch(ch);
-	coco_swprintf(format, 20, L"ch == %ls\0", res);
-	delete[] res;
-	return format;
+	return std::wstring(L"ch == " + Ch(ch));
 }
 
 
@@ -74,23 +70,21 @@ void DFA::PutRange(CharSet *s)
 	{
 		if (r->from == r->to)
 		{
-			wchar_t *from = Ch(r->from);
-			fwprintf(gen, L"ch == %ls", from);
-			delete[] from;
+			fwprintf(gen, L"ch == %ls", Ch(r->from).c_str());
 		}
 		else if (r->from == 0)
 		{
-			wchar_t *to = Ch(r->to);
-			fwprintf(gen, L"ch <= %ls", to);
-			delete[] to;
+			fwprintf(gen, L"ch <= %ls", Ch(r->to).c_str());
 		}
 		else
 		{
-			wchar_t *from = Ch(r->from);
-			wchar_t *to = Ch(r->to);
-			fwprintf(gen, L"(ch >= %ls && ch <= %ls)", from, to);
-			delete[] from;
-			delete[] to;
+			fwprintf
+			(
+				gen,
+				L"(ch >= %ls && ch <= %ls)",
+				Ch(r->from).c_str(),
+				Ch(r->to).c_str()
+			);
 		}
 		if (r->next != NULL) fwprintf(gen, L" || ");
 	}
@@ -589,9 +583,7 @@ void DFA::PrintStates()
 			}
 			else
 			{
-				wchar_t* res = Ch(action->sym);
-				fwprintf(trace, L"%ls", res);
-				delete[] res;
+				fwprintf(trace, L"%ls", Ch(action->sym).c_str());
 			}
 			for (Target *targ = action->target; targ != NULL; targ = targ->next)
 			{
@@ -723,20 +715,25 @@ Melted* DFA::StateWithSet(BitArray *s)
 
 //------------------------ comments --------------------------------
 
-wchar_t* DFA::CommentStr(Node *p)
+std::wstring DFA::CommentStr(Node *p)
 {
-	StringBuilder s = StringBuilder();
+	std::wstring comstr;
+	comstr.reserve(2);
+
 	while (p != NULL)
 	{
 		if (p->typ == Node::chr)
 		{
-			s.Append(wchar_t(p->val));
+			comstr += wchar_t(p->val);
 		}
 		else if (p->typ == Node::clas)
 		{
 			CharSet *set = tab->CharClassSet(p->val);
-			if (set->Elements() != 1) parser->SemErr(L"character set contains more than 1 character");
-			s.Append(wchar_t(set->First()));
+			if (set->Elements() != 1)
+			{
+				parser->SemErr(L"character set contains more than 1 character");
+			}
+			comstr += wchar_t(set->First());
 		}
 		else
 		{
@@ -745,19 +742,20 @@ wchar_t* DFA::CommentStr(Node *p)
 
 		p = p->next;
 	}
-	if (s.GetLength() == 0 || s.GetLength() > 2)
+	if (comstr.size() < 1 || comstr.size() > 2)
 	{
 		parser->SemErr(L"comment delimiters must be 1 or 2 characters long");
-		s = StringBuilder(L"?");
+		comstr = L"?";
 	}
-	return s.ToString();
+	return comstr;
 }
 
 
 void DFA::NewComment(Node *from, Node *to, bool nested)
 {
 	Comment *c = new Comment(CommentStr(from), CommentStr(to), nested);
-	c->next = firstComment; firstComment = c;
+	c->next = firstComment;
+	firstComment = c;
 }
 
 
@@ -767,12 +765,9 @@ void DFA::GenComBody(Comment *com)
 {
 	fwprintf(gen, L"\t\tfor(;;) {\n");
 
-	wchar_t* res = ChCond(com->stop[0]);
-	fwprintf(gen, L"\t\t\tif (%ls) ", res);
-	fwprintf(gen, L"{\n");
-	delete[] res;
+	fwprintf(gen, L"\t\t\tif (%ls) {\n", ChCond(com->stop[0]).c_str());
 
-	if (coco_string_length(com->stop) == 1)
+	if (com->stop.length() == 1)
 	{
 		fwprintf(gen, L"\t\t\t\tlevel--;\n");
 		fwprintf(gen, L"\t\t\t\tif (level == 0) { oldEols = line - line0; NextCh(); return true; }\n");
@@ -781,9 +776,7 @@ void DFA::GenComBody(Comment *com)
 	else
 	{
 		fwprintf(gen, L"\t\t\t\tNextCh();\n");
-		wchar_t* res = ChCond(com->stop[1]);
-		fwprintf(gen, L"\t\t\t\tif (%ls) {\n", res);
-		delete[] res;
+		fwprintf(gen, L"\t\t\t\tif (%ls) {\n", ChCond(com->stop[1]).c_str());
 		fwprintf(gen, L"\t\t\t\t\tlevel--;\n");
 		fwprintf(gen, L"\t\t\t\t\tif (level == 0) { oldEols = line - line0; NextCh(); return true; }\n");
 		fwprintf(gen, L"\t\t\t\t\tNextCh();\n");
@@ -791,21 +784,16 @@ void DFA::GenComBody(Comment *com)
 	}
 	if (com->nested)
 	{
-			fwprintf(gen, L"\t\t\t}");
-			wchar_t* res = ChCond(com->start[0]);
-			fwprintf(gen, L" else if (%ls) ", res);
-			delete[] res;
-			fwprintf(gen, L"{\n");
-		if (coco_string_length(com->stop) == 1)
+		fwprintf(gen, L"\t\t\t}");
+		fwprintf(gen, L" else if (%ls) {\n", ChCond(com->start[0]).c_str());
+		if (com->stop.length() == 1)
 		{
 			fwprintf(gen, L"\t\t\t\tlevel++; NextCh();\n");
 		}
 		else
 		{
 			fwprintf(gen, L"\t\t\t\tNextCh();\n");
-			wchar_t* res = ChCond(com->start[1]);
-			fwprintf(gen, L"\t\t\t\tif (%ls) ", res);
-			delete[] res;
+			fwprintf(gen, L"\t\t\t\tif (%ls) ", ChCond(com->start[1]).c_str());
 			fwprintf(gen, L"{\n");
 			fwprintf(gen, L"\t\t\t\t\tlevel++; NextCh();\n");
 			fwprintf(gen, L"\t\t\t\t}\n");
@@ -829,19 +817,14 @@ void DFA::GenComment(Comment *com, int i)
 	fwprintf(gen, L"bool Scanner::Comment%d() ", i);
 	fwprintf(gen, L"{\n");
 	fwprintf(gen, L"\tint level = 1, pos0 = pos, line0 = line, col0 = col;\n");
-	if (coco_string_length(com->start) == 1)
+	fwprintf(gen, L"\tNextCh();\n");
+	if (com->start.length() == 1)
 	{
-		fwprintf(gen, L"\tNextCh();\n");
 		GenComBody(com);
 	}
 	else
 	{
-		fwprintf(gen, L"\tNextCh();\n");
-		wchar_t* res = ChCond(com->start[1]);
-		fwprintf(gen, L"\tif (%ls) ", res);
-		delete[] res;
-		fwprintf(gen, L"{\n");
-
+		fwprintf(gen, L"\tif (%ls) {\n", ChCond(com->start[1]).c_str());
 		fwprintf(gen, L"\t\tNextCh();\n");
 		GenComBody(com);
 
@@ -864,7 +847,7 @@ void DFA::CopyFramePart(const wchar_t* stop, const bool doOutput)
 }
 
 
-wchar_t* DFA::SymName(Symbol *sym)  // real name value is stored in Tab.literals
+const wchar_t* DFA::SymName(Symbol *sym)  // real name value is stored in Tab.literals
 {
 	if   // Char::IsLetter(sym->name[0])
 	(
@@ -957,9 +940,7 @@ void DFA::WriteState(State *state)
 			fwprintf(gen, L"\t\t\telse if (");
 		if (action->typ == Node::chr)
 		{
-			wchar_t* res = ChCond(wchar_t(action->sym));
-			fwprintf(gen, L"%ls", res);
-			delete[] res;
+			fwprintf(gen, L"%ls", ChCond(wchar_t(action->sym)).c_str());
 		}
 		else
 		{
@@ -1144,9 +1125,12 @@ void DFA::WriteScanner()
 		com = firstComment;
 		for (int i=0; com; com = com->next, ++i)
 		{
-			wchar_t* res = ChCond(com->start[0]);
-			fwprintf(gen, L"(%ls && Comment%d())", res, i);
-			delete[] res;
+			fwprintf
+			(
+				gen, L"(%ls && Comment%d())",
+				ChCond(com->start[0]).c_str(),
+				i
+			);
 			if (com->next != NULL)
 			{
 				fwprintf(gen, L" || ");

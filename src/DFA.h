@@ -80,8 +80,8 @@ public:
 	Comment *firstComment;  //!< list of comments
 
 	//---------- Output primitives
-	wchar_t* Ch(wchar_t ch);
-	wchar_t* ChCond(wchar_t ch);
+	static std::wstring Ch(wchar_t ch);
+	static std::wstring ChCond(wchar_t ch);
 	void  PutRange(CharSet *s);
 
 	//---------- State handling
@@ -123,7 +123,8 @@ public:
 	Melted* StateWithSet(BitArray *s);
 
 	//------------------------ comments --------------------------------
-	wchar_t* CommentStr(Node *p);
+	
+	std::wstring CommentStr(Node *p);
 	void NewComment(Node *from, Node *to, bool nested);
 
 	//------------------------ scanner generation ----------------------
@@ -131,7 +132,7 @@ public:
 	void GenCommentHeader(Comment *com, int i);
 	void GenComment(Comment *com, int i);
 	void CopyFramePart(const wchar_t* stop, const bool doOutput = true);
-	wchar_t* SymName(Symbol *sym); //!< real name value is stored in Tab.literals
+	const wchar_t* SymName(Symbol *sym); //!< real name value is stored in Tab.literals
 	void GenLiterals();
 	void WriteState(State *state);
 	void WriteStartTab();

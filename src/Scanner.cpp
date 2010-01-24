@@ -141,7 +141,7 @@ int coco_string_indexof(const wchar_t* str, const wchar_t ch)
 // string handling, byte character
 //
 
-std::string coco_string_stdStringASCII(const wchar_t* str)
+std::string coco_stdStringASCII(const wchar_t* str)
 {
     const int len = coco_string_length(str);
     std::string dest;
@@ -156,11 +156,11 @@ std::string coco_string_stdStringASCII(const wchar_t* str)
 }
 
 
-std::string coco_string_stdStringASCII
+std::string coco_stdStringASCII
 (
-	const wchar_t* str,
-	int index,
-	int length
+    const wchar_t* str,
+    int index,
+    int length
 )
 {
     const int len = (str && *str) ? length : 0;
@@ -174,6 +174,99 @@ std::string coco_string_stdStringASCII
 
     return dest;
 }
+
+
+std::string coco_stdStringUTF8(const wchar_t* str)
+{
+    return str ? coco_stdStringUTF8(str, 0, wcslen(str)) : std::string();
+}
+
+
+std::string coco_stdStringUTF8
+(
+    const wchar_t* str,
+    int index,
+    int length
+)
+{
+    const int len = (str && *str) ? length : 0;
+    std::string dest;
+    dest.reserve(len);
+
+
+    for (int i = 0; i < len; ++i)
+    {
+        wchar_t wc = str[index+i];
+
+        if (!(wc & ~0x0000007F))
+        {
+            // 0x00000000 - 0x0000007F [min. 8bit storage, 1-byte encoding)
+            // 0aaaaaaa
+            dest += char(wc);
+        }
+        else if (!(wc & ~0x000007FF))
+        {
+            // 0x00000080 - 0x000007FF [min. 16bit storage, 2-byte encoding]
+            // 110bbbaa 10aaaaaa
+            dest += char(0xC0 | ((wc >> 6) & 0x1F));
+            dest += char(0x80 | ((wc) & 0x3F));
+        }
+        else if (!(wc & ~0x0000FFFF))
+        {
+            // 0x00000800 - 0x0000FFFF [min. 16bit storage, 3-byte encoding]
+            // 1110bbbb 10bbbbaa 10aaaaaa
+            dest += char(0xE0 | ((wc >> 12) & 0x0F));
+            dest += char(0x80 | ((wc >> 6) & 0x3F));
+            dest += char(0x80 | ((wc) & 0x3F));
+        }
+        else if (!(wc & ~0x001FFFFF))
+        {
+            // 0x00010000 - 0x001FFFFF [min. 24bit storage, 4-byte encoding]
+            // 11110ccc 10ccbbbb 10bbbbaa 10aaaaaa
+            dest += char(0xF0 | ((wc >> 18) & 0x07));
+            dest += char(0x80 | ((wc >> 12) & 0x3F));
+            dest += char(0x80 | ((wc >> 6) & 0x3F));
+            dest += char(0x80 | ((wc) & 0x3F));
+        }
+//
+// Not (yet) used - wchar_t storage is limited to 16bit on windows
+// This also corresponds to the unicode BMP (Basic Multilingual Plane)
+//
+//        else if (!(wc & ~0x03FFFFFF))
+//        {
+//            // 0x00200000 - 0x03FFFFFF [min. 32bit storage, 5-byte encoding]
+//            // 111110dd 10cccccc 10ccbbbb 10bbbbaa 10aaaaaa
+//            dest += char(0xF8 | ((wc >> 24) & 0x03));
+//            dest += char(0x80 | ((wc >> 18) & 0x3F));
+//            dest += char(0x80 | ((wc >> 12) & 0x3F));
+//            dest += char(0x80 | ((wc >> 6) & 0x3F));
+//            dest += char(0x80 | ((wc) & 0x3F));
+//        }
+//        else if (!(wc & ~0x7FFFFFFF))
+//        {
+//            // 0x04000000 - 0x7FFFFFFF [min. 32bit storage, 6-byte encoding]
+//            // 1111110d 10dddddd 10cccccc 10ccbbbb 10bbbbaa 10aaaaaa
+//            dest += char(0xFC | ((wc >> 30) & 0x01));
+//            dest += char(0x80 | ((wc >> 24) & 0x3F));
+//            dest += char(0x80 | ((wc >> 18) & 0x3F));
+//            dest += char(0x80 | ((wc >> 12) & 0x3F));
+//            dest += char(0x80 | ((wc >> 6) & 0x3F));
+//            dest += char(0x80 | ((wc) & 0x3F));
+//        }
+//
+        else
+        {
+            // report anything unknown/invalid as replacement character U+FFFD
+            dest += char(0xEF);
+            dest += char(0xBF);
+            dest += char(0xBD);
+        }
+    }
+
+    return dest;
+}
+
+
 
 // * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
 
@@ -374,7 +467,8 @@ int UTF8Buffer::Read()
 		// 0xxxxxxx or end of file character
 	}
 	else if ((ch & 0xF0) == 0xF0) {
-		// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+		// 0x00010000 - 0x001FFFFF [min. 24bit storage, 4-byte encoding]
+		// 11110ccc 10ccbbbb 10bbbbaa 10aaaaaa
 		int c1 = ch & 0x07; ch = Buffer::Read();
 		int c2 = ch & 0x3F; ch = Buffer::Read();
 		int c3 = ch & 0x3F; ch = Buffer::Read();
@@ -382,14 +476,16 @@ int UTF8Buffer::Read()
 		ch = (((((c1 << 6) | c2) << 6) | c3) << 6) | c4;
 	}
 	else if ((ch & 0xE0) == 0xE0) {
-		// 1110xxxx 10xxxxxx 10xxxxxx
+		// 0x00000800 - 0x0000FFFF [min. 16bit storage, 3-byte encoding]
+		// 1110bbbb 10bbbbaa 10aaaaaa
 		int c1 = ch & 0x0F; ch = Buffer::Read();
 		int c2 = ch & 0x3F; ch = Buffer::Read();
 		int c3 = ch & 0x3F;
 		ch = (((c1 << 6) | c2) << 6) | c3;
 	}
 	else if ((ch & 0xC0) == 0xC0) {
-		// 110xxxxx 10xxxxxx
+		// 0x00000080 - 0x000007FF [min. 16bit storage, 2-byte encoding]
+		// 110bbbaa 10aaaaaa
 		int c1 = ch & 0x1F; ch = Buffer::Read();
 		int c2 = ch & 0x3F;
 		ch = (c1 << 6) | c2;

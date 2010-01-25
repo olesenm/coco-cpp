@@ -87,7 +87,7 @@ void ParserGen::GenErrorMsg(ParserGen::errorType errTyp, Symbol *sym)
 	errorNr++;
 	const int formatLen = 1000;
 	wchar_t format[formatLen];
-	coco_swprintf(format, formatLen, L"\t\t\tcase %d: s = coco_string_create(L\"", errorNr);
+	coco_swprintf(format, formatLen, L"\t\t\tcase %d: return L\"", errorNr);
 	coco_string_merge(err, format);
 	if (errTyp == tErr)
 	{
@@ -111,7 +111,7 @@ void ParserGen::GenErrorMsg(ParserGen::errorType errTyp, Symbol *sym)
 		coco_swprintf(format, formatLen, L"this symbol not expected in %ls", sym->name);
 		coco_string_merge(err, format);
 	}
-	coco_swprintf(format, formatLen, L"\"); break;\n");
+	coco_swprintf(format, formatLen, L"\"; break;\n");
 	coco_string_merge(err, format);
 }
 

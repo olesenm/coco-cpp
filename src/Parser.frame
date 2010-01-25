@@ -43,26 +43,23 @@ class Errors
 public:
 	int count;      //!< The number of errors detected
 
-	//! Allocate and return a string describing the given error code.
-	/** It is the responsibility of the caller to free this string,
-	 *  eg, with coco_string_delete()
-	 */
-	static wchar_t* strerror(int n);
+	//! Return a string describing the given error code.
+	static std::wstring strerror(int n);
 
 	Errors();               //!< Construct null - start with no errors
 	virtual ~Errors();      //!< Destructor
 	virtual void clear();   //!< Clear the error count
 
 	//! Handle a general warning 'msg'
-	virtual void Warning(const wchar_t* msg);
+	virtual void Warning(const std::wstring& msg);
 	//! Handle a general warning 'msg'
-	virtual void Warning(int line, int col, const wchar_t* msg);
+	virtual void Warning(int line, int col, const std::wstring& msg);
 	//! Handle general error 'msg' (eg, a semantic error)
-	virtual void Error(int line, int col, const wchar_t* msg);
+	virtual void Error(int line, int col, const std::wstring& msg);
 	//! Handle syntax error 'n', uses strerror for the message, calls Error()
 	virtual void SynErr(int line, int col, int n);
 	//! Handle a general exception 'msg'
-	virtual void Exception(const wchar_t* msg);
+	virtual void Exception(const std::wstring& msg);
 
 }; // Errors
 
@@ -101,7 +98,7 @@ public:
 	 */
 	Parser(Scanner* scan, Errors* err = 0);
 	~Parser();
-	void SemErr(const wchar_t* msg);    //!< Handle semantic error
+	void SemErr(const std::wstring& msg);    //!< Handle semantic error
 
 -->productionsheader
 	void Parse();                       //!< Execute the parse operation
@@ -135,7 +132,7 @@ void Parser::SynErr(int n)
 }
 
 
-void Parser::SemErr(const wchar_t* msg)
+void Parser::SemErr(const std::wstring& msg)
 {
 	if (errDist >= minErrDist) errors->Error(t->line, t->col, msg);
 	errDist = 0;
@@ -295,53 +292,49 @@ void Errors::clear()
 }
 
 
-wchar_t* Errors::strerror(int n)
+std::wstring Errors::strerror(int n)
 {
-	wchar_t* s;
 	switch (n) {
 -->errors
 		default:
 		{
 			wchar_t format[20];
 			coco_swprintf(format, 20, L"error %d", n);
-			s = coco_string_create(format);
+			return format;
 		}
 		break;
 	}
-	return s;
 }
 
 
-void Errors::Warning(const wchar_t* msg)
+void Errors::Warning(const std::wstring& msg)
 {
-	wprintf(L"%ls\n", msg);
+	wprintf(L"%ls\n", msg.c_str());
 }
 
 
-void Errors::Warning(int line, int col, const wchar_t* msg)
+void Errors::Warning(int line, int col, const std::wstring& msg)
 {
-	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
+	wprintf(L"-- line %d col %d: %ls\n", line, col, msg.c_str());
 }
 
 
-void Errors::Error(int line, int col, const wchar_t* msg)
+void Errors::Error(int line, int col, const std::wstring& msg)
 {
-	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
+	wprintf(L"-- line %d col %d: %ls\n", line, col, msg.c_str());
 	count++;
 }
 
 
 void Errors::SynErr(int line, int col, int n)
 {
-	wchar_t* msg = this->strerror(n);
-	this->Error(line, col, msg);
-	coco_string_delete(msg);
+	this->Error(line, col, this->strerror(n));
 }
 
 
-void Errors::Exception(const wchar_t* msg)
+void Errors::Exception(const std::wstring& msg)
 {
-	wprintf(L"%ls", msg);
+	wprintf(L"%ls", msg.c_str());
 	::exit(1);
 }
 

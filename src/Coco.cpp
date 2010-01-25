@@ -199,7 +199,7 @@ void printUsage(const char* message = NULL)
 int main(int argc, char *argv[])
 #endif
 {
-	wprintf(L"Coco/R C++ (21 Jan 2010)\n");
+	wprintf(L"Coco/R C++ (25 Jan 2010)\n");
 
 #ifdef _WIN32
 	std::wstring srcName;

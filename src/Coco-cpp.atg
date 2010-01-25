@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
  Coco-cpp.atg -- Attributed Grammar for Coco/R C++ version
  compile with:
-   Coco Coco-cpp.atg -namespace Coco
+   coco-cpp Coco-cpp.atg
 -------------------------------------------------------------------------*/
 [copy]
 /*-------------------------------*- C++ -*---------------------------------
@@ -36,8 +36,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Tab.h"
 #include "DFA.h"
 #include "ParserGen.h"
-
-
 
 
 COMPILER Coco

@@ -39,8 +39,6 @@ Coco/R itself) does not fall under the GNU General Public License.
 
 
 
-
-
 #include "Scanner.h"
 
 namespace Coco {
@@ -52,26 +50,23 @@ class Errors
 public:
 	int count;      //!< The number of errors detected
 
-	//! Allocate and return a string describing the given error code.
-	/** It is the responsibility of the caller to free this string,
-	 *  eg, with coco_string_delete()
-	 */
-	static wchar_t* strerror(int n);
+	//! Return a string describing the given error code.
+	static std::wstring strerror(int n);
 
 	Errors();               //!< Construct null - start with no errors
 	virtual ~Errors();      //!< Destructor
 	virtual void clear();   //!< Clear the error count
 
 	//! Handle a general warning 'msg'
-	virtual void Warning(const wchar_t* msg);
+	virtual void Warning(const std::wstring& msg);
 	//! Handle a general warning 'msg'
-	virtual void Warning(int line, int col, const wchar_t* msg);
+	virtual void Warning(int line, int col, const std::wstring& msg);
 	//! Handle general error 'msg' (eg, a semantic error)
-	virtual void Error(int line, int col, const wchar_t* msg);
+	virtual void Error(int line, int col, const std::wstring& msg);
 	//! Handle syntax error 'n', uses strerror for the message, calls Error()
 	virtual void SynErr(int line, int col, int n);
 	//! Handle a general exception 'msg'
-	virtual void Exception(const wchar_t* msg);
+	virtual void Exception(const std::wstring& msg);
 
 }; // Errors
 
@@ -135,7 +130,7 @@ public:
 	 */
 	Parser(Scanner* scan, Errors* err = 0);
 	~Parser();
-	void SemErr(const wchar_t* msg);    //!< Handle semantic error
+	void SemErr(const std::wstring& msg);    //!< Handle semantic error
 
 	void Coco();
 	void SetDecl();

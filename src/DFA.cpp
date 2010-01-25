@@ -397,9 +397,13 @@ void DFA::MatchLiteral(wchar_t* s, Symbol *sym)
 	)
 	{
 		// s matched a token with a fixed definition or a token with an appendix that will be cut off
-		wchar_t format[200];
-		coco_swprintf(format, 200, L"tokens %ls and %ls cannot be distinguished", sym->name, matchedSym->name);
-		parser->SemErr(format);
+		parser->SemErr
+		(
+		    std::wstring(L"cannot distinguish tokens ")
+		  + sym->name
+		  + L" and "
+		  + matchedSym->name
+		);
 	}
 	else    // matchedSym == classToken || classLitToken
 	{

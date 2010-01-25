@@ -49,7 +49,7 @@ void Parser::SynErr(int n)
 }
 
 
-void Parser::SemErr(const wchar_t* msg)
+void Parser::SemErr(const std::wstring& msg)
 {
 	if (errDist >= minErrDist) errors->Error(t->line, t->col, msg);
 	errDist = 0;
@@ -896,113 +896,109 @@ void Errors::clear()
 }
 
 
-wchar_t* Errors::strerror(int n)
+std::wstring Errors::strerror(int n)
 {
-	wchar_t* s;
 	switch (n) {
-			case 0: s = coco_string_create(L"EOF expected"); break;
-			case 1: s = coco_string_create(L"ident expected"); break;
-			case 2: s = coco_string_create(L"number expected"); break;
-			case 3: s = coco_string_create(L"string expected"); break;
-			case 4: s = coco_string_create(L"badString expected"); break;
-			case 5: s = coco_string_create(L"char expected"); break;
-			case 6: s = coco_string_create(L"\"[copy]\" expected"); break;
-			case 7: s = coco_string_create(L"\"[/copy]\" expected"); break;
-			case 8: s = coco_string_create(L"\"COMPILER\" expected"); break;
-			case 9: s = coco_string_create(L"\"[initialize]\" expected"); break;
-			case 10: s = coco_string_create(L"\"[/initialize]\" expected"); break;
-			case 11: s = coco_string_create(L"\"[destroy]\" expected"); break;
-			case 12: s = coco_string_create(L"\"[/destroy]\" expected"); break;
-			case 13: s = coco_string_create(L"\"[code]\" expected"); break;
-			case 14: s = coco_string_create(L"\"[/code]\" expected"); break;
-			case 15: s = coco_string_create(L"\"IGNORECASE\" expected"); break;
-			case 16: s = coco_string_create(L"\"CHARACTERS\" expected"); break;
-			case 17: s = coco_string_create(L"\"TOKENS\" expected"); break;
-			case 18: s = coco_string_create(L"\"PRAGMAS\" expected"); break;
-			case 19: s = coco_string_create(L"\"COMMENTS\" expected"); break;
-			case 20: s = coco_string_create(L"\"FROM\" expected"); break;
-			case 21: s = coco_string_create(L"\"TO\" expected"); break;
-			case 22: s = coco_string_create(L"\"NESTED\" expected"); break;
-			case 23: s = coco_string_create(L"\"IGNORE\" expected"); break;
-			case 24: s = coco_string_create(L"\"PRODUCTIONS\" expected"); break;
-			case 25: s = coco_string_create(L"\"=\" expected"); break;
-			case 26: s = coco_string_create(L"\".\" expected"); break;
-			case 27: s = coco_string_create(L"\"END\" expected"); break;
-			case 28: s = coco_string_create(L"\"+\" expected"); break;
-			case 29: s = coco_string_create(L"\"-\" expected"); break;
-			case 30: s = coco_string_create(L"\"..\" expected"); break;
-			case 31: s = coco_string_create(L"\"ANY\" expected"); break;
-			case 32: s = coco_string_create(L"\"<\" expected"); break;
-			case 33: s = coco_string_create(L"\">\" expected"); break;
-			case 34: s = coco_string_create(L"\"<.\" expected"); break;
-			case 35: s = coco_string_create(L"\".>\" expected"); break;
-			case 36: s = coco_string_create(L"\"|\" expected"); break;
-			case 37: s = coco_string_create(L"\"WEAK\" expected"); break;
-			case 38: s = coco_string_create(L"\"(\" expected"); break;
-			case 39: s = coco_string_create(L"\")\" expected"); break;
-			case 40: s = coco_string_create(L"\"[\" expected"); break;
-			case 41: s = coco_string_create(L"\"]\" expected"); break;
-			case 42: s = coco_string_create(L"\"{\" expected"); break;
-			case 43: s = coco_string_create(L"\"}\" expected"); break;
-			case 44: s = coco_string_create(L"\"SYNC\" expected"); break;
-			case 45: s = coco_string_create(L"\"IF\" expected"); break;
-			case 46: s = coco_string_create(L"\"CONTEXT\" expected"); break;
-			case 47: s = coco_string_create(L"\"(.\" expected"); break;
-			case 48: s = coco_string_create(L"\".)\" expected"); break;
-			case 49: s = coco_string_create(L"??? expected"); break;
-			case 50: s = coco_string_create(L"this symbol not expected in Coco"); break;
-			case 51: s = coco_string_create(L"this symbol not expected in TokenDecl"); break;
-			case 52: s = coco_string_create(L"invalid TokenDecl"); break;
-			case 53: s = coco_string_create(L"invalid AttrDecl"); break;
-			case 54: s = coco_string_create(L"invalid SimSet"); break;
-			case 55: s = coco_string_create(L"invalid Sym"); break;
-			case 56: s = coco_string_create(L"invalid Term"); break;
-			case 57: s = coco_string_create(L"invalid Factor"); break;
-			case 58: s = coco_string_create(L"invalid Attribs"); break;
-			case 59: s = coco_string_create(L"invalid TokenFactor"); break;
+			case 0: return L"EOF expected"; break;
+			case 1: return L"ident expected"; break;
+			case 2: return L"number expected"; break;
+			case 3: return L"string expected"; break;
+			case 4: return L"badString expected"; break;
+			case 5: return L"char expected"; break;
+			case 6: return L"\"[copy]\" expected"; break;
+			case 7: return L"\"[/copy]\" expected"; break;
+			case 8: return L"\"COMPILER\" expected"; break;
+			case 9: return L"\"[initialize]\" expected"; break;
+			case 10: return L"\"[/initialize]\" expected"; break;
+			case 11: return L"\"[destroy]\" expected"; break;
+			case 12: return L"\"[/destroy]\" expected"; break;
+			case 13: return L"\"[code]\" expected"; break;
+			case 14: return L"\"[/code]\" expected"; break;
+			case 15: return L"\"IGNORECASE\" expected"; break;
+			case 16: return L"\"CHARACTERS\" expected"; break;
+			case 17: return L"\"TOKENS\" expected"; break;
+			case 18: return L"\"PRAGMAS\" expected"; break;
+			case 19: return L"\"COMMENTS\" expected"; break;
+			case 20: return L"\"FROM\" expected"; break;
+			case 21: return L"\"TO\" expected"; break;
+			case 22: return L"\"NESTED\" expected"; break;
+			case 23: return L"\"IGNORE\" expected"; break;
+			case 24: return L"\"PRODUCTIONS\" expected"; break;
+			case 25: return L"\"=\" expected"; break;
+			case 26: return L"\".\" expected"; break;
+			case 27: return L"\"END\" expected"; break;
+			case 28: return L"\"+\" expected"; break;
+			case 29: return L"\"-\" expected"; break;
+			case 30: return L"\"..\" expected"; break;
+			case 31: return L"\"ANY\" expected"; break;
+			case 32: return L"\"<\" expected"; break;
+			case 33: return L"\">\" expected"; break;
+			case 34: return L"\"<.\" expected"; break;
+			case 35: return L"\".>\" expected"; break;
+			case 36: return L"\"|\" expected"; break;
+			case 37: return L"\"WEAK\" expected"; break;
+			case 38: return L"\"(\" expected"; break;
+			case 39: return L"\")\" expected"; break;
+			case 40: return L"\"[\" expected"; break;
+			case 41: return L"\"]\" expected"; break;
+			case 42: return L"\"{\" expected"; break;
+			case 43: return L"\"}\" expected"; break;
+			case 44: return L"\"SYNC\" expected"; break;
+			case 45: return L"\"IF\" expected"; break;
+			case 46: return L"\"CONTEXT\" expected"; break;
+			case 47: return L"\"(.\" expected"; break;
+			case 48: return L"\".)\" expected"; break;
+			case 49: return L"??? expected"; break;
+			case 50: return L"this symbol not expected in Coco"; break;
+			case 51: return L"this symbol not expected in TokenDecl"; break;
+			case 52: return L"invalid TokenDecl"; break;
+			case 53: return L"invalid AttrDecl"; break;
+			case 54: return L"invalid SimSet"; break;
+			case 55: return L"invalid Sym"; break;
+			case 56: return L"invalid Term"; break;
+			case 57: return L"invalid Factor"; break;
+			case 58: return L"invalid Attribs"; break;
+			case 59: return L"invalid TokenFactor"; break;
 
 		default:
 		{
 			wchar_t format[20];
 			coco_swprintf(format, 20, L"error %d", n);
-			s = coco_string_create(format);
+			return format;
 		}
 		break;
 	}
-	return s;
 }
 
 
-void Errors::Warning(const wchar_t* msg)
+void Errors::Warning(const std::wstring& msg)
 {
-	wprintf(L"%ls\n", msg);
+	wprintf(L"%ls\n", msg.c_str());
 }
 
 
-void Errors::Warning(int line, int col, const wchar_t* msg)
+void Errors::Warning(int line, int col, const std::wstring& msg)
 {
-	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
+	wprintf(L"-- line %d col %d: %ls\n", line, col, msg.c_str());
 }
 
 
-void Errors::Error(int line, int col, const wchar_t* msg)
+void Errors::Error(int line, int col, const std::wstring& msg)
 {
-	wprintf(L"-- line %d col %d: %ls\n", line, col, msg);
+	wprintf(L"-- line %d col %d: %ls\n", line, col, msg.c_str());
 	count++;
 }
 
 
 void Errors::SynErr(int line, int col, int n)
 {
-	wchar_t* msg = this->strerror(n);
-	this->Error(line, col, msg);
-	coco_string_delete(msg);
+	this->Error(line, col, this->strerror(n));
 }
 
 
-void Errors::Exception(const wchar_t* msg)
+void Errors::Exception(const std::wstring& msg)
 {
-	wprintf(L"%ls", msg);
+	wprintf(L"%ls", msg.c_str());
 	::exit(1);
 }
 

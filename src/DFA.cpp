@@ -117,22 +117,24 @@ void DFA::NewTransition
 
 void DFA::CombineShifts()
 {
-	State *state;
-	Action *a, *b, *c;
-	CharSet *seta, *setb;
-	for (state = firstState; state != NULL; state = state->next)
+	for (State *state = firstState; state != NULL; state = state->next)
 	{
-		for (a = state->firstAction; a != NULL; a = a->next)
+		for (Action *a = state->firstAction; a != NULL; a = a->next)
 		{
-			b = a->next;
+			Action* b = a->next;
 			while (b != NULL)
 			{
 				if (a->target->state == b->target->state && a->tc == b->tc)
 				{
-					seta = a->Symbols(tab); setb = b->Symbols(tab);
+					CharSet* seta = a->Symbols(tab);
+					CharSet* setb = b->Symbols(tab);
+
 					seta->Or(setb);
 					a->ShiftWith(seta, tab);
-					c = b; b = b->next; state->DetachAction(c);
+
+					Action* c = b;
+					b = b->next;
+					state->DetachAction(c);
 				}
 				else
 				{
@@ -161,6 +163,7 @@ void DFA::DeleteRedundantStates()
 	State **newState = (State**) malloc (sizeof(State*) * (lastStateNr + 1));
 	BitArray *used = new BitArray(lastStateNr + 1);
 	FindUsedStates(firstState, used);
+
 	// combine equal final states
 	for (State *s1 = firstState->next; s1 != NULL; s1 = s1->next) // firstState cannot be final
 	{
@@ -188,8 +191,7 @@ void DFA::DeleteRedundantStates()
 		}
 	}
 
-	State *state;
-	for (state = firstState; state != NULL; state = state->next)
+	for (State *state = firstState; state != NULL; state = state->next)
 	{
 		if ((*used)[state->nr])
 		{
@@ -205,7 +207,7 @@ void DFA::DeleteRedundantStates()
 
 	// delete unused states
 	lastState = firstState; lastStateNr = 0; // firstState has number 0
-	for (state = firstState->next; state != NULL; state = state->next)
+	for (State *state = firstState->next; state != NULL; state = state->next)
 	{
 		if ((*used)[state->nr])
 		{
@@ -475,13 +477,19 @@ bool DFA::MakeUnique(State *state) // return true if actions were split
 
 void DFA::MeltStates(State *state)
 {
-	bool changed, ctx;
-	BitArray *targets;
-	Symbol *endOf;
-	for (Action *action = state->firstAction; action != NULL; action = action->next)
+	for
+	(
+	    Action *action = state->firstAction;
+	    action != NULL;
+	    action = action->next
+	)
 	{
 		if (action->target->next != NULL)
 		{
+			BitArray *targets;
+			Symbol *endOf;
+			bool changed, ctx;
+
 			GetTargetStates(action, targets, endOf, ctx);
 			Melted *melt = StateWithSet(targets);
 			if (melt == NULL)
@@ -522,13 +530,12 @@ void DFA::FindCtxStates()
 
 void DFA::MakeDeterministic()
 {
-	State *state;
-	bool changed;
 	lastSimState = lastState->nr;
 	maxStates = 2 * lastSimState; // heuristic for set size in Melted.set
 	FindCtxStates();
-	for (state = firstState; state != NULL; state = state->next)
+	for (State *state = firstState; state != NULL; state = state->next)
 	{
+		bool changed;
 		do
 		{
 			changed = MakeUnique(state);
@@ -536,7 +543,7 @@ void DFA::MakeDeterministic()
 		while (changed);
 	}
 
-	for (state = firstState; state != NULL; state = state->next)
+	for (State *state = firstState; state != NULL; state = state->next)
 	{
 		MeltStates(state);
 	}
@@ -914,9 +921,9 @@ void DFA::CheckLabels()
 		existLabel[i] = false;
 	}
 
-	for (State* state = firstState->next; state; state = state->next)
+	for (State *state = firstState->next; state; state = state->next)
 	{
-		for (Action* action = state->firstAction; action; action = action->next)
+		for (Action *action = state->firstAction; action; action = action->next)
 		{
 			existLabel[action->target->state->nr] = true;
 		}

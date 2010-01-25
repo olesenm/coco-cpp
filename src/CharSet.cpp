@@ -38,7 +38,7 @@ namespace Coco
 
 bool CharSet::Get(int i) const
 {
-	for (CharSet::Range *p = head; p != NULL; p = p->next)
+	for (Range *p = head; p != NULL; p = p->next)
 	{
 		// p.from <= i <= p.to
 		if (i < p->from)

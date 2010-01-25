@@ -556,7 +556,7 @@ void Parser::Sym(wchar_t* &name, int &kind) {
 			  name = coco_string_create_lower(oldName);
 			  coco_string_delete(oldName);
 			}
-			if (coco_string_indexof(name, ' ') >= 0)
+			if (wcscspn(name, L"\t\r\n ") < wcslen(name))
 			  SemErr(L"literal tokens must not contain blanks");
 			
 		} else SynErr(55);

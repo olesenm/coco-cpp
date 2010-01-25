@@ -90,9 +90,10 @@ inline int coco_string_compare(const char* str1, const char* str2)
 }
 
 
-//! Return the index of the last occurrence of ch.
+//! Return the index of the first occurrence of ch.
 //! Return -1 if nothing is found.
-int coco_string_lastindexof(const wchar_t* str, const wchar_t ch);
+int coco_string_indexof(const wchar_t* str, const wchar_t ch);
+
 
 //! Check for bool values. Return 1 for 'true', 0 for 'false' and -1 for unknown
 int coco_string_checkBool(const wchar_t* str);

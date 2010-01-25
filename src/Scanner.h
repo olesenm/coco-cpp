@@ -130,10 +130,6 @@ inline int coco_string_hash(const CharT* str)
 	return h < 0 ? -h : h;
 }
 
-//! Return the index of the first occurrence of ch.
-//  Return -1 if nothing is found.
-int coco_string_indexof(const wchar_t* str, const wchar_t ch);
-
 
 //
 // String conversions

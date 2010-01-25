@@ -156,9 +156,9 @@ void coco_string_merge(wchar_t* &dest, const std::string& str)
 }
 
 
-int coco_string_lastindexof(const wchar_t* str, const wchar_t ch)
+int coco_string_indexof(const wchar_t* str, const wchar_t ch)
 {
-    const wchar_t* fnd = wcsrchr(str, ch);
+    const wchar_t* fnd = wcschr(str, ch);
     return fnd ? (fnd - str) : -1;
 }
 

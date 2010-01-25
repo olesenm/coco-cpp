@@ -130,13 +130,6 @@ bool coco_string_equal(const wchar_t* str1, const char* str2)
 }
 
 
-int coco_string_indexof(const wchar_t* str, const wchar_t ch)
-{
-	const wchar_t* fnd = wcschr(str, ch);
-	return fnd ? (fnd - str) : -1;
-}
-
-
 //
 // string handling, byte character
 //

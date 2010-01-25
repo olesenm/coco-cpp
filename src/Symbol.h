@@ -73,7 +73,8 @@ public:
 	                      //!< nt: pos of local declarations in source text (or null)
 
 	//! Construct from components
-	Symbol(Node::nodeType nodeTyp, const wchar_t* symName, int lineNr) :
+	Symbol(Node::nodeType nodeTyp, const wchar_t* symName, int lineNr)
+	:
 		n(0),
 		typ(nodeTyp),
 		name(coco_string_create(symName)),
@@ -89,8 +90,9 @@ public:
 		semPos(0)
 	{}
 
-
-	virtual ~Symbol() {
+	//! Destructor frees name
+	virtual ~Symbol()
+	{
 		coco_string_delete(name);
 	}
 

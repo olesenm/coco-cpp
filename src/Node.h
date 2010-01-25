@@ -75,9 +75,9 @@ public:
 	};
 
 	int      n;     //!< node number
-	nodeType typ;   //!< node type, one of t, nt, wt, chr, clas, any, eps, sem, sync, alt, iter, opt, rslv
+	nodeType typ;   //!< node type
 	Symbol   *sym;  //!< nt, t, wt: symbol represented by this node
-	int      val;   //!< chr:  ordinal character value, clas: index of character class
+	int      val;   //!< chr: ordinal character value, clas: index of character class
 	transitionType code;  //!< chr, clas: transition code
 	int      line;  //!< source text line number of item in this node
 
@@ -97,7 +97,13 @@ public:
 	Node     *down; //!< alt: to next alternative
 	Node     *sub;  //!< alt, iter, opt: to first node of substructure
 
+	//! Construct for a symbol on a line
 	Node(nodeType theTyp, Symbol* theSym, int lineNr);
+
+	//! Destructor is currently a nop.
+	~Node()
+	{}
+
 };
 
 

@@ -566,7 +566,7 @@ void Parser::Term(Graph* &g) {
 		Graph *g2; Node *rslv = NULL; g = NULL; 
 		if (StartOf(22)) {
 			if (la->kind == 45) {
-				rslv = tab->NewNode(Node::rslv, (Symbol*)NULL, la->line); 
+				rslv = tab->NewNode(Node::rslv, NULL, la->line); 
 				Resolver(rslv->pos);
 				g = new Graph(rslv); 
 			}
@@ -578,10 +578,10 @@ void Parser::Term(Graph* &g) {
 				tab->MakeSequence(g, g2); 
 			}
 		} else if (StartOf(24)) {
-			g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0)); 
+			g = new Graph(tab->NewNode(Node::eps)); 
 		} else SynErr(56);
 		if (g == NULL) // invalid start of Term
-		 g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0)); 
+		 g = new Graph(tab->NewNode(Node::eps)); 
 }
 
 void Parser::Resolver(Position* &pos) {
@@ -661,7 +661,7 @@ void Parser::Factor(Graph* &g) {
 		}
 		case 47: {
 			SemText(pos);
-			Node *p = tab->NewNode(Node::sem, (Symbol*)NULL, 0);
+			Node *p = tab->NewNode(Node::sem);
 			p->pos = pos;
 			g = new Graph(p);
 			
@@ -669,14 +669,14 @@ void Parser::Factor(Graph* &g) {
 		}
 		case 31: {
 			Get();
-			Node *p = tab->NewNode(Node::any, (Symbol*)NULL, 0);  // p.set is set in tab->SetupAnys
+			Node *p = tab->NewNode(Node::any);  // p.set is set in tab->SetupAnys
 			g = new Graph(p);
 			
 			break;
 		}
 		case 44: {
 			Get();
-			Node *p = tab->NewNode(Node::sync, (Symbol*)NULL, 0);
+			Node *p = tab->NewNode(Node::sync);
 			g = new Graph(p);
 			
 			break;
@@ -684,7 +684,7 @@ void Parser::Factor(Graph* &g) {
 		default: SynErr(57); break;
 		}
 		if (g == NULL) // invalid start of Factor
-		 g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0));
+		 g = new Graph(tab->NewNode(Node::eps));
 		
 }
 
@@ -758,7 +758,7 @@ void Parser::TokenFactor(Graph* &g) {
 			   SemErr(L"undefined name");
 			   c = tab->NewCharClass(name, new CharSet());
 			 }
-			 Node *p = tab->NewNode(Node::clas, (Symbol*)NULL, 0); p->val = c->n;
+			 Node *p = tab->NewNode(Node::clas); p->val = c->n;
 			 g = new Graph(p);
 			 tokenString = coco_string_create(noString);
 			} else { // str
@@ -783,7 +783,7 @@ void Parser::TokenFactor(Graph* &g) {
 			tab->MakeIteration(g); 
 		} else SynErr(59);
 		if (g == NULL) // invalid start of TokenFactor
-		 g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0)); 
+		 g = new Graph(tab->NewNode(Node::eps)); 
 }
 
 

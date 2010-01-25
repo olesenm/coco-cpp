@@ -143,16 +143,7 @@ int coco_string_indexof(const wchar_t* str, const wchar_t ch)
 
 std::string coco_stdStringASCII(const wchar_t* str)
 {
-    const int len = coco_string_length(str);
-    std::string dest;
-    dest.reserve(len);
-
-    for (int i = 0; i < len; ++i)
-    {
-        dest += char(str[i] & 0x7F);
-    }
-
-    return dest;
+    return str ? coco_stdStringASCII(str, 0, wcslen(str)) : std::string();
 }
 
 

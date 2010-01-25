@@ -382,16 +382,16 @@ Expression<Graph* &g>           (. Graph *g2; .)
 
 Term<Graph* &g>                 (. Graph *g2; Node *rslv = NULL; g = NULL; .)
 =
-( [                             (. rslv = tab->NewNode(Node::rslv, (Symbol*)NULL, la->line); .)
+( [                             (. rslv = tab->NewNode(Node::rslv, NULL, la->line); .)
     Resolver<.rslv->pos.>       (. g = new Graph(rslv); .)
   ]
   Factor<g2>                    (. if (rslv != NULL) tab->MakeSequence(g, g2);
                                    else g = g2; .)
   { Factor<g2>                  (. tab->MakeSequence(g, g2); .)
   }
-|                               (. g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0)); .)
+|                               (. g = new Graph(tab->NewNode(Node::eps)); .)
 )                               (. if (g == NULL) // invalid start of Term
-                                     g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0)); .)
+                                     g = new Graph(tab->NewNode(Node::eps)); .)
 .
 
 /*------------------------------------------------------------------------------------*/
@@ -436,18 +436,18 @@ Factor<Graph* &g>               (. wchar_t* name = NULL; int kind; Position *pos
 | '(' Expression<g> ')'
 | '[' Expression<g> ']'         (. tab->MakeOption(g); .)
 | '{' Expression<g> '}'         (. tab->MakeIteration(g); .)
-| SemText<pos>                  (. Node *p = tab->NewNode(Node::sem, (Symbol*)NULL, 0);
+| SemText<pos>                  (. Node *p = tab->NewNode(Node::sem);
                                    p->pos = pos;
                                    g = new Graph(p);
                                  .)
-| "ANY"                         (. Node *p = tab->NewNode(Node::any, (Symbol*)NULL, 0);  // p.set is set in tab->SetupAnys
+| "ANY"                         (. Node *p = tab->NewNode(Node::any);  // p.set is set in tab->SetupAnys
                                    g = new Graph(p);
                                  .)
-| "SYNC"                        (. Node *p = tab->NewNode(Node::sync, (Symbol*)NULL, 0);
+| "SYNC"                        (. Node *p = tab->NewNode(Node::sync);
                                    g = new Graph(p);
                                  .)
 )                               (. if (g == NULL) // invalid start of Factor
-                                     g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0));
+                                     g = new Graph(tab->NewNode(Node::eps));
                                  .)
 .
 
@@ -501,7 +501,7 @@ TokenFactor<Graph* &g>          (. wchar_t* name = NULL; int kind; g = NULL; .)
                                        SemErr(L"undefined name");
                                        c = tab->NewCharClass(name, new CharSet());
                                      }
-                                     Node *p = tab->NewNode(Node::clas, (Symbol*)NULL, 0); p->val = c->n;
+                                     Node *p = tab->NewNode(Node::clas); p->val = c->n;
                                      g = new Graph(p);
                                      tokenString = coco_string_create(noString);
                                    } else { // str
@@ -514,7 +514,7 @@ TokenFactor<Graph* &g>          (. wchar_t* name = NULL; int kind; g = NULL; .)
 | '[' TokenExpr<g> ']'          (. tab->MakeOption(g); .)
 | '{' TokenExpr<g> '}'          (. tab->MakeIteration(g); .)
 )                               (. if (g == NULL) // invalid start of TokenFactor
-                                     g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0)); .)
+                                     g = new Graph(tab->NewNode(Node::eps)); .)
 .
 
 /*------------------------------------------------------------------------------------*/

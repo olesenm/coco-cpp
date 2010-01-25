@@ -99,7 +99,7 @@ Tab::Tab(Parser *theParser)
 	dummyName('A')
 {
 	eofSy = NewSym(Node::t, L"EOF", 0);
-	dummyNode = NewNode(Node::eps, reinterpret_cast<Symbol*>(0), 0);
+	dummyNode = NewNode(Node::eps);
 }
 
 
@@ -260,17 +260,23 @@ Node* Tab::NewNode(Node::nodeType typ, Symbol *sym, int line)
 }
 
 
+Node* Tab::NewNode(Node::nodeType typ)
+{
+	return NewNode(typ, reinterpret_cast<Symbol*>(0), 0);
+}
+
+
 Node* Tab::NewNode(Node::nodeType typ, Node* sub)
 {
-	Node* node = NewNode(typ, reinterpret_cast<Symbol*>(0), 0);
+	Node* node = NewNode(typ);
 	node->sub = sub;
 	return node;
 }
 
 
-Node* Tab::NewNode(Node::nodeType typ, int val, int line)
+Node* Tab::NewNode(Node::nodeType typ, int val)
 {
-	Node* node = NewNode(typ, reinterpret_cast<Symbol*>(0), line);
+	Node* node = NewNode(typ);
 	node->val = val;
 	return node;
 }
@@ -351,7 +357,7 @@ void Tab::Finish(Graph *g)
 void Tab::DeleteNodes()
 {
 	nodes.Clear();
-	dummyNode = NewNode(Node::eps, reinterpret_cast<Symbol*>(0), 0);
+	dummyNode = NewNode(Node::eps);
 }
 
 
@@ -365,7 +371,7 @@ Graph* Tab::StrToGraph(const wchar_t* str)
 	g->r = dummyNode;
 	for (int i = 0; i < coco_string_length(s); i++)
 	{
-		Node *p = NewNode(Node::chr, int(s[i]), 0);
+		Node *p = NewNode(Node::chr, int(s[i]));
 		g->r->next = p; g->r = p;
 	}
 	g->l = dummyNode->next; dummyNode->next = NULL;

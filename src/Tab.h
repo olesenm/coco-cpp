@@ -155,9 +155,15 @@ public:
 	//  Syntax graph management
 	//---------------------------------------------------------------------
 
+	//! Add new node for a symbol on a line
 	Node* NewNode(Node::nodeType typ, Symbol *sym, int line);
+	//! Add new node for a null symbol (on line 0)
+	Node* NewNode(Node::nodeType typ);
+	//! Add new node with a null symbol (on line 0) and a sub-node
 	Node* NewNode(Node::nodeType typ, Node* sub);
-	Node* NewNode(Node::nodeType typ, int val, int line);
+	//! Add new node with a null symbol (on line 0) and a value val
+	Node* NewNode(Node::nodeType typ, int val);
+
 	void MakeFirstAlt(Graph *g);
 	void MakeAlternative(Graph *g1, Graph *g2);
 	static void MakeSequence(Graph *g1, Graph *g2);

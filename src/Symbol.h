@@ -30,6 +30,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #define COCO_SYMBOL_H__
 
 #include "Node.h"
+#include "BitArray.h"
 #include "Position.h"
 #include "Utils.h"
 
@@ -38,7 +39,6 @@ namespace Coco
 
 // forward declarations
 class Node;
-class BitArray;
 
 /*---------------------------------------------------------------------------*\
                            Class Symbol Declaration
@@ -94,6 +94,11 @@ public:
 	virtual ~Symbol()
 	{
 		coco_string_delete(name);
+		if (attrPos) { delete attrPos; }
+		if (semPos)  { delete semPos; }
+		if (first)   { delete first; }
+		if (follow)  { delete follow; }
+		if (nts)     { delete nts; }
 	}
 
 };

@@ -105,14 +105,15 @@ Tab::Tab(Parser *theParser)
 
 Tab::~Tab()
 {
-	if (ignored) { delete ignored; }
 	if (copyPos) { delete copyPos; }
-	if (eofSy) { delete eofSy; }
-	if (noSym) { delete noSym; }
+	if (ignored) { delete ignored; }
 	if (allSyncSets) { delete allSyncSets; }
 	if (visited) { delete visited; }
-	if (dummyNode) { delete dummyNode; }
 
+	terminals.Delete();
+	pragmas.Delete();
+	nonterminals.Delete();
+	nodes.Delete();
 	classes.Delete();
 }
 
@@ -356,7 +357,7 @@ void Tab::Finish(Graph *g)
 
 void Tab::DeleteNodes()
 {
-	nodes.Clear();
+	nodes.Delete();
 	dummyNode = NewNode(Node::eps);
 }
 
@@ -448,9 +449,9 @@ int Tab::Ptr(Node *p, bool up)
 }
 
 
-wchar_t* Tab::Pos(Position *pos)
+std::wstring Tab::Pos(Position *pos)
 {
-	wchar_t* format = new wchar_t[10];
+	wchar_t format[10];
 	if (pos == NULL) {
 		coco_swprintf(format, 10, L"     ");
 	} else {
@@ -489,7 +490,7 @@ void Tab::PrintNodes()
 
 		if (p->typ == Node::t || p->typ == Node::nt || p->typ == Node::wt)
 		{
-			fwprintf(trace, L"             %5s", Pos(p->pos));
+			fwprintf(trace, L"             %5s", Pos(p->pos).c_str());
 		}
 		if (p->typ == Node::chr)
 		{
@@ -505,7 +506,7 @@ void Tab::PrintNodes()
 		}
 		if (p->typ == Node::sem)
 		{
-			fwprintf(trace, L"             %5s", Pos(p->pos));
+			fwprintf(trace, L"             %5s", Pos(p->pos).c_str());
 		}
 		if (p->typ == Node::eps || p->typ == Node::any || p->typ == Node::sync)
 		{
@@ -570,9 +571,9 @@ CharSet* Tab::CharClassSet(int i)
 
 //----------- character class printing
 
-wchar_t* Tab::Ch(const wchar_t ch)
+std::wstring Tab::Ch(const wchar_t ch)
 {
-	wchar_t* format = new wchar_t[10];
+	wchar_t format[10];
 	if (ch < 32 || ch >= 0x7F || ch == '\'' || ch == '\\') {
 		coco_swprintf(format, 10, L"%d", int(ch));
 	} else {
@@ -586,14 +587,10 @@ void Tab::WriteCharSet(CharSet *s)
 {
 	for (CharSet::Range *r = s->head; r != NULL; r = r->next)
 	{
-		wchar_t *from = Ch(r->from);
-		fwprintf(trace, L" %ls", from);
-		delete[] from;
+		fwprintf(trace, L" %ls", Ch(r->from).c_str());
 		if (r->from < r->to)
 		{
-			wchar_t *to = Ch(r->to);
-			fwprintf(trace, L" .. %ls", to);
-			delete[] to;
+			fwprintf(trace, L" .. %ls", Ch(r->to).c_str());
 		}
 	}
 }

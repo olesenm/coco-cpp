@@ -50,10 +50,11 @@ namespace Coco
 std::wstring DFA::Ch(wchar_t ch)
 {
 	wchar_t format[10];
-	if (ch < 32 || ch >= 0x7F || ch == '\'' || ch == '\\')
-		coco_swprintf(format, 10, L"%d\0", int(ch));
-	else
-		coco_swprintf(format, 10, L"'%c'\0", int(ch));
+	if (ch < 32 || ch >= 0x7F || ch == '\'' || ch == '\\') {
+		coco_swprintf(format, 10, L"%d", int(ch));
+	} else {
+		coco_swprintf(format, 10, L"'%c'", int(ch));
+	}
 	return format;
 }
 

@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
 				return 1;
 			}
 #ifdef _WIN32
-			Tab::nsName = coco_stdStringASCII(argv[i]);
+			Tab::nsName = coco_stdString(argv[i]);
 #else
 			Tab::nsName = argv[i];
 #endif
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
 				return 1;
 			}
 #ifdef _WIN32
-			Tab::prefixName = coco_stdStringASCII(argv[i]);
+			Tab::prefixName = coco_stdString(argv[i]);
 #else
 			Tab::prefixName = argv[i];
 #endif

@@ -134,13 +134,13 @@ bool coco_string_equal(const wchar_t* str1, const char* str2)
 // string handling, byte character
 //
 
-std::string coco_stdStringASCII(const wchar_t* str)
+std::string coco_stdString(const wchar_t* str)
 {
-    return str ? coco_stdStringASCII(str, 0, wcslen(str)) : std::string();
+    return str ? coco_stdString(str, 0, wcslen(str)) : std::string();
 }
 
 
-std::string coco_stdStringASCII
+std::string coco_stdString
 (
     const wchar_t* str,
     int index,
@@ -153,7 +153,7 @@ std::string coco_stdStringASCII
 
     for (int i = 0; i < len; ++i)
     {
-        dest += char(str[index+i] & 0x7F);
+        dest += char(str[index+i] & 0xFF);
     }
 
     return dest;
@@ -445,14 +445,16 @@ int UTF8Buffer::Read()
 	do {
 		ch = Buffer::Read();
 		// until we find a utf8 start (0xxxxxxx or 11xxxxxx)
-	} while ((ch >= 128) && ((ch & 0xC0) != 0xC0) && (ch != EoF));
+	} while (ch != EoF && ch >= 128 && ((ch & 0xC0) != 0xC0));
 	if (ch < 128 || ch == EoF) {
-		// nothing to do, first 127 chars are the same in ascii and utf8
+		// nothing to do, first 127 chars are identical in ASCII and UTF8
 		// 0xxxxxxx or end of file character
 	}
 	else if ((ch & 0xF0) == 0xF0) {
 		// 0x00010000 - 0x001FFFFF [min. 24bit storage, 4-byte encoding]
 		// 11110ccc 10ccbbbb 10bbbbaa 10aaaaaa
+		// CAUTION: this should probably be disallowed since it overflows
+		// wchar_t on windows and overflows the max (0xFFFF) used here
 		int c1 = ch & 0x07; ch = Buffer::Read();
 		int c2 = ch & 0x3F; ch = Buffer::Read();
 		int c3 = ch & 0x3F; ch = Buffer::Read();

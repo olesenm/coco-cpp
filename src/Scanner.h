@@ -153,13 +153,12 @@ inline long coco_string_toLong(const wchar_t* str)
 // String handling, byte character
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//! Create a byte string by copying str
-//! Restrict to a ASCII (7bit) value
-std::string coco_stdStringASCII(const wchar_t* str);
+//! Create a byte string by copying str, restricted to 8bit values
+std::string coco_stdString(const wchar_t* str);
 
 //! Create a byte substring of str starting at index and length characters long
-//! Restrict to a ASCII (7bit) value
-std::string coco_stdStringASCII(const wchar_t* str, int index, int length);
+//! Restricted to 8bit values
+std::string coco_stdString(const wchar_t* str, int index, int length);
 
 
 //! Create a UTF8 byte string by copying str

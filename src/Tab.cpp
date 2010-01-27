@@ -1584,7 +1584,7 @@ void Tab::DispatchDirective(const wchar_t* str)
 		// set namespace if not already set
 		if (nsName.empty())
 		{
-			nsName = coco_stdStringASCII(strval, 0, len2);
+			nsName = coco_stdString(strval, 0, len2);
 		}
 		wprintf(L"using namespace: '%s'\n", nsName.c_str());
 	}
@@ -1593,7 +1593,7 @@ void Tab::DispatchDirective(const wchar_t* str)
 		// set prefix if not already set
 		if (prefixName.empty())
 		{
-			prefixName = coco_stdStringASCII(strval, 0, len2);
+			prefixName = coco_stdString(strval, 0, len2);
 		}
 		wprintf(L"using prefix: '%s'\n", prefixName.c_str());
 	}

@@ -238,6 +238,7 @@ public:
 
 	virtual int GetPos() const;
 	virtual void SetPos(int value);
+	virtual bool isUTF8() const;  //!< Return false - buffer is not UTF8
 };
 
 
@@ -247,6 +248,7 @@ class UTF8Buffer : public Buffer
 public:
 	UTF8Buffer(Buffer* b) : Buffer(b) {}
 	virtual int Read();
+	virtual bool isUTF8() const;  //!< Return true - buffer is UTF8
 };
 
 

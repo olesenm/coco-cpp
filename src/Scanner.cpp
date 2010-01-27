@@ -480,6 +480,18 @@ int UTF8Buffer::Read()
 }
 
 
+bool Buffer::isUTF8() const
+{
+	return false;
+}
+
+
+bool UTF8Buffer::isUTF8() const
+{
+	return true;
+}
+
+
 int Buffer::Peek()
 {
 	int curPos = GetPos();
@@ -722,7 +734,7 @@ void Scanner::Init()
 	oldEols = 0;
 	NextCh();
 	if (ch == 0xEF)   // check optional byte order mark for UTF-8
-	{                 // this is (likely) Win32-specific
+	{                 // Windows-specific magic
 		NextCh(); int ch1 = ch;
 		NextCh(); int ch2 = ch;
 		if (ch1 != 0xBB || ch2 != 0xBF)
@@ -731,10 +743,21 @@ void Scanner::Init()
 			::exit(1);
 		}
 		Buffer *oldBuf = buffer;
-		buffer = new UTF8Buffer(buffer); col = 0;
+		buffer = new UTF8Buffer(oldBuf); col = 0;
 		delete oldBuf; oldBuf = NULL;
 		NextCh();
 	}
+	// likely need this chunk of code for non-windows systems, they don't
+	// rely on a byte order mark. Should make it selectable via a directive
+	// or command-line option etc.
+// #ifndef _WIN32
+// 	else
+// 	{
+// 		Buffer *oldBuf = buffer;
+// 		buffer = new UTF8Buffer(oldBuf); col = 0;
+// 		delete oldBuf; oldBuf = NULL;
+// 	}
+// #endif
 
 
 	pt = tokens = CreateToken(); // first token is a dummy

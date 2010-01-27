@@ -1057,7 +1057,7 @@ void DFA::WriteScanner()
 	}
 
 	CopyFramePart(L"-->begin", false);
-	tab->CopySourcePart(gen, tab->copyPos, 0);  // copy without emitLines
+	tab->CopySourcePart(gen, tab->copyPos, 0, false);  // copy without emitLines
 	CopyFramePart(L"-->namespace_open");
 	int nrOfNs = tab->GenNamespaceOpen(gen);
 

@@ -78,7 +78,7 @@ void ParserGen::CopyFramePart(const wchar_t* stop, const bool doOutput)
 void ParserGen::CopySourcePart(Position *pos, int indent)
 {
 	// Copy text described by pos from atg to gen
-	tab->CopySourcePart(gen, pos, indent, Tab::emitLines);
+	tab->CopySourcePart(gen, pos, indent);
 }
 
 
@@ -466,7 +466,7 @@ void ParserGen::WriteParser()
 	}
 
 	CopyFramePart(L"-->begin", false);
-	tab->CopySourcePart(gen, tab->copyPos, 0);  // copy without emitLines
+	tab->CopySourcePart(gen, tab->copyPos, 0, false);  // copy without emitLines
 	CopyFramePart(L"-->headerdef");
 
 	if (preamblePos != NULL)

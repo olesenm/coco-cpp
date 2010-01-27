@@ -57,10 +57,6 @@ class Tab
 {
 public:
 	// Constants
-
-	static const char CR = '\r';    //!< carriage-return character
-	static const char LF = '\n';    //!< line-feed character
-
 	//! String representations for the node types (in Node class)
 	//! Corresponds to Node::nodeType
 	static const char* nTyp[];
@@ -322,7 +318,7 @@ public:
 		const bool doOutput = true
 	) const;
 
-	void CopySourcePart(FILE *dest, Position *pos, int indent, bool emitLines = false);
+	void CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines=true);
 
 };
 

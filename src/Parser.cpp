@@ -1,4 +1,3 @@
-
 /*---------------------------------*- C++ -*---------------------------------*\
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
@@ -69,10 +68,10 @@ void Parser::Get()
 			break;
 		}
 		if (la->kind == 50) {
-				Tab::SetDDT(la->val+1); 
+				Tab::SetDDT(la->val+1);
 		}
 		if (la->kind == 51) {
-				tab->DispatchDirective(la->val+1); 
+				tab->DispatchDirective(la->val+1);
 		}
 
 		if (dummyToken != t)
@@ -145,45 +144,45 @@ bool Parser::WeakSeparator(int n, int syFol, int repFol)
 
 
 void Parser::Coco() {
-		Symbol *sym; Graph *g; wchar_t* grammarName = NULL; CharSet *s; 
+		Symbol *sym; Graph *g; wchar_t* grammarName = NULL; CharSet *s;
 		if (la->kind == 6) {
 			Get();
-			int beg = t->pos + coco_string_length(t->val); int line = t->line; 
+			int beg = t->pos + coco_string_length(t->val); int line = t->line;
 			while (StartOf(1)) {
 				Get();
 			}
-			tab->copyPos = new Position(beg, la->pos, 0, line); 
+			tab->copyPos = new Position(beg, la->pos, 0, line);
 			Expect(7);
 		}
 		if (StartOf(2)) {
 			Get();
-			int beg = t->pos; int line = t->line; 
+			int beg = t->pos; int line = t->line;
 			while (StartOf(3)) {
 				Get();
 			}
-			pgen->preamblePos = new Position(beg, la->pos, 0, line); 
+			pgen->preamblePos = new Position(beg, la->pos, 0, line);
 		}
 		Expect(8);
-		genScanner = true; 
+		genScanner = true;
 		Expect(1);
-		grammarName = coco_string_create(t->val); 
+		grammarName = coco_string_create(t->val);
 		if (StartOf(4)) {
 			Get();
-			int beg = t->pos; int line = t->line; 
+			int beg = t->pos; int line = t->line;
 			while (StartOf(4)) {
 				Get();
 			}
-			pgen->semDeclPos = new Position(beg, la->pos, 0, line); 
+			pgen->semDeclPos = new Position(beg, la->pos, 0, line);
 		}
 		if (la->kind == 9) {
 			Get();
 			if (StartOf(5)) {
 				Get();
-				int beg = t->pos; int line = t->line; 
+				int beg = t->pos; int line = t->line;
 				while (StartOf(5)) {
 					Get();
 				}
-				pgen->initCodePos = new Position(beg, la->pos, 0, line); 
+				pgen->initCodePos = new Position(beg, la->pos, 0, line);
 			}
 			Expect(10);
 		}
@@ -191,11 +190,11 @@ void Parser::Coco() {
 			Get();
 			if (StartOf(6)) {
 				Get();
-				int beg = t->pos; int line = t->line; 
+				int beg = t->pos; int line = t->line;
 				while (StartOf(6)) {
 					Get();
 				}
-				pgen->deinitCodePos = new Position(beg, la->pos, 0, line); 
+				pgen->deinitCodePos = new Position(beg, la->pos, 0, line);
 			}
 			Expect(12);
 		}
@@ -203,17 +202,17 @@ void Parser::Coco() {
 			Get();
 			if (StartOf(7)) {
 				Get();
-				int beg = t->pos; int line = t->line; 
+				int beg = t->pos; int line = t->line;
 				while (StartOf(7)) {
 					Get();
 				}
-				pgen->extraCodePos = new Position(beg, la->pos, 0, line); 
+				pgen->extraCodePos = new Position(beg, la->pos, 0, line);
 			}
 			Expect(14);
 		}
 		if (la->kind == 15) {
 			Get();
-			dfa->ignoreCase = true; 
+			dfa->ignoreCase = true;
 		}
 		if (la->kind == 16) {
 			Get();
@@ -235,21 +234,21 @@ void Parser::Coco() {
 		}
 		while (la->kind == 19) {
 			Get();
-			Graph *g1, *g2; bool nested = false; 
+			Graph *g1, *g2; bool nested = false;
 			Expect(20);
 			TokenExpr(g1);
 			Expect(21);
 			TokenExpr(g2);
 			if (la->kind == 22) {
 				Get();
-				nested = true; 
+				nested = true;
 			}
-			dfa->NewComment(g1->l, g2->l, nested); 
+			dfa->NewComment(g1->l, g2->l, nested);
 		}
 		while (la->kind == 23) {
 			Get();
 			Set(s);
-			tab->ignored->Or(s); 
+			tab->ignored->Or(s);
 		}
 		while (!(la->kind == 0 || la->kind == 24)) {SynErr(50); Get();}
 		Expect(24);
@@ -332,7 +331,7 @@ void Parser::Coco() {
 }
 
 void Parser::SetDecl() {
-		CharSet *s; 
+		CharSet *s;
 		Expect(1);
 		wchar_t *name = coco_string_create(t->val);
 		CharClass *c = tab->FindCharClass(name);
@@ -351,7 +350,7 @@ void Parser::SetDecl() {
 }
 
 void Parser::TokenDecl(Node::nodeType typ) {
-		wchar_t* name = NULL; int kind; Graph *g; 
+		wchar_t* name = NULL; int kind; Graph *g;
 		Sym(name, kind);
 		Symbol *sym = tab->FindSym(name);
 		if (sym != NULL) SemErr(L"name declared twice");
@@ -384,14 +383,14 @@ void Parser::TokenDecl(Node::nodeType typ) {
 		} else SynErr(52);
 		if (la->kind == 47) {
 			SemText(sym->semPos);
-			if (typ != Node::pr) SemErr(L"semantic action not allowed here"); 
+			if (typ != Node::pr) SemErr(L"semantic action not allowed here");
 		}
 }
 
 void Parser::TokenExpr(Graph* &g) {
-		Graph *g2; 
+		Graph *g2;
 		TokenTerm(g);
-		bool first = true; 
+		bool first = true;
 		while (WeakSeparator(36,13,12) ) {
 			TokenTerm(g2);
 			if (first) { tab->MakeFirstAlt(g); first = false; }
@@ -401,17 +400,17 @@ void Parser::TokenExpr(Graph* &g) {
 }
 
 void Parser::Set(CharSet* &s) {
-		CharSet *s2; 
+		CharSet *s2;
 		SimSet(s);
 		while (la->kind == 28 || la->kind == 29) {
 			if (la->kind == 28) {
 				Get();
 				SimSet(s2);
-				s->Or(s2); 
+				s->Or(s2);
 			} else {
 				Get();
 				SimSet(s2);
-				s->Subtract(s2); 
+				s->Subtract(s2);
 			}
 		}
 }
@@ -419,57 +418,57 @@ void Parser::Set(CharSet* &s) {
 void Parser::AttrDecl(Symbol *sym) {
 		if (la->kind == 32) {
 			Get();
-			int beg = la->pos; int col = la->col; int line = la->line; 
+			int beg = la->pos; int col = la->col; int line = la->line;
 			while (StartOf(14)) {
 				if (StartOf(15)) {
 					Get();
 				} else {
 					Get();
-					SemErr(L"bad string in attributes"); 
+					SemErr(L"bad string in attributes");
 				}
 			}
 			Expect(33);
 			if (t->pos > beg)
-			 sym->attrPos = new Position(beg, t->pos, col, line); 
+			 sym->attrPos = new Position(beg, t->pos, col, line);
 		} else if (la->kind == 34) {
 			Get();
-			int beg = la->pos; int col = la->col; int line = la->line; 
+			int beg = la->pos; int col = la->col; int line = la->line;
 			while (StartOf(16)) {
 				if (StartOf(17)) {
 					Get();
 				} else {
 					Get();
-					SemErr(L"bad string in attributes"); 
+					SemErr(L"bad string in attributes");
 				}
 			}
 			Expect(35);
 			if (t->pos > beg)
-			 sym->attrPos = new Position(beg, t->pos, col, line); 
+			 sym->attrPos = new Position(beg, t->pos, col, line);
 		} else SynErr(53);
 }
 
 void Parser::SemText(Position* &pos) {
 		Expect(47);
-		int beg = la->pos; int col = la->col; int line = t->line; 
+		int beg = la->pos; int col = la->col; int line = t->line;
 		while (StartOf(18)) {
 			if (StartOf(19)) {
 				Get();
 			} else if (la->kind == 4) {
 				Get();
-				SemErr(L"bad string in semantic action"); 
+				SemErr(L"bad string in semantic action");
 			} else {
 				Get();
-				SemErr(L"missing end of previous semantic action"); 
+				SemErr(L"missing end of previous semantic action");
 			}
 		}
 		Expect(48);
-		pos = new Position(beg, t->pos, col, line); 
+		pos = new Position(beg, t->pos, col, line);
 }
 
 void Parser::Expression(Graph* &g) {
-		Graph *g2; 
+		Graph *g2;
 		Term(g);
-		bool first = true; 
+		bool first = true;
 		while (WeakSeparator(36,21,20) ) {
 			Term(g2);
 			if (first) { tab->MakeFirstAlt(g); first = false; }
@@ -479,7 +478,7 @@ void Parser::Expression(Graph* &g) {
 }
 
 void Parser::SimSet(CharSet* &s) {
-		int n1, n2; s = new CharSet(); 
+		int n1, n2; s = new CharSet();
 		if (la->kind == 1) {
 			Get();
 			CharClass *c = tab->FindCharClass(t->val);
@@ -504,15 +503,15 @@ void Parser::SimSet(CharSet* &s) {
 			
 		} else if (la->kind == 5) {
 			Char(n1);
-			s->Set(n1); 
+			s->Set(n1);
 			if (la->kind == 30) {
 				Get();
 				Char(n2);
-				for (int i = n1; i <= n2; i++) s->Set(i); 
+				for (int i = n1; i <= n2; i++) s->Set(i);
 			}
 		} else if (la->kind == 31) {
 			Get();
-			s = new CharSet(); s->Fill(); 
+			s = new CharSet(); s->Fill();
 		} else SynErr(54);
 }
 
@@ -535,14 +534,14 @@ void Parser::Char(int &n) {
 }
 
 void Parser::Sym(wchar_t* &name, int &kind) {
-		name = coco_string_create(L"???"); kind = isIdent; 
+		name = coco_string_create(L"???"); kind = isIdent;
 		if (la->kind == 1) {
 			Get();
-			kind = isIdent; coco_string_delete(name); name = coco_string_create(t->val); 
+			kind = isIdent; coco_string_delete(name); name = coco_string_create(t->val);
 		} else if (la->kind == 3 || la->kind == 5) {
 			if (la->kind == 3) {
 				Get();
-				coco_string_delete(name); name = coco_string_create(t->val); 
+				coco_string_delete(name); name = coco_string_create(t->val);
 			} else {
 				Get();
 				coco_string_delete(name); name = coco_string_create(t->val);
@@ -564,33 +563,33 @@ void Parser::Sym(wchar_t* &name, int &kind) {
 }
 
 void Parser::Term(Graph* &g) {
-		Graph *g2; Node *rslv = NULL; g = NULL; 
+		Graph *g2; Node *rslv = NULL; g = NULL;
 		if (StartOf(22)) {
 			if (la->kind == 45) {
-				rslv = tab->NewNode(Node::rslv, NULL, la->line); 
+				rslv = tab->NewNode(Node::rslv, NULL, la->line);
 				Resolver(rslv->pos);
-				g = new Graph(rslv); 
+				g = new Graph(rslv);
 			}
 			Factor(g2);
 			if (rslv != NULL) tab->MakeSequence(g, g2);
-			else g = g2; 
+			else g = g2;
 			while (StartOf(23)) {
 				Factor(g2);
-				tab->MakeSequence(g, g2); 
+				tab->MakeSequence(g, g2);
 			}
 		} else if (StartOf(24)) {
-			g = new Graph(tab->NewNode(Node::eps)); 
+			g = new Graph(tab->NewNode(Node::eps));
 		} else SynErr(56);
 		if (g == NULL) // invalid start of Term
-		 g = new Graph(tab->NewNode(Node::eps)); 
+		 g = new Graph(tab->NewNode(Node::eps));
 }
 
 void Parser::Resolver(Position* &pos) {
 		Expect(45);
 		Expect(38);
-		int beg = la->pos; int col = la->col; int line = la->line; 
+		int beg = la->pos; int col = la->col; int line = la->line;
 		Condition();
-		pos = new Position(beg, t->pos, col, line); 
+		pos = new Position(beg, t->pos, col, line);
 }
 
 void Parser::Factor(Graph* &g) {
@@ -601,7 +600,7 @@ void Parser::Factor(Graph* &g) {
 		case 1: case 3: case 5: case 37: {
 			if (la->kind == 37) {
 				Get();
-				weak = true; 
+				weak = true;
 			}
 			Sym(name, kind);
 			Symbol *sym = tab->FindSym(name);
@@ -631,7 +630,7 @@ void Parser::Factor(Graph* &g) {
 			
 			if (la->kind == 32 || la->kind == 34) {
 				Attribs(p);
-				if (kind == isLiteral) SemErr(L"a literal must not have attributes"); 
+				if (kind == isLiteral) SemErr(L"a literal must not have attributes");
 			}
 			if (undef)
 			 sym->attrPos = p->pos;  // dummy
@@ -650,14 +649,14 @@ void Parser::Factor(Graph* &g) {
 			Get();
 			Expression(g);
 			Expect(41);
-			tab->MakeOption(g); 
+			tab->MakeOption(g);
 			break;
 		}
 		case 42: {
 			Get();
 			Expression(g);
 			Expect(43);
-			tab->MakeIteration(g); 
+			tab->MakeIteration(g);
 			break;
 		}
 		case 47: {
@@ -692,30 +691,30 @@ void Parser::Factor(Graph* &g) {
 void Parser::Attribs(Node *p) {
 		if (la->kind == 32) {
 			Get();
-			int beg = la->pos; int col = la->col; int line = la->line; 
+			int beg = la->pos; int col = la->col; int line = la->line;
 			while (StartOf(14)) {
 				if (StartOf(15)) {
 					Get();
 				} else {
 					Get();
-					SemErr(L"bad string in attributes"); 
+					SemErr(L"bad string in attributes");
 				}
 			}
 			Expect(33);
-			if (t->pos > beg) p->pos = new Position(beg, t->pos, col, line); 
+			if (t->pos > beg) p->pos = new Position(beg, t->pos, col, line);
 		} else if (la->kind == 34) {
 			Get();
-			int beg = la->pos; int col = la->col; int line = la->line; 
+			int beg = la->pos; int col = la->col; int line = la->line;
 			while (StartOf(16)) {
 				if (StartOf(17)) {
 					Get();
 				} else {
 					Get();
-					SemErr(L"bad string in attributes"); 
+					SemErr(L"bad string in attributes");
 				}
 			}
 			Expect(35);
-			if (t->pos > beg) p->pos = new Position(beg, t->pos, col, line); 
+			if (t->pos > beg) p->pos = new Position(beg, t->pos, col, line);
 		} else SynErr(58);
 }
 
@@ -732,11 +731,11 @@ void Parser::Condition() {
 }
 
 void Parser::TokenTerm(Graph* &g) {
-		Graph *g2; 
+		Graph *g2;
 		TokenFactor(g);
 		while (StartOf(13)) {
 			TokenFactor(g2);
-			tab->MakeSequence(g, g2); 
+			tab->MakeSequence(g, g2);
 		}
 		if (la->kind == 46) {
 			Get();
@@ -744,13 +743,13 @@ void Parser::TokenTerm(Graph* &g) {
 			TokenExpr(g2);
 			tab->SetContextTrans(g2->l);
 			dfa->hasCtxMoves = true;
-			tab->MakeSequence(g, g2); 
+			tab->MakeSequence(g, g2);
 			Expect(39);
 		}
 }
 
 void Parser::TokenFactor(Graph* &g) {
-		wchar_t* name = NULL; int kind; g = NULL; 
+		wchar_t* name = NULL; int kind; g = NULL;
 		if (la->kind == 1 || la->kind == 3 || la->kind == 5) {
 			Sym(name, kind);
 			if (kind == isIdent) {
@@ -776,15 +775,15 @@ void Parser::TokenFactor(Graph* &g) {
 			Get();
 			TokenExpr(g);
 			Expect(41);
-			tab->MakeOption(g); 
+			tab->MakeOption(g);
 		} else if (la->kind == 42) {
 			Get();
 			TokenExpr(g);
 			Expect(43);
-			tab->MakeIteration(g); 
+			tab->MakeIteration(g);
 		} else SynErr(59);
 		if (g == NULL) // invalid start of TokenFactor
-		 g = new Graph(tab->NewNode(Node::eps)); 
+		 g = new Graph(tab->NewNode(Node::eps));
 }
 
 

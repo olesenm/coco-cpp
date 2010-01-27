@@ -1966,14 +1966,28 @@ bool Tab::CopyFramePart
 }
 
 
-void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool emitLines)
+void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines)
 {
 	// Copy text described by pos from atg to dest
-	int ch, i;
 	if (pos != NULL)
 	{
-		buffer->SetPos(pos->beg); ch = buffer->Read();
-		if (emitLines && pos->line)
+		int ch, i;
+		buffer->SetPos(pos->beg);
+		ch = buffer->Read();
+
+		// skip lead whitespace - only arises in some circumstances,
+		// such as when surrounding tokens are used to define the
+		// content.
+		while
+		(
+		    buffer->GetPos() <= pos->end
+		 && (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n')
+		)
+		{
+			ch = buffer->Read();
+		}
+
+		if (allowLines && emitLines && pos->line)
 		{
 #ifdef _WIN32
 			fwprintf(dest, L"\n#line %d \"%ls\"\n", pos->line, srcName.c_str());
@@ -1981,15 +1995,18 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool emitLines)
 			fwprintf(dest, L"\n#line %d \"%s\"\n", pos->line, srcName.c_str());
 #endif
 		}
+
 		for (int t=0; t < indent; ++t) fwprintf(dest, L"\t");
+
 		while (buffer->GetPos() <= pos->end)
 		{
-			while (ch == CR || ch == LF)   // eol is either CR or CRLF or LF
+			// eol is either CR or CRLF or LF
+			while (ch == '\r' || ch == '\n')
 			{
 				fwprintf(dest, L"\n");
 				for (int t=0; t < indent; ++t) fwprintf(dest, L"\t");
-				if (ch == CR) { ch = buffer->Read(); } // skip CR
-				if (ch == LF) { ch = buffer->Read(); } // skip LF
+				if (ch == '\r') { ch = buffer->Read(); } // skip CR
+				if (ch == '\n') { ch = buffer->Read(); } // skip LF
 				for (i = 1; i <= pos->col && (ch == ' ' || ch == '\t'); i++)
 				{
 					// skip blanks at beginning of line
@@ -1998,14 +2015,23 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool emitLines)
 				if (i <= pos->col) pos->col = i - 1; // heading TABs => not enough blanks
 				if (buffer->GetPos() > pos->end) goto Done;
 			}
-			fwprintf(dest, L"%lc", ch);
+
+			if (buffer->GetPos() == pos->end && ch == ' ')
+			{
+				// disallow extra trailing blank that would otherwise
+				// sneak in with this common construction:
+				// (. code .) vs. the less readable (.code.)
+			}
+			else
+			{
+				fwprintf(dest, L"%lc", ch);
+			}
 			ch = buffer->Read();
 		}
 		Done:
 		if (indent > 0) fwprintf(dest, L"\n");
 	}
 }
-
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

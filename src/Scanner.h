@@ -1,4 +1,4 @@
-/*---------------------------------*- C++ -*---------------------------------*\
+/*---------------------------------------------------------------------------*\
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 extended by M. Loeberbauer & A. Woess, Univ. of Linz

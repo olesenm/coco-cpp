@@ -1968,7 +1968,8 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines)
 #endif
 		}
 
-		for (int t=0; t < indent; ++t) fwprintf(dest, L"\t");
+		// track if the line might need indenting (eg, after a newline)
+		bool mightIndent = true;
 
 		while (buffer->GetPos() <= pos->end)
 		{
@@ -1976,7 +1977,8 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines)
 			while (ch == '\r' || ch == '\n')
 			{
 				fwprintf(dest, L"\n");
-				for (int t=0; t < indent; ++t) fwprintf(dest, L"\t");
+				mightIndent = true;
+
 				if (ch == '\r') { ch = buffer->Read(); } // skip CR
 				if (ch == '\n') { ch = buffer->Read(); } // skip LF
 				for (i = 1; i <= pos->col && (ch == ' ' || ch == '\t'); i++)
@@ -1996,6 +1998,12 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines)
 			}
 			else
 			{
+				if (mightIndent)
+				{
+					for (int t=0; t < indent; ++t)
+						fwprintf(dest, L"\t");
+					mightIndent = false;
+				}
 				fwprintf(dest, L"%lc", ch);
 			}
 			ch = buffer->Read();

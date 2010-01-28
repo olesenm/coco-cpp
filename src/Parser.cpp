@@ -1,4 +1,4 @@
-/*---------------------------------*- C++ -*---------------------------------*\
+/*---------------------------------------------------------------------------*\
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -252,7 +252,7 @@ void Parser::Coco()
 	Expect(24);
 	if (genScanner) dfa->MakeDeterministic();
 	tab->DeleteNodes();
-	
+
 	while (la->kind == 1) {
 		Get();
 		sym = tab->FindSym(t->val);
@@ -269,13 +269,13 @@ void Parser::Coco()
 		}
 		bool noAttrs = (sym->attrPos == NULL);
 		sym->attrPos = NULL;
-		
+
 		if (la->kind == 32 || la->kind == 34) {
 			AttrDecl(sym);
 		}
 		if (!undef && noAttrs != (sym->attrPos == NULL))
 		 SemErr(L"attribute mismatch between declaration and use of this symbol");
-		
+
 		if (la->kind == 47) {
 			SemText(sym->semPos);
 		}
@@ -283,7 +283,7 @@ void Parser::Coco()
 		Expression(g);
 		sym->graph = g->l;
 		tab->Finish(g);
-		
+
 		ExpectWeak(26, 9);
 	}
 	Expect(27);
@@ -324,7 +324,7 @@ void Parser::Coco()
 	}
 	if (tab->ddt[6]) tab->PrintSymbolTable();
 	coco_string_delete(grammarName);
-	
+
 	Expect(26);
 }
 
@@ -338,14 +338,15 @@ void Parser::SetDecl()
 	if (c != NULL) {
 	  SemErr(L"name declared twice");
 	}
-	
+
 	Expect(25);
 	Set(s);
 	if (s->Elements() == 0) {
 	 SemErr(L"character set must not be empty");
 	}
 	tab->NewCharClass(name, s);
-	
+	coco_string_delete(name);
+
 	Expect(26);
 }
 
@@ -361,7 +362,7 @@ void Parser::TokenDecl(Node::nodeType typ)
 	  sym->tokenKind = Symbol::fixedToken;
 	}
 	tokenString = NULL;
-	
+
 	while (!(StartOf(10))) {SynErr(51); Get();}
 	if (la->kind == 25) {
 		Get();
@@ -377,11 +378,11 @@ void Parser::TokenDecl(Node::nodeType typ)
 		  tab->literals.Set(tokenString, sym);
 		  dfa->MatchLiteral(tokenString, sym);
 		}
-		
+
 	} else if (StartOf(11)) {
 		if (kind == isIdent) genScanner = false;
 		else dfa->MatchLiteral(sym->name, sym);
-		
+
 	} else SynErr(52);
 	if (la->kind == 47) {
 		SemText(sym->semPos);
@@ -399,7 +400,7 @@ void Parser::TokenExpr(Graph* &g)
 		TokenTerm(g2);
 		if (first) { tab->MakeFirstAlt(g); first = false; }
 		tab->MakeAlternative(g, g2);
-		
+
 	}
 }
 
@@ -485,7 +486,7 @@ void Parser::Expression(Graph* &g)
 		Term(g2);
 		if (first) { tab->MakeFirstAlt(g); first = false; }
 		tab->MakeAlternative(g, g2);
-		
+
 	}
 }
 
@@ -497,7 +498,7 @@ void Parser::SimSet(CharSet* &s)
 		Get();
 		CharClass *c = tab->FindCharClass(t->val);
 		if (c == NULL) SemErr(L"undefined name"); else s->Or(c->set);
-		
+
 	} else if (la->kind == 3) {
 		Get();
 		std::wstring name = tab->Unescape
@@ -518,7 +519,7 @@ void Parser::SimSet(CharSet* &s)
 		    }
 		    s->Set(ch);
 		}
-		
+
 	} else if (la->kind == 5) {
 		Char(n1);
 		s->Set(n1);
@@ -556,7 +557,7 @@ void Parser::Char(int &n)
 	{
 	    n += ('a' - 'A');
 	}
-	
+
 }
 
 
@@ -576,7 +577,7 @@ void Parser::Sym(wchar_t* &name, int &kind)
 			const int len = coco_string_length(name);
 			// change surrounding single quotes to double quotes (does not escape '"')
 			name[0] = name[len-1] = '"';
-			
+
 		}
 		kind = isLiteral;
 		if (dfa->ignoreCase) {
@@ -586,7 +587,7 @@ void Parser::Sym(wchar_t* &name, int &kind)
 		}
 		if (wcscspn(name, L"\t\r\n ") < wcslen(name))
 		  SemErr(L"literal tokens must not contain blanks");
-		
+
 	} else SynErr(55);
 }
 
@@ -629,7 +630,7 @@ void Parser::Factor(Graph* &g)
 {
 	wchar_t* name = NULL; int kind; Position *pos; bool weak = false;
 	g = NULL;
-	
+
 	switch (la->kind) {
 	case 1: case 3: case 5: case 37: {
 		if (la->kind == 37) {
@@ -661,7 +662,7 @@ void Parser::Factor(Graph* &g)
 		}
 		Node *p = tab->NewNode(typ, sym, t->line);
 		g = new Graph(p);
-		
+
 		if (la->kind == 32 || la->kind == 34) {
 			Attribs(p);
 			if (kind == isLiteral) SemErr(L"a literal must not have attributes");
@@ -670,7 +671,7 @@ void Parser::Factor(Graph* &g)
 		 sym->attrPos = p->pos;  // dummy
 		else if ((p->pos == NULL) != (sym->attrPos == NULL))
 		  SemErr(L"attribute mismatch between declaration and use of this symbol");
-		
+
 		break;
 	}
 	case 38: {
@@ -698,28 +699,28 @@ void Parser::Factor(Graph* &g)
 		Node *p = tab->NewNode(Node::sem);
 		p->pos = pos;
 		g = new Graph(p);
-		
+
 		break;
 	}
 	case 31: {
 		Get();
 		Node *p = tab->NewNode(Node::any);  // p.set is set in tab->SetupAnys
 		g = new Graph(p);
-		
+
 		break;
 	}
 	case 44: {
 		Get();
 		Node *p = tab->NewNode(Node::sync);
 		g = new Graph(p);
-		
+
 		break;
 	}
 	default: SynErr(57); break;
 	}
 	if (g == NULL) // invalid start of Factor
 	 g = new Graph(tab->NewNode(Node::eps));
-	
+
 }
 
 
@@ -808,7 +809,7 @@ void Parser::TokenFactor(Graph* &g)
 		  if (tokenString == NULL) tokenString = coco_string_create(name);
 		  else tokenString = coco_string_create(noString);
 		}
-		
+
 	} else if (la->kind == 38) {
 		Get();
 		TokenExpr(g);

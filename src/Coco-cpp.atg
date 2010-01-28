@@ -1,10 +1,10 @@
 /*-------------------------------------------------------------------------
- Coco-cpp.atg -- Attributed Grammar for Coco/R C++ version
+ Coco-cpp.atg -- Attributed Grammar for Coco/R -*- C++ -*- version
  compile with:
    coco-cpp Coco-cpp.atg
 -------------------------------------------------------------------------*/
 [copy]
-/*---------------------------------*- C++ -*---------------------------------*\
+/*---------------------------------------------------------------------------*\
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -253,6 +253,7 @@ SetDecl                         (. CharSet *s; .)
                                      SemErr(L"character set must not be empty");
                                    }
                                    tab->NewCharClass(name, s);
+                                   coco_string_delete(name);
                                  .)
   '.'
 .

@@ -364,19 +364,28 @@ void Tab::DeleteNodes()
 
 Graph* Tab::StrToGraph(const wchar_t* str)
 {
-	wchar_t *subStr = coco_string_create(str, 1, coco_string_length(str)-2);
-	wchar_t *s = Unescape(subStr);
-	coco_string_delete(subStr);
-	if (coco_string_length(s) == 0) parser->SemErr(L"empty token not allowed");
+	std::wstring s = Unescape
+	(
+	    std::wstring(str, 1, coco_string_length(str)-2)
+	);
+
+	if (s.empty())
+		parser->SemErr(L"empty token not allowed");
+
 	Graph *g = new Graph();
 	g->r = dummyNode;
-	for (int i = 0; i < coco_string_length(s); i++)
+	for
+	(
+		std::wstring::const_iterator iter = s.begin();
+		iter != s.end();
+		++iter
+	)
 	{
-		Node *p = NewNode(Node::chr, int(s[i]));
+		Node *p = NewNode(Node::chr, int(*iter));
 		g->r->next = p; g->r = p;
 	}
 	g->l = dummyNode->next; dummyNode->next = NULL;
-	coco_string_delete(s);
+
 	return g;
 }
 
@@ -1041,9 +1050,11 @@ std::wstring Tab::Char2Hex(const wchar_t ch)
 }
 
 
-wchar_t* Tab::Unescape(const wchar_t* s)
+std::wstring Tab::Unescape(const std::wstring& str)
 {
+	const wchar_t* s = str.c_str();
 	const int len = coco_string_length(s);
+
 	std::wstring buf;
 	buf.reserve(len);
 
@@ -1092,20 +1103,23 @@ wchar_t* Tab::Unescape(const wchar_t* s)
 		}
 	}
 
-	return coco_string_create(buf.c_str());
+	return buf;
 }
 
 
-std::wstring Tab::Escape(const wchar_t* s)
+std::wstring Tab::Escape(const std::wstring& str)
 {
-	const int len = coco_string_length(s);
-
 	std::wstring buf;
-	buf.reserve(len);
+	buf.reserve(str.size());  // not enough room, but a good start
 
-	for (int i=0; i < len; i++)
+	for
+	(
+		std::wstring::const_iterator iter = str.begin();
+		iter != str.end();
+		++iter
+	)
 	{
-		wchar_t ch = s[i];
+		const wchar_t ch = *iter;
 		switch (ch)
 		{
 			case '\\':  buf += L"\\\\"; break;
@@ -1567,48 +1581,51 @@ void Tab::XRef()
 }
 
 
-void Tab::DispatchDirective(const wchar_t* str)
+void Tab::DispatchDirective(const std::string& str)
 {
-	const int len1 = coco_string_indexof(str, '=');
-	const int len2 = coco_string_length(str) - len1 - 1;
-
-	if (len1 < 0 || len2 < 1)
+	const std::string::size_type len1 = str.find('=');
+	if (len1 == std::string::npos)
 	{
 		return;
 	}
-	wchar_t* name = coco_string_create(str, 0, len1);
-	const wchar_t* strval = (str + len1+1);
 
-	if (coco_string_equal(name, L"namespace"))
+	const std::string name  = str.substr(0, len1);
+	const std::string value  = str.substr(len1+1);
+
+	if (value.empty())
+	{
+		return;
+	}
+
+	if (name == "namespace")
 	{
 		// set namespace if not already set
 		if (nsName.empty())
 		{
-			nsName = coco_stdString(strval, 0, len2);
+			nsName = value;
 		}
 		wprintf(L"using namespace: '%s'\n", nsName.c_str());
 	}
-	else if (coco_string_equal(name, L"prefix"))
+	else if (name == "prefix")
 	{
 		// set prefix if not already set
 		if (prefixName.empty())
 		{
-			prefixName = coco_stdString(strval, 0, len2);
+			prefixName = value;
 		}
 		wprintf(L"using prefix: '%s'\n", prefixName.c_str());
 	}
-	else if (coco_string_equal(name, L"trace"))
+	else if (name == "trace")
 	{
-		SetDDT(strval);
+		SetDDT(value);
 	}
-	else if (coco_string_equal(name, L"explicitEOF"))
+	else if (name == "explicitEOF")
 	{
-		const int boolval = coco_string_checkBool(strval);
-		if (boolval > 0)
+		if (value == "true")
 		{
 			Tab::explicitEOF = true;
 		}
-		else if (!boolval)
+		else if (value == "false")
 		{
 			Tab::explicitEOF = false;
 		}
@@ -1616,39 +1633,37 @@ void Tab::DispatchDirective(const wchar_t* str)
 		{
 			wprintf
 			(
-				L"ignoring unknown bool value for pragma: '%ls' = '%ls'\n",
-				name, strval
+				L"ignoring unknown bool value for pragma: '%ls'\n",
+				str.c_str()
 			);
 		}
 	}
-	else if (coco_string_equal(name, L"lines"))
+	else if (name == "lines")
 	{
-		const int boolval = coco_string_checkBool(strval);
-		if (boolval > 0)
+		if (value == "true")
 		{
-			emitLines = true;
+			Tab::emitLines = true;
 		}
-		else if (!boolval)
+		else if (value == "false")
 		{
-			emitLines = false;
+			Tab::emitLines = false;
 		}
 		else
 		{
 			wprintf
 			(
-				L"ignoring unknown bool value for pragma: '%ls' = '%ls'\n",
-				name, strval
+				L"ignoring unknown bool value for pragma: '%ls'\n",
+				str.c_str()
 			);
 		}
 	}
-	else if (coco_string_equal(name, L"single"))
+	else if (name == "single")
 	{
-		const int boolval = coco_string_checkBool(strval);
-		if (boolval > 0)
+		if (value == "true")
 		{
 			singleOutput = true;
 		}
-		else if (!boolval)
+		else if (value == "false")
 		{
 			singleOutput = false;
 		}
@@ -1656,45 +1671,42 @@ void Tab::DispatchDirective(const wchar_t* str)
 		{
 			wprintf
 			(
-				L"ignoring unknown bool value for pragma: '%ls' = '%ls'\n",
-				name, strval
+				L"ignoring unknown bool value for pragma: '%ls'\n",
+				str.c_str()
 			);
 		}
 	}
 	else
 	{
-		wprintf(L"ignoring unknown pragma: '%ls'\n", name);
+		wprintf(L"ignoring unknown pragma: '%ls'\n", str.c_str());
 	}
-
-	coco_string_delete(name);
 }
 
 
-void Tab::SetDDT(const wchar_t* str)
+void Tab::SetDDT(const std::string& str)
 {
-	const int len = (str && *str) ? coco_string_length(str) : 0;
-
-	for (int i = 0; i < len; i++)
+	for
+	(
+		std::string::const_iterator iter = str.begin();
+		iter != str.end();
+		++iter
+	)
 	{
-		char ch = str[i];
-		if (ch >= '0' && ch <= '9')
+		switch (*iter)
 		{
-			ddt[ch - '0'] = true;
-		}
-		else
-		{
-			switch (ch)
-			{
-			 case 'A': case 'a': ddt[0] = true; break; // trace automaton
-			 case 'F': case 'f': ddt[1] = true; break; // list first/follow sets
-			 case 'G': case 'g': ddt[2] = true; break; // print syntax graph
-			 case 'I': case 'i': ddt[3] = true; break; // trace computation of first sets
-			 case 'J': case 'j': ddt[4] = true; break; // print ANY and SYNC sets
-			 case 'P': case 'p': ddt[8] = true; break; // print statistics
-			 case 'S': case 's': ddt[6] = true; break; // list symbol table
-			 case 'X': case 'x': ddt[7] = true; break; // list cross reference table
-			 default: break;
-			}
+			case '0': case '1': case '2': case '3': case '4':
+			case '5': case '6': case '7': case '8': case '9':
+				ddt[*iter - '0'] = true;
+				break;
+			case 'A': case 'a': ddt[0] = true; break; // trace automaton
+			case 'F': case 'f': ddt[1] = true; break; // list first/follow sets
+			case 'G': case 'g': ddt[2] = true; break; // print syntax graph
+			case 'I': case 'i': ddt[3] = true; break; // trace computation of first sets
+			case 'J': case 'j': ddt[4] = true; break; // print ANY and SYNC sets
+			case 'P': case 'p': ddt[8] = true; break; // print statistics
+			case 'S': case 's': ddt[6] = true; break; // list symbol table
+			case 'X': case 'x': ddt[7] = true; break; // list cross reference table
+			default: break;
 		}
 	}
 }
@@ -1709,7 +1721,7 @@ int Tab::GenNamespaceOpen(FILE* ostr) const
 {
 	const std::string::size_type len = nsName.size();
 
-	if (!nsName.size())
+	if (nsName.empty())
 	{
 		return 0;
 	}
@@ -1833,6 +1845,7 @@ FILE* Tab::OpenFrameFile(const std::string& frameName) const
 FILE* Tab::OpenGenFile(const std::string& genName) const
 {
 	FILE* ostr = NULL;
+
 #ifdef _WIN32
 	std::wstring fullName = outDir;
 	if (prefixName.size())

@@ -33,150 +33,31 @@ namespace Coco
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-wchar_t* coco_string_create(const char* str)
-{
-    const int len = str ? strlen(str) : 0;
-    wchar_t* dest = new wchar_t[len + 1];
-    for (int i = 0; i < len; ++i)
-    {
-        dest[i] = wchar_t(str[i]);
-    }
-    dest[len] = 0;
-    return dest;
-}
-
-
-wchar_t* coco_string_create_append
-(
-    const wchar_t* str1,
-    const wchar_t* str2
-)
-{
-    const int str1Len = coco_string_length(str1);
-    const int str2Len = coco_string_length(str2);
-
-    wchar_t* dest = new wchar_t[str1Len + str2Len + 1];
-
-    if (str1Len)
-    {
-        wcscpy(dest, str1);
-    }
-    if (str2Len)
-    {
-        wcscpy(dest + str1Len, str2);
-    }
-
-    dest[str1Len + str2Len] = 0;
-    return dest;
-}
-
-
-wchar_t* coco_string_create_append
-(
-    const wchar_t* str1,
-    const std::string& str2
-)
-{
-    const int str1Len = coco_string_length(str1);
-    const int str2Len = str2.size();
-
-    wchar_t* dest = new wchar_t[str1Len + str2Len + 1];
-
-    if (str1Len)
-    {
-        wcscpy(dest, str1);
-    }
-
-    for (int i = 0; i < str2Len; ++i)
-    {
-        dest[str1Len + i] = wchar_t(str2[i]);
-    }
-
-    dest[str1Len + str2Len] = 0;
-    return dest;
-}
-
-
-
 std::wstring coco_stdWString(const std::string& str)
 {
     std::wstring dest;
+    dest.reserve(str.size());
 
-    const int len = str.size();
-    if (len)
+    for
+    (
+        std::string::const_iterator iter = str.begin();
+        iter != str.end();
+        ++iter
+    )
     {
-        dest.reserve(len);
-        for (int i = 0; i < len; ++i)
-        {
-            dest += str[i];
-        }
+        dest += *iter;
     }
 
     return dest;
-}
-
-
-std::wstring coco_stdWString_append
-(
-    const std::wstring& str1,
-    const std::string& str2
-)
-{
-    std::wstring dest = str1;
-    const int str2Len = str2.size();
-
-    if (str2Len)
-    {
-        dest.reserve(dest.size() + str2Len);
-        for (int i = 0; i < str2Len; ++i)
-        {
-            dest += str2[i];
-        }
-    }
-
-    return dest;
-}
-
-
-void coco_string_merge(wchar_t* &dest, const wchar_t* str)
-{
-    if (!str) return;
-    wchar_t* newstr = coco_string_create_append(dest, str);
-    delete[] dest;
-    dest = newstr;
-}
-
-
-void coco_string_merge(wchar_t* &dest, const std::string& str)
-{
-    if (str.empty()) return;
-    wchar_t* newstr = coco_string_create_append(dest, str);
-    delete[] dest;
-    dest = newstr;
-}
-
-
-int coco_string_indexof(const wchar_t* str, const wchar_t ch)
-{
-    const wchar_t* fnd = wcschr(str, ch);
-    return fnd ? (fnd - str) : -1;
-}
-
-
-int coco_string_checkBool(const wchar_t* str)
-{
-    if (coco_string_equal(str, L"true"))  return 1;
-    if (coco_string_equal(str, L"false")) return 0;
-    return -1;
 }
 
 
 bool getLine(FILE* is, std::string& line)
 {
     line.clear();
-    line.reserve(256);
+    line.reserve(256);  // enough to avoid resizing in most cases
 
-    if (feof(is))
+    if (is == NULL || feof(is))
     {
         return false;
     }
@@ -191,109 +72,8 @@ bool getLine(FILE* is, std::string& line)
 }
 
 
-
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
-
-std::ostream& operator<<(std::ostream& os, const wchar_t wc)
-{
-    if (!(wc & ~0x0000007F))
-    {
-        // 0x00000000 - 0x0000007F [min. 8bit storage, 1-byte encoding)
-        // 0aaaaaaa
-        os.put(char(wc));
-    }
-    else if (!(wc & ~0x000007FF))
-    {
-        // 0x00000080 - 0x000007FF [min. 16bit storage, 2-byte encoding]
-        // 110bbbaa 10aaaaaa
-        os.put(char(0xC0 | ((wc >> 6) & 0x1F)));
-        os.put(char(0x80 | ((wc) & 0x3F)));
-    }
-    else if (!(wc & ~0x0000FFFF))
-    {
-        // 0x00000800 - 0x0000FFFF [min. 16bit storage, 3-byte encoding]
-        // 1110bbbb 10bbbbaa 10aaaaaa
-        os.put(char(0xE0 | ((wc >> 12) & 0x0F)));
-        os.put(char(0x80 | ((wc >> 6) & 0x3F)));
-        os.put(char(0x80 | ((wc) & 0x3F)));
-    }
-    else if (!(wc & ~0x001FFFFF))
-    {
-        // 0x00010000 - 0x001FFFFF [min. 24bit storage, 4-byte encoding]
-        // 11110ccc 10ccbbbb 10bbbbaa 10aaaaaa
-        os.put(char(0xF0 | ((wc >> 18) & 0x07)));
-        os.put(char(0x80 | ((wc >> 12) & 0x3F)));
-        os.put(char(0x80 | ((wc >> 6) & 0x3F)));
-        os.put(char(0x80 | ((wc) & 0x3F)));
-    }
-//
-// Not (yet) used - wchar_t storage is limited to 16bit on windows
-// This also corresponds to the unicode BMP (Basic Multilingual Plane)
-//
-//    else if (!(wc & ~0x03FFFFFF))
-//    {
-//        // 0x00200000 - 0x03FFFFFF [min. 32bit storage, 5-byte encoding]
-//        // 111110dd 10cccccc 10ccbbbb 10bbbbaa 10aaaaaa
-//        os.put(char(0xF8 | ((wc >> 24) & 0x03)));
-//        os.put(char(0x80 | ((wc >> 18) & 0x3F)));
-//        os.put(char(0x80 | ((wc >> 12) & 0x3F)));
-//        os.put(char(0x80 | ((wc >> 6) & 0x3F)));
-//        os.put(char(0x80 | ((wc) & 0x3F)));
-//    }
-//    else if (!(wc & ~0x7FFFFFFF))
-//    {
-//        // 0x04000000 - 0x7FFFFFFF [min. 32bit storage, 6-byte encoding]
-//        // 1111110d 10dddddd 10cccccc 10ccbbbb 10bbbbaa 10aaaaaa
-//        os.put(char(0xFC | ((wc >> 30) & 0x01)));
-//        os.put(char(0x80 | ((wc >> 24) & 0x3F)));
-//        os.put(char(0x80 | ((wc >> 18) & 0x3F)));
-//        os.put(char(0x80 | ((wc >> 12) & 0x3F)));
-//        os.put(char(0x80 | ((wc >> 6) & 0x3F)));
-//        os.put(char(0x80 | ((wc) & 0x3F)));
-//    }
-//
-    else
-    {
-        // report anything unknown/invalid as replacement character U+FFFD
-        os.put(char(0xEF));
-        os.put(char(0xBF));
-        os.put(char(0xBD));
-    }
-
-    return os;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const wchar_t* ws)
-{
-    if (ws)
-    {
-        for (const wchar_t* p = ws; *p; ++p)
-        {
-            os  << *p;
-        }
-    }
-
-    return os;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const std::wstring& ws)
-{
-    for
-    (
-        std::wstring::const_iterator iter = ws.begin();
-        iter != ws.end();
-        ++iter
-    )
-    {
-        os  << *iter;
-    }
-
-    return os;
-}
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 
 } // End namespace Coco
 

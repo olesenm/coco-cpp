@@ -85,34 +85,33 @@ void ParserGen::CopySourcePart(Position *pos, int indent)
 void ParserGen::GenErrorMsg(ParserGen::errorType errTyp, Symbol *sym)
 {
 	errorNr++;
-	const int formatLen = 1000;
-	wchar_t format[formatLen];
-	coco_swprintf(format, formatLen, L"\t\tcase %d: return L\"", errorNr);
-	coco_string_merge(err, format);
+	wchar_t format[32];
+	coco_swprintf(format, 32, L"\t\tcase %d:", errorNr);
+	err += format;
+	err += L" return L\"";
 	if (errTyp == tErr)
 	{
 		if (sym->name[0] == '"')
 		{
-			coco_swprintf(format, formatLen, L"%ls expected", Tab::Escape(sym->name).c_str());
+			err += Tab::Escape(sym->name);
 		}
 		else
 		{
-			coco_swprintf(format, formatLen, L"%ls expected", sym->name);
+			err += sym->name;
 		}
-		coco_string_merge(err, format);
+		err += L" expected";
 	}
 	else if (errTyp == altErr)
 	{
-		coco_swprintf(format, formatLen, L"invalid %ls", sym->name);
-		coco_string_merge(err, format);
+		err += L"invalid ";
+		err += sym->name;
 	}
 	else if (errTyp == syncErr)
 	{
-		coco_swprintf(format, formatLen, L"this symbol not expected in %ls", sym->name);
-		coco_string_merge(err, format);
+		err += L"this symbol not expected in ";
+		err += sym->name;
 	}
-	coco_swprintf(format, formatLen, L"\"; break;\n");
-	coco_string_merge(err, format);
+	err += L"\"; break;\n";
 }
 
 
@@ -528,7 +527,7 @@ void ParserGen::WriteParser()
 	CopyFramePart("-->constructor"); CopySourcePart(initCodePos, 0);
 	CopyFramePart("-->initialization"); InitSets();
 	CopyFramePart("-->destructor"); CopySourcePart(deinitCodePos, 0);
-	CopyFramePart("-->errors"); fwprintf(gen, L"%ls", err);
+	CopyFramePart("-->errors"); fwprintf(gen, L"%ls", err.c_str());
 	CopyFramePart("-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);
 
@@ -557,7 +556,6 @@ ParserGen::ParserGen(Parser *parser)
 	curSy(NULL),
 	fram(NULL),
 	gen(NULL),
-	err(NULL),
 	tab(parser->tab),
 	errors(parser->errors)
 {}
@@ -565,7 +563,6 @@ ParserGen::ParserGen(Parser *parser)
 
 ParserGen::~ParserGen()
 {
-	coco_string_delete(err);
 	if (preamblePos) { delete preamblePos; }
 	if (semDeclPos) { delete semDeclPos; }
 	if (initCodePos) { delete initCodePos; }

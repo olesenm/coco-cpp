@@ -118,7 +118,7 @@ bool coco_string_equal(const wchar_t* str1, const char* str2)
 
 	for (int i = 0; i < str1Len; ++i)
 	{
-		if (str1[i] != str2[i])
+		if (str1[i] != wchar_t(str2[i]))
 		{
 			return false;
 		}
@@ -249,9 +249,7 @@ std::string coco_stdStringUTF8
 }
 
 
-
 // * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
-
 
 Token::Token()
 :

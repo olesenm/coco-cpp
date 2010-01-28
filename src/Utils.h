@@ -39,51 +39,20 @@ License
 #ifndef COCO_UTILS_H__
 #define COCO_UTILS_H__
 
+#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <wchar.h>
 #include <string>
-#include <iostream>
+#include <wchar.h>
 
 #include "Scanner.h"
 
 namespace Coco
 {
 
-// * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
-
-//
-// string handling, wide character
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//! Create by copying ASCII byte str
-wchar_t* coco_string_create(const char* str);
-
-//! Create a string by concatenating str1 and str2
-wchar_t* coco_string_create_append(const wchar_t* str1, const wchar_t* str2);
-
-//! Create a string by concatenating str1 and str2
-wchar_t* coco_string_create_append(const wchar_t* str1, const std::string& str2);
-
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 //! Create by copying ASCII byte str
 std::wstring coco_stdWString(const std::string& str);
-
-
-//! Create by concatenating str1 and str2
-std::wstring coco_stdWString_append
-(
-    const std::wstring& str1,
-    const std::string& str2
-);
-
-
-//! Append str to dest
-void coco_string_merge(wchar_t* &dest, const wchar_t* str);
-
-//! Append str to dest
-void coco_string_merge(wchar_t* &dest, const std::string& str);
-
 
 //! Compare strings, return 0 if they are equal
 inline int coco_string_compare(const wchar_t* str1, const wchar_t* str2)
@@ -97,32 +66,8 @@ inline int coco_string_compare(const char* str1, const char* str2)
     return strcmp(str1, str2);
 }
 
-
-//! Return the index of the first occurrence of ch.
-//! Return -1 if nothing is found.
-int coco_string_indexof(const wchar_t* str, const wchar_t ch);
-
-
-//! Check for bool values. Return 1 for 'true', 0 for 'false' and -1 for unknown
-int coco_string_checkBool(const wchar_t* str);
-
-
 //! Roughly equivalent to std::getline, but uses stdio file handle
-bool getLine(FILE* istr, std::string& line);
-
-
-//! Output wchar_t as UTF8.
-std::ostream& operator<<(std::ostream& os, const wchar_t wc);
-
-//! Output a wchar_t string as UTF8.
-std::ostream& operator<<(std::ostream& os, const wchar_t* ws);
-
-//! Output std::wstring as UTF8.
-std::ostream& operator<<(std::ostream& os, const std::wstring&);
-
-
-// * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
-
+bool getLine(FILE*, std::string& line);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

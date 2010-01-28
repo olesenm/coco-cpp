@@ -72,7 +72,7 @@ public:
 
 	FILE* fram;             //!< parser frame file
 	FILE* gen;              //!< generated parser source file
-	wchar_t* err;           //!< generated parser error messages
+	std::wstring err;       //!< generated parser error messages
 
 	ArrayList<BitArray> symSet;
 

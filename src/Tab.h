@@ -230,9 +230,11 @@ public:
 	wchar_t  Hex2Char(const wchar_t* s, const int len);
 	static std::wstring Char2Hex(const wchar_t ch);
 
-	//! replaces escape sequences in s by their Unicode values.
-	wchar_t* Unescape(const wchar_t* s);
-	static std::wstring Escape(const wchar_t* s);
+	//! Replace escape sequences by their Unicode values.
+	std::wstring Unescape(const std::wstring&);
+
+	//! Replace non-ASCII Unicode values by an escape sequence.
+	static std::wstring Escape(const std::wstring&);
 
 	//---------------------------------------------------------------------
 	//  Grammar checks
@@ -288,10 +290,10 @@ public:
 	void XRef();
 
 	//! Dispatch a directive of the type name=value
-	void DispatchDirective(const wchar_t* str);
+	void DispatchDirective(const std::string& str);
 
 	//! Set trace flags
-	static void SetDDT(const wchar_t* str);
+	static void SetDDT(const std::string& str);
 
 	//---------------------------------------------------------------------
 	//  Output file generation, common to DFA and ParserGen

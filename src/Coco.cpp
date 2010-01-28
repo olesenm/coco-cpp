@@ -199,7 +199,7 @@ void printUsage(const char* message = NULL)
 int main(int argc, char *argv[])
 #endif
 {
-	wprintf(L"Coco/R C++ (25 Jan 2010)\n");
+	wprintf(L"Coco/R C++ (28 Jan 2010)\n");
 
 #ifdef _WIN32
 	std::wstring srcName;
@@ -260,9 +260,9 @@ int main(int argc, char *argv[])
 			}
 			traceToFile = true;
 #ifdef _WIN32
-			Tab::SetDDT(argv[i]);
+			Tab::SetDDT(coco_stdString(argv[i]));
 #else
-			Tab::SetDDT(coco_stdWString(argv[i]).c_str());
+			Tab::SetDDT(argv[i]);
 #endif
 		}
 		else if (coco_string_equal(argv[i], "-trace2"))
@@ -274,9 +274,9 @@ int main(int argc, char *argv[])
 			}
 			traceToFile = false;
 #ifdef _WIN32
-			Tab::SetDDT(argv[i]);
+			Tab::SetDDT(coco_stdString(argv[i]));
 #else
-			Tab::SetDDT(coco_stdWString(argv[i]).c_str());
+			Tab::SetDDT(argv[i]);
 #endif
 		}
 		else if (coco_string_equal(argv[i], "-o"))

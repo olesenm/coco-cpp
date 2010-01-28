@@ -359,12 +359,15 @@ void DFA::ConvertToStates(Node *p, Symbol *sym)
 
 
 // match string against current automaton; store it either as a fixedToken or as a litToken
-void DFA::MatchLiteral(wchar_t* s, Symbol *sym)
+void DFA::MatchLiteral(const wchar_t* str, Symbol *sym)
 {
-	wchar_t *subS = coco_string_create(s, 1, coco_string_length(s)-2);
-	s = tab->Unescape(subS);
-	coco_string_delete(subS);
-	int i, len = coco_string_length(s);
+	std::wstring s = tab->Unescape
+	(
+	    std::wstring(str, 1, coco_string_length(str)-2)
+	);
+	const int len = s.size();
+	int i;
+
 	State *state = firstState;
 	Action *a = NULL;
 	for (i = 0; i < len; i++)  // try to match s against existing DFA
@@ -385,7 +388,7 @@ void DFA::MatchLiteral(wchar_t* s, Symbol *sym)
 		NewTransition(state, to, Node::chr, s[i], Node::normalTrans);
 		state = to;
 	}
-	coco_string_delete(s);
+
 	Symbol *matchedSym = state->endOf;
 	if (state->endOf == NULL)
 	{
@@ -779,7 +782,7 @@ void DFA::GenComBody(Comment *com)
 
 	fwprintf(gen, L"\t\t\tif (%ls) {\n", ChCond(com->stop[0]).c_str());
 
-	if (com->stop.length() == 1)
+	if (com->stop.size() == 1)
 	{
 		fwprintf(gen, L"\t\t\t\tlevel--;\n");
 		fwprintf(gen, L"\t\t\t\tif (level == 0) { oldEols = line - line0; NextCh(); return true; }\n");
@@ -798,7 +801,7 @@ void DFA::GenComBody(Comment *com)
 	{
 		fwprintf(gen, L"\t\t\t}");
 		fwprintf(gen, L" else if (%ls) {\n", ChCond(com->start[0]).c_str());
-		if (com->stop.length() == 1)
+		if (com->stop.size() == 1)
 		{
 			fwprintf(gen, L"\t\t\t\tlevel++; NextCh();\n");
 		}
@@ -830,7 +833,7 @@ void DFA::GenComment(Comment *com, int i)
 	fwprintf(gen, L"{\n");
 	fwprintf(gen, L"\tint level = 1, pos0 = pos, line0 = line, col0 = col;\n");
 	fwprintf(gen, L"\tNextCh();\n");
-	if (com->start.length() == 1)
+	if (com->start.size() == 1)
 	{
 		GenComBody(com);
 	}

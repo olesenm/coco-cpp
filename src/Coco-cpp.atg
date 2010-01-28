@@ -92,10 +92,13 @@ TOKENS
     char      = '\'' ( charCh | '\\' printable { hex } ) '\''.
 
 PRAGMAS
-    ddtSym    = '$' { alphanum }.   (. Tab::SetDDT(la->val+1); .)
+    ddtSym    = '$' { alphanum }.
+                        (. Tab::SetDDT(coco_stdString(la->val+1)); .)
+
     directive = '$' letter { letter } '='
         { alphanum | '-' | '.' | ':' } .
-                                (. tab->DispatchDirective(la->val+1); .)
+                        (. tab->DispatchDirective(coco_stdString(la->val+1)); .)
+
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -272,20 +275,24 @@ SimSet<CharSet* &s>             (. int n1, n2; s = new CharSet(); .)
                                    if (c == NULL) SemErr(L"undefined name"); else s->Or(c->set);
                                 .)
 | string                        (.
-                                   wchar_t *subName2 = coco_string_create(t->val, 1, coco_string_length(t->val)-2);
-                                   wchar_t *name = tab->Unescape(subName2);
-                                   coco_string_delete(subName2);
-                                   const int len = coco_string_length(name);
-                                   for (int i=0; i < len; i++)
+                                   std::wstring name = tab->Unescape
+                                   (
+                                       std::wstring(t->val, 1, coco_string_length(t->val)-2)
+                                   );
+                                   for
+                                   (
+                                       std::wstring::const_iterator iter = name.begin();
+                                       iter != name.end();
+                                       ++iter
+                                   )
                                    {
-                                       wchar_t ch = name[i];
+                                       wchar_t ch = *iter;
                                        if (dfa->ignoreCase && ch >= 'A' && ch <= 'Z')
                                        {
                                            ch += ('a' - 'A'); // ch.ToLower()
                                        }
                                        s->Set(ch);
                                    }
-                                   coco_string_delete(name);
                                 .)
 | Char<n1>                      (. s->Set(n1); .)
   [ ".." Char<n2>               (. for (int i = n1; i <= n2; i++) s->Set(i); .)
@@ -299,13 +306,19 @@ SimSet<CharSet* &s>             (. int n1, n2; s = new CharSet(); .)
 Char<int &n>
 =
   char                          (. n = 0;
-                                   wchar_t* subName = coco_string_create(t->val, 1, coco_string_length(t->val)-2);
-                                   wchar_t* name = tab->Unescape(subName);
-                                   coco_string_delete(subName);
+                                   std::wstring name = tab->Unescape
+                                   (
+                                       std::wstring(t->val, 1, coco_string_length(t->val)-2)
+                                   );
                                    // "<= 1" instead of "== 1" to allow the escape sequence '\0' in C++
-                                   if (coco_string_length(name) <= 1) n = name[0];
-                                   else SemErr(L"unacceptable character value");
-                                   coco_string_delete(name);
+                                   if (name.size() == 1)
+                                   {
+                                       n = name[0];
+                                   }
+                                   else if (!name.empty())
+                                   {
+                                       SemErr(L"unacceptable character value");
+                                   }
                                    // n is int, we can create lowercase directly
                                    if (dfa->ignoreCase && n >= 'A' && n <= 'Z')
                                    {

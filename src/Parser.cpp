@@ -66,10 +66,10 @@ void Parser::Get()
 			break;
 		}
 		if (la->kind == 50) {
-				Tab::SetDDT(la->val+1);
+				Tab::SetDDT(coco_stdString(la->val+1));
 		}
 		if (la->kind == 51) {
-				tab->DispatchDirective(la->val+1);
+				tab->DispatchDirective(coco_stdString(la->val+1));
 		}
 		if (dummyToken != t)
 		{
@@ -500,20 +500,24 @@ void Parser::SimSet(CharSet* &s)
 		
 	} else if (la->kind == 3) {
 		Get();
-		wchar_t *subName2 = coco_string_create(t->val, 1, coco_string_length(t->val)-2);
-		wchar_t *name = tab->Unescape(subName2);
-		coco_string_delete(subName2);
-		const int len = coco_string_length(name);
-		for (int i=0; i < len; i++)
+		std::wstring name = tab->Unescape
+		(
+		    std::wstring(t->val, 1, coco_string_length(t->val)-2)
+		);
+		for
+		(
+		    std::wstring::const_iterator iter = name.begin();
+		    iter != name.end();
+		    ++iter
+		)
 		{
-		    wchar_t ch = name[i];
+		    wchar_t ch = *iter;
 		    if (dfa->ignoreCase && ch >= 'A' && ch <= 'Z')
 		    {
 		        ch += ('a' - 'A'); // ch.ToLower()
 		    }
 		    s->Set(ch);
 		}
-		coco_string_delete(name);
 		
 	} else if (la->kind == 5) {
 		Char(n1);
@@ -534,13 +538,19 @@ void Parser::Char(int &n)
 {
 	Expect(5);
 	n = 0;
-	wchar_t* subName = coco_string_create(t->val, 1, coco_string_length(t->val)-2);
-	wchar_t* name = tab->Unescape(subName);
-	coco_string_delete(subName);
+	std::wstring name = tab->Unescape
+	(
+	    std::wstring(t->val, 1, coco_string_length(t->val)-2)
+	);
 	// "<= 1" instead of "== 1" to allow the escape sequence '\0' in C++
-	if (coco_string_length(name) <= 1) n = name[0];
-	else SemErr(L"unacceptable character value");
-	coco_string_delete(name);
+	if (name.size() == 1)
+	{
+	    n = name[0];
+	}
+	else if (!name.empty())
+	{
+	    SemErr(L"unacceptable character value");
+	}
 	// n is int, we can create lowercase directly
 	if (dfa->ignoreCase && n >= 'A' && n <= 'Z')
 	{

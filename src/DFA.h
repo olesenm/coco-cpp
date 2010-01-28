@@ -101,7 +101,7 @@ public:
 	void ConvertToStates(Node *p, Symbol *sym);
 
 	// match string against current automaton; store it either as a fixedToken or as a litToken
-	void MatchLiteral(wchar_t* s, Symbol *sym);
+	void MatchLiteral(const wchar_t* s, Symbol *sym);
 	void SplitActions(State *state, Action *a, Action *b);
 	bool Overlap(Action *a, Action *b);
 	bool MakeUnique(State *state); // return true if actions were split

@@ -53,8 +53,6 @@ License
 # define coco_swprintf swprintf
 #endif
 
-#define COCO_WCHAR_MAX    65535    // 0xFFFF = max unicode characters
-
 
 namespace Coco {
 
@@ -211,7 +209,9 @@ protected:
 	Buffer(Buffer*);    //!< for the UTF8Buffer
 
 public:
-	static const int EoF = COCO_WCHAR_MAX + 1;
+	//! max unicode characters is 0xFFFF (16bit storage)
+	static const int MaxChar = 65535;
+	static const int EoF = MaxChar + 1;
 
 	//! @brief Attach buffer to a stdio stream.
 	//! User streams are not closed in the destructor

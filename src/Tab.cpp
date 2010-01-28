@@ -1034,7 +1034,7 @@ wchar_t Tab::Hex2Char(const wchar_t* s, const int len)
 		else if (ch >= 'A' && ch <= 'F') val = 16 * val + (10 + ch - 'A');
 		else parser->SemErr(L"bad escape sequence in string or character");
 	}
-	if (val >= COCO_WCHAR_MAX)  /* pdt */
+	if (val >= Buffer::MaxChar)
 	{
 		parser->SemErr(L"bad escape sequence in string or character");
 	}
@@ -1160,7 +1160,7 @@ bool Tab::GrammarOk()
 	{
 		CheckResolvers(); CheckLL1();
 	}
-    return ok;
+	return ok;
 }
 
 
@@ -1590,7 +1590,7 @@ void Tab::DispatchDirective(const std::string& str)
 	}
 
 	const std::string name  = str.substr(0, len1);
-	const std::string value  = str.substr(len1+1);
+	const std::string value = str.substr(len1+1);
 
 	if (value.empty())
 	{
@@ -1599,7 +1599,7 @@ void Tab::DispatchDirective(const std::string& str)
 
 	if (name == "namespace")
 	{
-		// set namespace if not already set
+		// set namespace if not already set (eg, from command-line)
 		if (nsName.empty())
 		{
 			nsName = value;
@@ -1608,7 +1608,7 @@ void Tab::DispatchDirective(const std::string& str)
 	}
 	else if (name == "prefix")
 	{
-		// set prefix if not already set
+		// set prefix if not already set (eg, from command-line)
 		if (prefixName.empty())
 		{
 			prefixName = value;

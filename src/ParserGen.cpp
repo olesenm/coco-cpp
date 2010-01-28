@@ -65,7 +65,7 @@ bool ParserGen::UseSwitch(Node *p)
 }
 
 
-void ParserGen::CopyFramePart(const wchar_t* stop, const bool doOutput)
+void ParserGen::CopyFramePart(const std::string& stop, const bool doOutput)
 {
 	bool ok = tab->CopyFramePart(gen, fram, stop, doOutput);
 	if (!ok)
@@ -87,7 +87,7 @@ void ParserGen::GenErrorMsg(ParserGen::errorType errTyp, Symbol *sym)
 	errorNr++;
 	const int formatLen = 1000;
 	wchar_t format[formatLen];
-	coco_swprintf(format, formatLen, L"\t\t\tcase %d: return L\"", errorNr);
+	coco_swprintf(format, formatLen, L"\t\tcase %d: return L\"", errorNr);
 	coco_string_merge(err, format);
 	if (errTyp == tErr)
 	{
@@ -408,17 +408,17 @@ void ParserGen::GenProductions()
 		curSy = sym;
 		fwprintf(gen, L"void Parser::%ls(", sym->name);
 		CopySourcePart(sym->attrPos, 0);
-		fwprintf(gen, L") {\n");
-		CopySourcePart(sym->semPos, 2);
-		GenCode(sym->graph, 2, new BitArray(tab->terminals.Count));
-		fwprintf(gen, L"}\n"); fwprintf(gen, L"\n");
+		fwprintf(gen, L")\n{\n");
+		CopySourcePart(sym->semPos, 1);
+		GenCode(sym->graph, 1, new BitArray(tab->terminals.Count));
+		fwprintf(gen, L"}\n\n\n");
 	}
 }
 
 
 void ParserGen::InitSets()
 {
-	fwprintf(gen, L"\tstatic const bool set[%d][%d] = {\n", symSet.Count, tab->terminals.Count+1);
+	fwprintf(gen, L"\tstatic const bool set[%d][%d] =\n\t{\n", symSet.Count, tab->terminals.Count+1);
 
 	for (int i=0; i < symSet.Count; i++)
 	{
@@ -465,26 +465,26 @@ void ParserGen::WriteParser()
 		GenErrorMsg(tErr, sym);
 	}
 
-	CopyFramePart(L"-->begin", false);
+	CopyFramePart("-->begin", false);                  // no output
 	tab->CopySourcePart(gen, tab->copyPos, 0, false);  // copy without emitLines
-	CopyFramePart(L"-->headerdef");
+	CopyFramePart("-->headerdef");
 
 	if (preamblePos != NULL)
 	{
 		CopySourcePart(preamblePos, 0); fwprintf(gen, L"\n");
 	}
-	CopyFramePart(L"-->namespace_open");
+	CopyFramePart("-->namespace_open");
 	int nrOfNs = tab->GenNamespaceOpen(gen);
 
-	CopyFramePart(L"-->constantsheader");
+	CopyFramePart("-->constantsheader");
 	GenTokensHeader();  /* ML 2002/09/07 write the token kinds */
 	fwprintf(gen, L"\tstatic const int maxT = %d;\n", tab->terminals.Count-1);
-	CopyFramePart(L"-->declarations"); CopySourcePart(semDeclPos, 0);
-	CopyFramePart(L"-->productionsheader"); GenProductionsHeader();
-	CopyFramePart(L"-->namespace_close");
+	CopyFramePart("-->declarations"); CopySourcePart(semDeclPos, 0);
+	CopyFramePart("-->productionsheader"); GenProductionsHeader();
+	CopyFramePart("-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);
 
-	CopyFramePart(L"-->implementation");
+	CopyFramePart("-->implementation");
 	fclose(gen);
 
 	//
@@ -496,9 +496,8 @@ void ParserGen::WriteParser()
 		errors->Exception(L"-- Cannot generate Parser source\n");
 	}
 
-	CopyFramePart(L"-->begin", false);
-	tab->CopySourcePart(gen, tab->copyPos, 0);  // copy without emitLines
-	CopyFramePart(L"-->namespace_open");
+	tab->CopySourcePart(gen, tab->copyPos, 0, false);  // copy without emitLines
+	CopyFramePart("-->namespace_open");
 	if (Tab::singleOutput)
 	{
 		const std::string scannerCpp = Tab::prefixName + "Scanner.cpp";
@@ -514,9 +513,9 @@ void ParserGen::WriteParser()
 	// insert extra user-defined code
 	CopySourcePart(extraCodePos, 0);
 
-	CopyFramePart(L"-->pragmas"); GenCodePragmas();
-	CopyFramePart(L"-->productions"); GenProductions();
-	CopyFramePart(L"-->parseRoot");
+	CopyFramePart("-->pragmas"); GenCodePragmas();
+	CopyFramePart("-->productions"); GenProductions();
+	CopyFramePart("-->parseRoot");
 	fwprintf(gen, L"\t%ls();\n", tab->gramSy->name);
 	if (Tab::explicitEOF)
 	{
@@ -526,14 +525,14 @@ void ParserGen::WriteParser()
 	{
 		fwprintf(gen, L"\tExpect(0); // expect end-of-file automatically added\n");
 	}
-	CopyFramePart(L"-->constructor"); CopySourcePart(initCodePos, 0);
-	CopyFramePart(L"-->initialization"); InitSets();
-	CopyFramePart(L"-->destructor"); CopySourcePart(deinitCodePos, 0);
-	CopyFramePart(L"-->errors"); fwprintf(gen, L"%ls", err);
-	CopyFramePart(L"-->namespace_close");
+	CopyFramePart("-->constructor"); CopySourcePart(initCodePos, 0);
+	CopyFramePart("-->initialization"); InitSets();
+	CopyFramePart("-->destructor"); CopySourcePart(deinitCodePos, 0);
+	CopyFramePart("-->errors"); fwprintf(gen, L"%ls", err);
+	CopyFramePart("-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);
 
-	CopyFramePart(L"$$$");
+	CopyFramePart("$$$");
 	fclose(gen);
 	tab->buffer->SetPos(oldPos);    // restore Pos
 }

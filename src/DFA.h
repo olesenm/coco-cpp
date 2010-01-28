@@ -131,7 +131,7 @@ public:
 	void GenComBody(Comment *com);
 	void GenCommentHeader(Comment *com, int i);
 	void GenComment(Comment *com, int i);
-	void CopyFramePart(const wchar_t* stop, const bool doOutput = true);
+	void CopyFramePart(const std::string& stop, const bool doOutput=true);
 	const wchar_t* SymName(Symbol *sym); //!< real name value is stored in Tab.literals
 	void GenLiterals();
 	void WriteState(State *state);

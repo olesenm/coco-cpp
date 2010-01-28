@@ -82,7 +82,7 @@ public:
 	void Indent(int n);     //!< indent with tabs to the specified level
 
 	bool UseSwitch(Node *p);
-	void CopyFramePart(const wchar_t* stop, const bool doOutput = true);
+	void CopyFramePart(const std::string& stop, const bool doOutput=true);
 	void CopySourcePart(Position *pos, int indent);
 	void GenErrorMsg(errorType errTyp, Symbol *sym);
 	int  NewCondSet(BitArray *s);

@@ -27,7 +27,6 @@ License
     Coco/R itself) does not fall under the GNU General Public License.
 \*---------------------------------------------------------------------------*/
 
-
 #ifndef COCO_SCANNER_H__
 #define COCO_SCANNER_H__
 
@@ -58,7 +57,6 @@ License
 
 
 namespace Coco {
-
 
 
 // * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
@@ -382,7 +380,6 @@ class Scanner
 private:
 	static const int maxT = 49;
 	static const int noSym = 49;
-
 	static const int eofSym = 0;    //!< end-of-file token id
 	static const char EOL = '\n';   //!< end-of-line character
 
@@ -403,7 +400,6 @@ private:
 	Token *pt;        //!< current peek token
 
 	int ch;           //!< current input character
-
 	int pos;          //!< byte position of current character
 	int line;         //!< line number of current character
 	int col;          //!< column number of current character
@@ -418,7 +414,6 @@ private:
 	void AddCh();     //!< append the character ch to tval
 	bool Comment0();
 	bool Comment1();
-
 	Token* NextToken();  //!< get the next token
 
 public:
@@ -457,6 +452,6 @@ public:
 
 } // End namespace
 
-
 #endif // COCO_SCANNER_H__
 
+// ************************************************************************* //

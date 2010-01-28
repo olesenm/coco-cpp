@@ -849,7 +849,7 @@ void DFA::GenComment(Comment *com, int i)
 }
 
 
-void DFA::CopyFramePart(const wchar_t* stop, const bool doOutput)
+void DFA::CopyFramePart(const std::string& stop, const bool doOutput)
 {
 	bool ok = tab->CopyFramePart(gen, fram, stop, doOutput);
 	if (!ok)
@@ -1056,31 +1056,31 @@ void DFA::WriteScanner()
 		errors->Exception(L"-- Cannot generate Scanner header");
 	}
 
-	CopyFramePart(L"-->begin", false);
+	CopyFramePart("-->begin", false);                  // no output
 	tab->CopySourcePart(gen, tab->copyPos, 0, false);  // copy without emitLines
-	CopyFramePart(L"-->namespace_open");
+	CopyFramePart("-->namespace_open");
 	int nrOfNs = tab->GenNamespaceOpen(gen);
 
-	CopyFramePart(L"-->constantsheader");
+	CopyFramePart("-->constantsheader");
 	fwprintf(gen, L"\tstatic const int maxT = %d;\n", tab->terminals.Count-1);
 	fwprintf(gen, L"\tstatic const int noSym = %d;\n", tab->noSym->n);
 
-	CopyFramePart(L"-->casing0");
+	CopyFramePart("-->casing0");
 	if (ignoreCase)
 	{
-		fwprintf(gen, L"\twchar_t valCh;       // current input character (for token.val)\n");
+		fwprintf(gen, L"\twchar_t valCh;  //!< current input character (for token.val)\n");
 	}
 
-	CopyFramePart(L"-->commentsheader");
+	CopyFramePart("-->commentsheader");
 	Comment *com = firstComment;
 	for (int i=0; com; com = com->next, ++i)
 	{
 		GenCommentHeader(com, i);
 	}
 
-	CopyFramePart(L"-->namespace_close");
+	CopyFramePart("-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);
-	CopyFramePart(L"-->implementation");
+	CopyFramePart("-->implementation");
 	fclose(gen);
 
 	//
@@ -1092,45 +1092,43 @@ void DFA::WriteScanner()
 		errors->Exception(L"-- Cannot generate Scanner source");
 	}
 
-	CopyFramePart(L"-->begin", false);
-	tab->CopySourcePart(gen, tab->copyPos, 0);  // copy without emitLines
-	CopyFramePart(L"-->namespace_open");
+	tab->CopySourcePart(gen, tab->copyPos, 0, false);  // copy without emitLines
+	CopyFramePart("-->namespace_open");
 	nrOfNs = tab->GenNamespaceOpen(gen);
 
-	CopyFramePart(L"-->declarations");
+	CopyFramePart("-->declarations");
 	WriteStartTab();
 	GenLiterals();
 
-	CopyFramePart(L"-->initialization");
-	CopyFramePart(L"-->casing1");
+	CopyFramePart("-->casing1");
 	if (ignoreCase)
 	{
 		fwprintf(gen, L"\t\tvalCh = ch;\n");
-		fwprintf(gen, L"\t\tif (ch >= 'A' && ch <= 'Z') ch += ('a' - 'A'); // ch.ToLower()");
+		fwprintf(gen, L"\t\tif (ch >= 'A' && ch <= 'Z') ch += ('a' - 'A'); // ch.ToLower()\n");
 	}
-	CopyFramePart(L"-->casing2");
+	CopyFramePart("-->casing2");
 	fwprintf(gen, L"\t\ttval[tlen++] = ");
-	if (ignoreCase) fwprintf(gen, L"valCh;"); else fwprintf(gen, L"ch;");
+	if (ignoreCase)
+		fwprintf(gen, L"valCh;\n");
+	else
+		fwprintf(gen, L"ch;\n");
 
-	CopyFramePart(L"-->comments");
+	CopyFramePart("-->comments");
 	com = firstComment;
 	for (int i=0; com; com = com->next, ++i)
 	{
 		GenComment(com, i);
 	}
 
-	CopyFramePart(L"-->scan1");
-	fwprintf(gen, L"\t\t\t");
+	CopyFramePart("-->scan1");
 	if (tab->ignored->Elements() > 0)
 	{
+		fwprintf(gen, L"\t || ");
 		PutRange(tab->ignored);
 	}
-	else
-	{
-		fwprintf(gen, L"false");
-	}
+	fwprintf(gen, L"\n");
 
-	CopyFramePart(L"-->scan2");
+	CopyFramePart("-->scan2");
 	if (firstComment)
 	{
 		fwprintf(gen, L"\tif (");
@@ -1148,14 +1146,14 @@ void DFA::WriteScanner()
 				fwprintf(gen, L" || ");
 			}
 		}
-		fwprintf(gen, L") return NextToken();");
+		fwprintf(gen, L") return NextToken();\n");
 	}
 	if (hasCtxMoves)   /* pdt */
 	{
 		fwprintf(gen, L"\n");
 		fwprintf(gen, L"\tint apx = 0;");
 	}
-	CopyFramePart(L"-->scan3");
+	CopyFramePart("-->scan3");
 
 	/* CSB 02-10-05 check the Labels */
 	existLabel = new bool[lastStateNr+1];
@@ -1167,10 +1165,10 @@ void DFA::WriteScanner()
 
 	delete[] existLabel;
 
-	CopyFramePart(L"-->namespace_close");
+	CopyFramePart("-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);
 
-	CopyFramePart(L"$$$");
+	CopyFramePart("$$$");
 	fclose(gen);
 	tab->buffer->SetPos(oldPos);    // restore Pos
 }

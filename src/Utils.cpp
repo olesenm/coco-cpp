@@ -171,6 +171,27 @@ int coco_string_checkBool(const wchar_t* str)
 }
 
 
+bool getLine(FILE* is, std::string& line)
+{
+    line.clear();
+    line.reserve(256);
+
+    if (feof(is))
+    {
+        return false;
+    }
+
+    int ch;
+    while ((ch = fgetc(is)) != EOF && ch != '\n')
+    {
+        line += char(ch);
+    }
+
+    return true;
+}
+
+
+
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 std::ostream& operator<<(std::ostream& os, const wchar_t wc)

@@ -32,22 +32,23 @@ About this file
 
     The '-->TAG' text markers are used to delimit code chunks and typically
     correspond to places where additional information is added by the
-    DFA or ParserGen code.
+    DFA or ParserGen code. These tag must be the first token to appear
+    on a line. Any trailing information is ignored.
 
     All information prior to the first 'begin' text marker is discarded.
     If the grammar contains a '[copy]' .. '[/copy]' section, its contents
     will added instead.
 \*---------------------------------------------------------------------------*/
--->begin
+-->begin    // <-- ignore all preliminary text
 
 #ifndef COCO_$PREFIX$PARSER_H__
 #define COCO_$PREFIX$PARSER_H__
 
--->headerdef
+-->headerdef    // <-- add in preamble (eg, includes)
 
 #include "$PREFIX$Scanner.h"
 
--->namespace_open
+-->namespace_open    // <-- open the namespace(s)
 
 //! Parser error handing
 class Errors
@@ -79,8 +80,7 @@ public:
 //! A Coco/R Parser
 class Parser
 {
-private:
--->constantsheader
+-->constantsheader    // <-- add enum with the token kinds and maxT
 	static const int minErrDist = 2; //!< min. distance before reporting errors
 
 	Token *dummyToken;
@@ -101,7 +101,7 @@ public:
 	Token *t;                   //!< last recognized token
 	Token *la;                  //!< lookahead token
 
--->declarations
+-->declarations    // <-- add user-defined date and method declarations
 
 	//! Construct for the specified scanner
 	/**
@@ -110,19 +110,19 @@ public:
 	 */
 	Parser(Scanner* scan, Errors* err = 0);
 	~Parser();
-	void SemErr(const std::wstring& msg);    //!< Handle semantic error
+	void Parse();                          //!< Execute the parse operation
+	void SemErr(const std::wstring& msg);  //!< Handle semantic error
 
--->productionsheader
-	void Parse();                       //!< Execute the parse operation
+-->productionsheader   // <-- productions headers
 
 }; // end Parser
 
--->namespace_close
+-->namespace_close    // <-- close the namespace(s)
 
 #endif // COCO_$PREFIX$PARSER_H__
 
--->implementation
--->begin
+// ************************************************************************* //
+-->implementation    // <-- start the implementation itself
 
 #include <cstdio>
 #include <cstdlib>
@@ -131,7 +131,7 @@ public:
 
 #include "$PREFIX$Parser.h"
 
--->namespace_open
+-->namespace_open    // <-- open the namespace(s)
 
 // ----------------------------------------------------------------------------
 // Parser Implementation
@@ -162,7 +162,7 @@ void Parser::Get()
 			++errDist;
 			break;
 		}
--->pragmas
+-->pragmas    // <-- add in pragma handlers
 		if (dummyToken != t)
 		{
 			dummyToken->kind = t->kind;
@@ -232,7 +232,7 @@ bool Parser::WeakSeparator(int n, int syFol, int repFol)
 }
 
 
--->productions
+-->productions    // <-- implementation for productions
 
 void Parser::Parse()
 {
@@ -241,7 +241,7 @@ void Parser::Parse()
 	la = dummyToken = new Token();
 	la->val = coco_string_create(L"Dummy Token");
 	Get();
--->parseRoot
+-->parseRoot    // <-- call main production, optionally expect end-of-file
 }
 
 
@@ -259,8 +259,8 @@ Parser::Parser(Scanner* scan, Errors* err)
 	{
 		errors = new Errors();
 	}
-	// user-defined initialization:
--->constructor
+	// user-defined initializations:
+-->constructor    // <-- user-defined initializations
 }
 
 
@@ -269,8 +269,7 @@ bool Parser::StartOf(int s)
 	const bool T = true;
 	const bool x = false;
 
--->initialization
-
+-->initialization    // <-- define start-of set
 	return set[s][la->kind];
 }
 
@@ -280,7 +279,7 @@ Parser::~Parser()
 	if (deleteErrorsDestruct_) { delete errors; } // delete default error handling
 	delete dummyToken;
 	// user-defined destruction:
--->destructor
+-->destructor    // <-- user-defined destruction
 }
 
 
@@ -307,7 +306,7 @@ void Errors::clear()
 std::wstring Errors::strerror(int n)
 {
 	switch (n) {
--->errors
+-->errors    // <-- return strings corresponding to error numbers
 		default:
 		{
 			wchar_t format[20];
@@ -353,7 +352,7 @@ void Errors::Exception(const std::wstring& msg)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
--->namespace_close
+-->namespace_close    // <-- close the namespace(s)
 
 // ************************************************************************* //
-$$$
+$$$    // <-- end of frame marker

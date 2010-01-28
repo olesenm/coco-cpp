@@ -27,7 +27,6 @@ License
     Coco/R itself) does not fall under the GNU General Public License.
 \*---------------------------------------------------------------------------*/
 
-
 #ifndef COCO_PARSER_H__
 #define COCO_PARSER_H__
 
@@ -38,11 +37,9 @@ License
 
 
 
-
 #include "Scanner.h"
 
 namespace Coco {
-
 
 //! Parser error handing
 class Errors
@@ -74,7 +71,6 @@ public:
 //! A Coco/R Parser
 class Parser
 {
-private:
 	enum {
 		_EOF=0,
 		_ident=1,
@@ -86,7 +82,6 @@ private:
 		_directive=51
 	};
 	static const int maxT = 49;
-
 	static const int minErrDist = 2; //!< min. distance before reporting errors
 
 	Token *dummyToken;
@@ -122,7 +117,6 @@ public:
 /*-------------------------------------------------------------------------*/
 
 
-
 	//! Construct for the specified scanner
 	/**
 	 *  Use the default error handling, or optionally provide an error
@@ -130,7 +124,8 @@ public:
 	 */
 	Parser(Scanner* scan, Errors* err = 0);
 	~Parser();
-	void SemErr(const std::wstring& msg);    //!< Handle semantic error
+	void Parse();                          //!< Execute the parse operation
+	void SemErr(const std::wstring& msg);  //!< Handle semantic error
 
 	void Coco();
 	void SetDecl();
@@ -151,12 +146,10 @@ public:
 	void TokenTerm(Graph* &g);
 	void TokenFactor(Graph* &g);
 
-	void Parse();                       //!< Execute the parse operation
-
 }; // end Parser
 
 } // End namespace
 
-
 #endif // COCO_PARSER_H__
 
+// ************************************************************************* //

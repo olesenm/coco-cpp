@@ -27,7 +27,6 @@ License
     Coco/R itself) does not fall under the GNU General Public License.
 \*---------------------------------------------------------------------------*/
 
-
 #include <sstream>
 
 // io.h and fcntl are used to ensure binary read from streams on windows
@@ -48,7 +47,6 @@ License
 
 
 namespace Coco {
-
 
 // * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
 
@@ -710,7 +708,6 @@ void Scanner::Init()
 	keywords.set(L"IF", 45);
 	keywords.set(L"CONTEXT", 46);
 
-
 	tvalLength = 128;
 	tval = new wchar_t[tvalLength]; // text of current token
 	tlen = 0;
@@ -759,7 +756,6 @@ void Scanner::Init()
 // 	}
 // #endif
 
-
 	pt = tokens = CreateToken(); // first token is a dummy
 }
 
@@ -780,7 +776,6 @@ void Scanner::NextCh()
 		if (ch == '\r' && buffer->Peek() != '\n') ch = EOL;
 		if (ch == EOL) { line++; col = 0; }
 	}
-
 }
 
 
@@ -848,7 +843,6 @@ bool Scanner::Comment1() {
 	}
 	return false;
 }
-
 
 void Scanner::CreateHeapBlock()
 {
@@ -934,8 +928,10 @@ void Scanner::AppendVal(Token* tok)
 
 Token* Scanner::NextToken()
 {
-	while (ch == ' ' ||
-			(ch >= 9 && ch <= 10) || ch == 13
+	while
+	(
+	    ch == ' '
+	 || (ch >= 9 && ch <= 10) || ch == 13
 	) NextCh();
 	if ((ch == '/' && Comment0()) || (ch == '/' && Comment1())) return NextToken();
 	t = CreateToken();
@@ -1276,7 +1272,6 @@ Token* Scanner::NextToken()
 			if (ch == 'p') {AddCh(); goto case_19;}
 			else if (ch == 'd') {AddCh(); goto case_63;}
 			else {t->kind = noSym; break;}
-
 	}
 	AppendVal(t);
 	return t;
@@ -1334,6 +1329,5 @@ void Scanner::Line(int lineNo)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace
-
 
 // ************************************************************************* //

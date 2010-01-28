@@ -51,7 +51,7 @@ const char* Tab::tKind[] =
 	"fixedToken", "classToken", "litToken", "classLitToken"
 };
 
-const wchar_t* Tab::prefixMacro = L"$PREFIX$";
+const std::string Tab::prefixMacro = "$PREFIX$";
 
 
 bool Tab::emitLines = false;
@@ -1884,81 +1884,40 @@ FILE* Tab::OpenGenFile(const std::string& genName) const
 
 bool Tab::CopyFramePart
 (
-	FILE* ostr,
-	FILE* istr,
-	const wchar_t* stop,
+	FILE* dst,
+	FILE* src,
+	const std::string& stop,
 	const bool doOutput
 ) const
 {
-	wchar_t startCh = stop[0];
-	int endOfStopString = coco_string_length(stop)-1;
-
-	int endOfPrefixMacro = coco_string_length(Tab::prefixMacro)-1;
-	wchar_t startPrefixCh = Tab::prefixMacro[0];
 	const bool isPrefixSet = !prefixName.empty();
 
-	wchar_t ch = 0;
-	fwscanf(istr, L"%lc", &ch); //	istr.ReadByte();
-	while (!feof(istr)) // ch != EOF
+	std::string line;
+	while (getLine(src, line))
 	{
-		if (ch == startCh)
+		if (line.find(stop) != std::string::npos)
 		{
-			int i = 0;
-			do {
-				if (i == endOfStopString)
-					return true; // stop[0..i] found
-				fwscanf(istr, L"%lc", &ch);
-				i++;
-			} while (ch == stop[i]);
-			// stop[0..i-1] found; continue with last read character
-			if (doOutput)
-			{
-				for (int subI = 0; subI < i; ++subI)
-				{
-					fwprintf(ostr, L"%lc", stop[subI]);
-				}
-			}
+			return true;        // stop found
 		}
-		else if (ch == startPrefixCh)
+
+		if (doOutput)
 		{
-			bool found = false;
-			int i = 0;
-			do {
-				if (i == endOfPrefixMacro)
-				{
-					found = true;
-					break;
-				}
-				fwscanf(istr, L"%lc", &ch);
-				i++;
-			} while (ch == Tab::prefixMacro[i]);
-			// prefixMacro[0..i-1] found; continue with last read character
-			if (found)
+			std::string::size_type foundPrefix = line.find(Tab::prefixMacro);
+			if (foundPrefix == std::string::npos)
 			{
-				if (doOutput && isPrefixSet)
-				{
-					fwprintf(ostr, L"%s", prefixName.c_str());
-				}
-				fwscanf(istr, L"%lc", &ch);
+				fwprintf(dst, L"%s\n", line.c_str());
 			}
 			else
 			{
-				if (doOutput)
+				fwprintf(dst, L"%s", line.substr(0, foundPrefix).c_str());
+				foundPrefix += prefixMacro.size();
+
+				if (isPrefixSet)
 				{
-					for (int subI = 0; subI < i; ++subI)
-					{
-						fwprintf(ostr, L"%lc", Tab::prefixMacro[subI]);
-					}
+					fwprintf(dst, L"%s", prefixName.c_str());
 				}
+				fwprintf(dst, L"%s\n", line.substr(foundPrefix).c_str());
 			}
-		}
-		else
-		{
-			if (doOutput)
-			{
-				fwprintf(ostr, L"%lc", ch);
-			}
-			fwscanf(istr, L"%lc", &ch);
 		}
 	}
 

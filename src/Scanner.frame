@@ -32,13 +32,14 @@ About this file
 
     The '-->TAG' text markers are used to delimit code chunks and typically
     correspond to places where additional information is added by the
-    DFA or ParserGen code.
+    DFA or ParserGen code. These tag must be the first token to appear
+    on a line. Any trailing information is ignored.
 
     All information prior to the first 'begin' text marker is discarded.
     If the grammar contains a '[copy]' .. '[/copy]' section, its contents
     will added instead.
 \*---------------------------------------------------------------------------*/
--->begin
+-->begin    // <-- ignore all preliminary text
 
 #ifndef COCO_$PREFIX$SCANNER_H__
 #define COCO_$PREFIX$SCANNER_H__
@@ -69,7 +70,7 @@ About this file
 #define COCO_WCHAR_MAX    65535    // 0xFFFF = max unicode characters
 
 
--->namespace_open
+-->namespace_open    // <-- open the namespace(s)
 
 
 // * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
@@ -391,7 +392,7 @@ public:
 class Scanner
 {
 private:
--->constantsheader
+-->constantsheader   // <-- add in maxT and noSym
 	static const int eofSym = 0;    //!< end-of-file token id
 	static const char EOL = '\n';   //!< end-of-line character
 
@@ -412,7 +413,7 @@ private:
 	Token *pt;        //!< current peek token
 
 	int ch;           //!< current input character
--->casing0
+-->casing0    // <-- add declaration for valCh (when ignoring case)
 	int pos;          //!< byte position of current character
 	int line;         //!< line number of current character
 	int col;          //!< column number of current character
@@ -425,7 +426,7 @@ private:
 	void Init();      //!< complete the initialization for the constructors
 	void NextCh();    //!< get the next input character into ch
 	void AddCh();     //!< append the character ch to tval
--->commentsheader
+-->commentsheader    // <-- declare the comment handlers
 	Token* NextToken();  //!< get the next token
 
 public:
@@ -462,12 +463,12 @@ public:
 
 }; // end Scanner
 
--->namespace_close
+-->namespace_close    // <-- close the namespace(s)
 
 #endif // COCO_$PREFIX$SCANNER_H__
 
--->implementation
--->begin
+// ************************************************************************* //
+-->implementation    // <-- start the implementation itself
 
 #include <sstream>
 
@@ -488,7 +489,7 @@ public:
 #define HEAP_BLOCK_SIZE   (64*1024)   // 64KB
 
 
--->namespace_open
+-->namespace_open    // <-- open the namespace(s)
 
 // * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
 
@@ -691,9 +692,7 @@ std::string coco_stdStringUTF8
 }
 
 
-
 // * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
-
 
 Token::Token()
 :
@@ -1110,7 +1109,7 @@ Scanner::~Scanner()
 
 void Scanner::Init()
 {
--->declarations
+-->declarations    // <-- define start sets and literals
 
 	tvalLength = 128;
 	tval = new wchar_t[tvalLength]; // text of current token
@@ -1160,7 +1159,6 @@ void Scanner::Init()
 // 	}
 // #endif
 
--->initialization
 	pt = tokens = CreateToken(); // first token is a dummy
 }
 
@@ -1181,7 +1179,7 @@ void Scanner::NextCh()
 		if (ch == '\r' && buffer->Peek() != '\n') ch = EOL;
 		if (ch == EOL) { line++; col = 0; }
 	}
--->casing1
+-->casing1    // <-- copy ch to valCh and change to lowercase (as required)
 }
 
 
@@ -1197,13 +1195,13 @@ void Scanner::AddCh()
 	}
 	if (ch != Buffer::EoF)
 	{
--->casing2
+-->casing2    // <-- copy ch or valCh to tval
 		NextCh();
 	}
 }
 
 
--->comments
+-->comments    // <-- define the comment handlers
 
 void Scanner::CreateHeapBlock()
 {
@@ -1289,10 +1287,12 @@ void Scanner::AppendVal(Token* tok)
 
 Token* Scanner::NextToken()
 {
-	while (ch == ' ' ||
--->scan1
+	while
+	(
+	    ch == ' '
+-->scan1    // <-- add in other IGNORE characters
 	) NextCh();
--->scan2
+-->scan2    // <-- comment skipping handlers
 	t = CreateToken();
 	t->pos = pos; t->col = col; t->line = line;
 	int state = start.state(ch);
@@ -1302,7 +1302,7 @@ Token* Scanner::NextToken()
 	{
 		case -1: { t->kind = eofSym; break; } // NextCh already done
 		case 0: { t->kind = noSym; break; }   // NextCh already done
--->scan3
+-->scan3    // <-- add in logic
 	}
 	AppendVal(t);
 	return t;
@@ -1359,7 +1359,7 @@ void Scanner::Line(int lineNo)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
--->namespace_close
+-->namespace_close    // <-- close the namespace(s)
 
 // ************************************************************************* //
-$$$
+$$$    // <-- end of frame marker

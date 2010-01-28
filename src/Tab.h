@@ -66,7 +66,7 @@ public:
 	static const char* tKind[];
 
 	//! String for replacing the file prefix name
-	static const wchar_t* prefixMacro;
+	static const std::string prefixMacro;
 
 	// Static data members
 
@@ -308,17 +308,23 @@ public:
 	//! Open a generated file (.h or .cpp), return NULL on failure
 	FILE* OpenGenFile(const std::string& genName) const;
 
-	//! Copy frame part from istr, to ostr until stop mark is seen
-	//  Return true on success. Optionally possible to suppress output.
+	//! Copy frame part from src to dst until the stop mark is seen.
+	//! Returns true on success. Optionally possible to suppress output.
 	bool CopyFramePart
 	(
-		FILE* ostr,
-		FILE* istr,
-		const wchar_t* stop,
+		FILE* dst,
+		FILE* src,
+		const std::string& stop,
 		const bool doOutput = true
 	) const;
 
-	void CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines=true);
+	void CopySourcePart
+	(
+		FILE* dest,
+		Position *pos,
+		int indent,
+		bool allowLines=true
+	);
 
 };
 

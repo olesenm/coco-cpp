@@ -184,7 +184,7 @@ public:
 	//----------------- graph printing ----------------------
 
 	static int Ptr(Node *p, bool up);
-	static std::wstring Pos(Position *pos);
+	static std::string Pos(Position *pos);
 	void PrintNodes();
 
 	//---------------------------------------------------------------------
@@ -198,7 +198,7 @@ public:
 
 	//----------- character class printing
 
-	static std::wstring Ch(const wchar_t ch);
+	static std::string Ch(const wchar_t ch);
 	void WriteCharSet(CharSet *s);
 	void WriteCharClasses();
 

@@ -33,6 +33,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Utils.h"
 #include "SortedList.h"
 
+#include <sstream>
+
 namespace Coco
 {
 
@@ -458,15 +460,14 @@ int Tab::Ptr(Node *p, bool up)
 }
 
 
-std::wstring Tab::Pos(Position *pos)
+std::string Tab::Pos(Position *pos)
 {
-	wchar_t format[10];
-	if (pos == NULL) {
-		coco_swprintf(format, 10, L"     ");
-	} else {
-		coco_swprintf(format, 10, L"%5d", pos->beg);
+	std::ostringstream buf;
+	if (pos != NULL)
+	{
+		buf << pos->beg;
 	}
-	return format;
+	return buf.str();
 }
 
 
@@ -580,15 +581,15 @@ CharSet* Tab::CharClassSet(int i)
 
 //----------- character class printing
 
-std::wstring Tab::Ch(const wchar_t ch)
+std::string Tab::Ch(const wchar_t ch)
 {
-	wchar_t format[10];
+	std::ostringstream buf;
 	if (ch < 32 || ch >= 0x7F || ch == '\'' || ch == '\\') {
-		coco_swprintf(format, 10, L"%d", int(ch));
+		buf << int(ch);
 	} else {
-		coco_swprintf(format, 10, L"'%c'", int(ch));
+		buf << '\'' << char(ch & 0x7F) << '\'';
 	}
-	return format;
+	return buf.str();
 }
 
 
@@ -596,10 +597,10 @@ void Tab::WriteCharSet(CharSet *s)
 {
 	for (CharSet::Range *r = s->head; r != NULL; r = r->next)
 	{
-		fwprintf(trace, L" %ls", Ch(r->from).c_str());
+		fwprintf(trace, L" %s", Ch(r->from).c_str());
 		if (r->from < r->to)
 		{
-			fwprintf(trace, L" .. %ls", Ch(r->to).c_str());
+			fwprintf(trace, L" .. %s", Ch(r->to).c_str());
 		}
 	}
 }

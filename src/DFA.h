@@ -80,8 +80,8 @@ public:
 	Comment *firstComment;  //!< list of comments
 
 	//---------- Output primitives
-	static std::wstring Ch(wchar_t ch);
-	static std::wstring ChCond(wchar_t ch);
+	static std::string Ch(wchar_t ch);
+	static std::string ChCond(wchar_t ch);
 	void  PutRange(CharSet *s);
 
 	//---------- State handling

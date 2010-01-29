@@ -38,6 +38,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Scanner.h"
 #include "Utils.h"
 
+#include <sstream>
+
 namespace Coco
 {
 
@@ -47,21 +49,21 @@ namespace Coco
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 //---------- Output primitives
-std::wstring DFA::Ch(wchar_t ch)
+std::string DFA::Ch(wchar_t ch)
 {
-	wchar_t format[10];
+	std::ostringstream buf;
 	if (ch < 32 || ch >= 0x7F || ch == '\'' || ch == '\\') {
-		coco_swprintf(format, 10, L"%d", int(ch));
+		buf << int(ch);
 	} else {
-		coco_swprintf(format, 10, L"'%c'", int(ch));
+		buf << '\'' << char(ch & 0x7F) << '\'';
 	}
-	return format;
+	return buf.str();
 }
 
 
-std::wstring DFA::ChCond(wchar_t ch)
+std::string DFA::ChCond(wchar_t ch)
 {
-	return std::wstring(L"ch == " + Ch(ch));
+	return std::string("ch == " + Ch(ch));
 }
 
 
@@ -71,18 +73,18 @@ void DFA::PutRange(CharSet *s)
 	{
 		if (r->from == r->to)
 		{
-			fwprintf(gen, L"ch == %ls", Ch(r->from).c_str());
+			fwprintf(gen, L"ch == %s", Ch(r->from).c_str());
 		}
 		else if (r->from == 0)
 		{
-			fwprintf(gen, L"ch <= %ls", Ch(r->to).c_str());
+			fwprintf(gen, L"ch <= %s", Ch(r->to).c_str());
 		}
 		else
 		{
 			fwprintf
 			(
 				gen,
-				L"(ch >= %ls && ch <= %ls)",
+				L"(ch >= %s && ch <= %s)",
 				Ch(r->from).c_str(),
 				Ch(r->to).c_str()
 			);
@@ -598,7 +600,7 @@ void DFA::PrintStates()
 			}
 			else
 			{
-				fwprintf(trace, L"%ls", Ch(action->sym).c_str());
+				fwprintf(trace, L"%s", Ch(action->sym).c_str());
 			}
 			for (Target *targ = action->target; targ != NULL; targ = targ->next)
 			{
@@ -780,7 +782,7 @@ void DFA::GenComBody(Comment *com)
 {
 	fwprintf(gen, L"\t\tfor(;;) {\n");
 
-	fwprintf(gen, L"\t\t\tif (%ls) {\n", ChCond(com->stop[0]).c_str());
+	fwprintf(gen, L"\t\t\tif (%s) {\n", ChCond(com->stop[0]).c_str());
 
 	if (com->stop.size() == 1)
 	{
@@ -791,7 +793,7 @@ void DFA::GenComBody(Comment *com)
 	else
 	{
 		fwprintf(gen, L"\t\t\t\tNextCh();\n");
-		fwprintf(gen, L"\t\t\t\tif (%ls) {\n", ChCond(com->stop[1]).c_str());
+		fwprintf(gen, L"\t\t\t\tif (%s) {\n", ChCond(com->stop[1]).c_str());
 		fwprintf(gen, L"\t\t\t\t\tlevel--;\n");
 		fwprintf(gen, L"\t\t\t\t\tif (level == 0) { oldEols = line - line0; NextCh(); return true; }\n");
 		fwprintf(gen, L"\t\t\t\t\tNextCh();\n");
@@ -800,7 +802,7 @@ void DFA::GenComBody(Comment *com)
 	if (com->nested)
 	{
 		fwprintf(gen, L"\t\t\t}");
-		fwprintf(gen, L" else if (%ls) {\n", ChCond(com->start[0]).c_str());
+		fwprintf(gen, L" else if (%s) {\n", ChCond(com->start[0]).c_str());
 		if (com->stop.size() == 1)
 		{
 			fwprintf(gen, L"\t\t\t\tlevel++; NextCh();\n");
@@ -808,7 +810,7 @@ void DFA::GenComBody(Comment *com)
 		else
 		{
 			fwprintf(gen, L"\t\t\t\tNextCh();\n");
-			fwprintf(gen, L"\t\t\t\tif (%ls) ", ChCond(com->start[1]).c_str());
+			fwprintf(gen, L"\t\t\t\tif (%s) ", ChCond(com->start[1]).c_str());
 			fwprintf(gen, L"{\n");
 			fwprintf(gen, L"\t\t\t\t\tlevel++; NextCh();\n");
 			fwprintf(gen, L"\t\t\t\t}\n");
@@ -839,7 +841,7 @@ void DFA::GenComment(Comment *com, int i)
 	}
 	else
 	{
-		fwprintf(gen, L"\tif (%ls) {\n", ChCond(com->start[1]).c_str());
+		fwprintf(gen, L"\tif (%s) {\n", ChCond(com->start[1]).c_str());
 		fwprintf(gen, L"\t\tNextCh();\n");
 		GenComBody(com);
 
@@ -955,7 +957,7 @@ void DFA::WriteState(State *state)
 			fwprintf(gen, L"\t\t\telse if (");
 		if (action->typ == Node::chr)
 		{
-			fwprintf(gen, L"%ls", ChCond(wchar_t(action->sym)).c_str());
+			fwprintf(gen, L"%s", ChCond(wchar_t(action->sym)).c_str());
 		}
 		else
 		{
@@ -1141,7 +1143,7 @@ void DFA::WriteScanner()
 		{
 			fwprintf
 			(
-				gen, L"(%ls && Comment%d())",
+				gen, L"(%s && Comment%d())",
 				ChCond(com->start[0]).c_str(),
 				i
 			);

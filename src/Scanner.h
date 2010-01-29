@@ -40,37 +40,9 @@ License
 
 namespace Coco {
 
+// * * * * * * * * * * * Miscellaneous String Routines * * * * * * * * * * * //
 
-// * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
-
-//
-// string handling, wide character
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//! Create by copying str
-wchar_t* coco_string_create(const wchar_t* str);
-
-//! Free storage and nullify the argument
-inline void coco_string_delete(wchar_t* &str)
-{
-	delete[] str;
-	str = NULL;
-}
-
-//! The length of the str, or 0 if the str is NULL
-inline int coco_string_length(const wchar_t* str)
-{
-	return str ? wcslen(str) : 0;
-}
-
-//! The length of the str, or 0 if the str is NULL
-inline int coco_string_length(const char* str)
-{
-	return str ? strlen(str) : 0;
-}
-
-
-//! Simple string transformation
+//! Simple lower-case string transformation
 template<class StringT>
 inline void coco_string_toLower(StringT& str)
 {
@@ -125,28 +97,29 @@ inline long coco_string_toLong(const wchar_t* str)
 }
 
 
-//
-// String handling, byte character
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 //! Create a byte string by copying str, restricted to 8bit values
 std::string coco_stdString(const wchar_t* str);
 
-//! Create a byte substring of str starting at index and length characters long
+//! Create a byte substring of str, max length characters long
 //! Restricted to 8bit values
-std::string coco_stdString(const wchar_t* str, int index, int length);
-
+std::string coco_stdString(const wchar_t* str, unsigned length);
 
 //! Create a UTF8 byte string by copying str
 std::string coco_stdStringUTF8(const wchar_t* str);
 
-//! Create a UTF8 byte substring starting at index and length characters long
-std::string coco_stdStringUTF8(const wchar_t* str, int index, int length);
+//! Create a UTF8 byte substring, max length length characters long
+std::string coco_stdStringUTF8(const wchar_t* str, unsigned length);
 
-// * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
+// * * * * * * * * * * * *  End of String Routines * * * * * * * * * * * * * //
 
 
+
+/*---------------------------------------------------------------------------*\
+                            Class Token Declaration
+\*---------------------------------------------------------------------------*/
 //! Scanner Token
+//! Note: since each Token is allocated by the internal heap mechanism,
+//! the destructor does not clean up the val member.
 class Token
 {
 public:
@@ -154,14 +127,24 @@ public:
 	int pos;        //!< token position in the source text (starting at 0)
 	int col;        //!< token column (starting at 1)
 	int line;       //!< token line (starting at 1)
-	wchar_t* val;   //!< token value
+	wchar_t* val;   //!< token value (normally allocated from the internal heap)
 	Token *next;    //!< Peek tokens are kept in linked list
 
-	Token();        //!< Construct null
-	~Token();       //!< Destructor - cleanup allocated val??
+	//! The length of val, or 0 if val is NULL
+	inline int length() const
+	{
+		return val ? wcslen(val) : 0;
+	}
+
+	//! Construct null Token with optional pointer to a string value
+	Token(wchar_t* value = 0);
+	~Token();       //!< Destructor - does not cleanup val member
 };
 
 
+/*---------------------------------------------------------------------------*\
+                           Class Buffer Declaration
+\*---------------------------------------------------------------------------*/
 //! Scanner Buffer
 //
 //! This Buffer supports the following cases:
@@ -219,7 +202,10 @@ public:
 };
 
 
-//! A Scanner buffer that handles UTF-8 characters
+/*---------------------------------------------------------------------------*\
+                         Class UTF8Buffer Declaration
+\*---------------------------------------------------------------------------*/
+//! A Scanner Buffer that handles UTF-8 characters
 class UTF8Buffer : public Buffer
 {
 public:
@@ -229,9 +215,9 @@ public:
 };
 
 
-//------------------------------------------------------------------------------
-// StartStates
-//------------------------------------------------------------------------------
+/*---------------------------------------------------------------------------*\
+                         Class StartStates Declaration
+\*---------------------------------------------------------------------------*/
 //! maps characters (integers) to start states of tokens as a HashTable
 class StartStates
 {
@@ -289,9 +275,9 @@ public:
 };
 
 
-//------------------------------------------------------------------------------
-// KeywordMap
-//------------------------------------------------------------------------------
+/*---------------------------------------------------------------------------*\
+                         Class KeywordMap Declaration
+\*---------------------------------------------------------------------------*/
 //! maps strings to integers (identifiers to keyword kinds) as a HashTable
 class KeywordMap
 {
@@ -352,6 +338,9 @@ public:
 };
 
 
+/*---------------------------------------------------------------------------*\
+                           Class Scanner Declaration
+\*---------------------------------------------------------------------------*/
 //! A Coco/R Scanner
 class Scanner
 {

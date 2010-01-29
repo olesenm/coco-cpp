@@ -112,7 +112,7 @@ Coco                            (. Symbol *sym; Graph *g; std::wstring grammarNa
 =
 
   // copyrights, notices, comments, etc. to add to the generated files
-  [ "[copy]"                    (. int beg = t->pos + coco_string_length(t->val); int line = t->line; .)
+  [ "[copy]"                    (. int beg = t->pos + t->length(); int line = t->line; .)
     { ANY }                     (. tab->copyPos = new Position(beg, la->pos, 0, line); .)
     "[/copy]"
   ]
@@ -275,7 +275,7 @@ SimSet<CharSet* &s>             (. int n1, n2; s = new CharSet(); .)
 | string                        (.
                                    std::wstring name = tab->Unescape
                                    (
-                                       std::wstring(t->val, 1, coco_string_length(t->val)-2)
+                                       std::wstring(t->val, 1, t->length()-2)
                                    );
                                    for
                                    (
@@ -306,7 +306,7 @@ Char<int &n>
   char                          (. n = 0;
                                    std::wstring name = tab->Unescape
                                    (
-                                       std::wstring(t->val, 1, coco_string_length(t->val)-2)
+                                       std::wstring(t->val, 1, t->length()-2)
                                    );
                                    // "<= 1" instead of "== 1" to allow the escape sequence '\0' in C++
                                    if (name.size() == 1)

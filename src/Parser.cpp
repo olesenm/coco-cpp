@@ -41,6 +41,32 @@ namespace Coco {
 const wchar_t* Parser::noString = L"-none-";
 
 
+
+//! @cond fileScope
+//
+
+//
+//  Create by copying str - only used locally
+inline static wchar_t* coco_string_create(const wchar_t* str)
+{
+	const int len = wcslen(str);
+	wchar_t* dest = new wchar_t[len + 1];
+	wcsncpy(dest, str, len);
+	dest[len] = 0;
+	return dest;
+}
+
+
+// Free storage and nullify the argument
+inline static void coco_string_delete(wchar_t* &str)
+{
+	delete[] str;
+	str = NULL;
+}
+//
+//! @endcond fileScope
+
+
 // ----------------------------------------------------------------------------
 // Parser Implementation
 // ----------------------------------------------------------------------------
@@ -156,7 +182,7 @@ void Parser::Coco()
 	Symbol *sym; Graph *g; std::wstring grammarName; CharSet *s;
 	if (la->kind == 6) {
 		Get();
-		int beg = t->pos + coco_string_length(t->val); int line = t->line;
+		int beg = t->pos + t->length(); int line = t->line;
 		while (StartOf(1)) {
 			Get();
 		}
@@ -512,7 +538,7 @@ void Parser::SimSet(CharSet* &s)
 		Get();
 		std::wstring name = tab->Unescape
 		(
-		    std::wstring(t->val, 1, coco_string_length(t->val)-2)
+		    std::wstring(t->val, 1, t->length()-2)
 		);
 		for
 		(
@@ -550,7 +576,7 @@ void Parser::Char(int &n)
 	n = 0;
 	std::wstring name = tab->Unescape
 	(
-	    std::wstring(t->val, 1, coco_string_length(t->val)-2)
+	    std::wstring(t->val, 1, t->length()-2)
 	);
 	// "<= 1" instead of "== 1" to allow the escape sequence '\0' in C++
 	if (name.size() == 1)
@@ -850,9 +876,13 @@ void Parser::TokenFactor(Graph* &g)
 void Parser::Parse()
 {
 	t = NULL;
-	if (dummyToken) { delete dummyToken; } // safety: might call Parse() twice
-	la = dummyToken = new Token();
-	la->val = coco_string_create(L"Dummy Token");
+	// might call Parse() twice
+	if (dummyToken) {
+		coco_string_delete(dummyToken->val);
+		delete dummyToken;
+	}
+	dummyToken = new Token(coco_string_create(L"Dummy Token"));
+	la = dummyToken;
 	Get();
 	Coco();
 	Expect(0); // expect end-of-file automatically added
@@ -923,7 +953,10 @@ bool Parser::StartOf(int s)
 Parser::~Parser()
 {
 	if (deleteErrorsDestruct_) { delete errors; } // delete default error handling
-	delete dummyToken;
+	if (dummyToken) {
+		coco_string_delete(dummyToken->val);
+		delete dummyToken;
+	}
 	// user-defined destruction:
 }
 

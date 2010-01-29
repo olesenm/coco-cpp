@@ -65,6 +65,10 @@ About this file
 
 -->namespace_open    // <-- open the namespace(s)
 
+
+/*---------------------------------------------------------------------------*\
+                           Class Errors Declaration
+\*---------------------------------------------------------------------------*/
 //! Parser error handing
 class Errors
 {
@@ -92,6 +96,10 @@ public:
 }; // Errors
 
 
+
+/*---------------------------------------------------------------------------*\
+                           Class Parser Declaration
+\*---------------------------------------------------------------------------*/
 //! A Coco/R Parser
 class Parser
 {
@@ -149,6 +157,32 @@ public:
 #include "$PREFIX$Parser.h"
 
 -->namespace_open    // <-- open the namespace(s)
+
+
+//! @cond fileScope
+//
+
+//
+//  Create by copying str - only used locally
+inline static wchar_t* coco_string_create(const wchar_t* str)
+{
+	const int len = wcslen(str);
+	wchar_t* dest = new wchar_t[len + 1];
+	wcsncpy(dest, str, len);
+	dest[len] = 0;
+	return dest;
+}
+
+
+// Free storage and nullify the argument
+inline static void coco_string_delete(wchar_t* &str)
+{
+	delete[] str;
+	str = NULL;
+}
+//
+//! @endcond fileScope
+
 
 // ----------------------------------------------------------------------------
 // Parser Implementation
@@ -260,9 +294,13 @@ bool Parser::WeakSeparator(int n, int syFol, int repFol)
 void Parser::Parse()
 {
 	t = NULL;
-	if (dummyToken) { delete dummyToken; } // safety: might call Parse() twice
-	la = dummyToken = new Token();
-	la->val = coco_string_create(L"Dummy Token");
+	// might call Parse() twice
+	if (dummyToken) {
+		coco_string_delete(dummyToken->val);
+		delete dummyToken;
+	}
+	dummyToken = new Token(coco_string_create(L"Dummy Token"));
+	la = dummyToken;
 	Get();
 -->parseRoot    // <-- call main production, optionally expect end-of-file
 }
@@ -300,7 +338,10 @@ bool Parser::StartOf(int s)
 Parser::~Parser()
 {
 	if (deleteErrorsDestruct_) { delete errors; } // delete default error handling
-	delete dummyToken;
+	if (dummyToken) {
+		coco_string_delete(dummyToken->val);
+		delete dummyToken;
+	}
 	// user-defined destruction:
 -->destructor    // <-- user-defined destruction
 }

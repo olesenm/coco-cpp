@@ -69,37 +69,9 @@ About this file
 
 -->namespace_open    // <-- open the namespace(s)
 
+// * * * * * * * * * * * Miscellaneous String Routines * * * * * * * * * * * //
 
-// * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
-
-//
-// string handling, wide character
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//! Create by copying str
-wchar_t* coco_string_create(const wchar_t* str);
-
-//! Free storage and nullify the argument
-inline void coco_string_delete(wchar_t* &str)
-{
-	delete[] str;
-	str = NULL;
-}
-
-//! The length of the str, or 0 if the str is NULL
-inline int coco_string_length(const wchar_t* str)
-{
-	return str ? wcslen(str) : 0;
-}
-
-//! The length of the str, or 0 if the str is NULL
-inline int coco_string_length(const char* str)
-{
-	return str ? strlen(str) : 0;
-}
-
-
-//! Simple string transformation
+//! Simple lower-case string transformation
 template<class StringT>
 inline void coco_string_toLower(StringT& str)
 {
@@ -154,28 +126,29 @@ inline long coco_string_toLong(const wchar_t* str)
 }
 
 
-//
-// String handling, byte character
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 //! Create a byte string by copying str, restricted to 8bit values
 std::string coco_stdString(const wchar_t* str);
 
-//! Create a byte substring of str starting at index and length characters long
+//! Create a byte substring of str, max length characters long
 //! Restricted to 8bit values
-std::string coco_stdString(const wchar_t* str, int index, int length);
-
+std::string coco_stdString(const wchar_t* str, unsigned length);
 
 //! Create a UTF8 byte string by copying str
 std::string coco_stdStringUTF8(const wchar_t* str);
 
-//! Create a UTF8 byte substring starting at index and length characters long
-std::string coco_stdStringUTF8(const wchar_t* str, int index, int length);
+//! Create a UTF8 byte substring, max length length characters long
+std::string coco_stdStringUTF8(const wchar_t* str, unsigned length);
 
-// * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
+// * * * * * * * * * * * *  End of String Routines * * * * * * * * * * * * * //
 
 
+
+/*---------------------------------------------------------------------------*\
+                            Class Token Declaration
+\*---------------------------------------------------------------------------*/
 //! Scanner Token
+//! Note: since each Token is allocated by the internal heap mechanism,
+//! the destructor does not clean up the val member.
 class Token
 {
 public:
@@ -183,14 +156,24 @@ public:
 	int pos;        //!< token position in the source text (starting at 0)
 	int col;        //!< token column (starting at 1)
 	int line;       //!< token line (starting at 1)
-	wchar_t* val;   //!< token value
+	wchar_t* val;   //!< token value (normally allocated from the internal heap)
 	Token *next;    //!< Peek tokens are kept in linked list
 
-	Token();        //!< Construct null
-	~Token();       //!< Destructor - cleanup allocated val??
+	//! The length of val, or 0 if val is NULL
+	inline int length() const
+	{
+		return val ? wcslen(val) : 0;
+	}
+
+	//! Construct null Token with optional pointer to a string value
+	Token(wchar_t* value = 0);
+	~Token();       //!< Destructor - does not cleanup val member
 };
 
 
+/*---------------------------------------------------------------------------*\
+                           Class Buffer Declaration
+\*---------------------------------------------------------------------------*/
 //! Scanner Buffer
 //
 //! This Buffer supports the following cases:
@@ -254,7 +237,10 @@ $endif // stdStreamOnly
 };
 
 
-//! A Scanner buffer that handles UTF-8 characters
+/*---------------------------------------------------------------------------*\
+                         Class UTF8Buffer Declaration
+\*---------------------------------------------------------------------------*/
+//! A Scanner Buffer that handles UTF-8 characters
 class UTF8Buffer : public Buffer
 {
 public:
@@ -264,9 +250,9 @@ public:
 };
 
 
-//------------------------------------------------------------------------------
-// StartStates
-//------------------------------------------------------------------------------
+/*---------------------------------------------------------------------------*\
+                         Class StartStates Declaration
+\*---------------------------------------------------------------------------*/
 //! maps characters (integers) to start states of tokens as a HashTable
 class StartStates
 {
@@ -324,9 +310,9 @@ public:
 };
 
 
-//------------------------------------------------------------------------------
-// KeywordMap
-//------------------------------------------------------------------------------
+/*---------------------------------------------------------------------------*\
+                         Class KeywordMap Declaration
+\*---------------------------------------------------------------------------*/
 //! maps strings to integers (identifiers to keyword kinds) as a HashTable
 class KeywordMap
 {
@@ -387,6 +373,9 @@ public:
 };
 
 
+/*---------------------------------------------------------------------------*\
+                           Class Scanner Declaration
+\*---------------------------------------------------------------------------*/
 //! A Coco/R Scanner
 class Scanner
 {
@@ -491,22 +480,7 @@ $endif // stdStreamOnly
 
 -->namespace_open    // <-- open the namespace(s)
 
-// * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
-
-// string handling, wide character
-
-wchar_t* coco_string_create(const wchar_t* str)
-{
-	const int len = coco_string_length(str);
-	wchar_t* dest = new wchar_t[len + 1];
-	if (len)
-	{
-		wcsncpy(dest, str, len);
-	}
-	dest[len] = 0;
-	return dest;
-}
-
+// * * * * * * * * * * * Miscellaneous String Routines * * * * * * * * * * * //
 
 //
 // string handling, byte character
@@ -514,24 +488,19 @@ wchar_t* coco_string_create(const wchar_t* str)
 
 std::string coco_stdString(const wchar_t* str)
 {
-    return str ? coco_stdString(str, 0, wcslen(str)) : std::string();
+    return str ? coco_stdString(str, wcslen(str)) : std::string();
 }
 
 
-std::string coco_stdString
-(
-    const wchar_t* str,
-    int index,
-    int length
-)
+std::string coco_stdString(const wchar_t* str, unsigned length)
 {
-    const int len = (str && *str) ? length : 0;
+    const unsigned len = (str && *str) ? length : 0;
     std::string dest;
     dest.reserve(len);
 
-    for (int i = 0; i < len; ++i)
+    for (unsigned i = 0; i < len; ++i)
     {
-        dest += char(str[index+i] & 0xFF);
+        dest += char(str[i] & 0xFF);
     }
 
     return dest;
@@ -540,25 +509,19 @@ std::string coco_stdString
 
 std::string coco_stdStringUTF8(const wchar_t* str)
 {
-    return str ? coco_stdStringUTF8(str, 0, wcslen(str)) : std::string();
+    return str ? coco_stdStringUTF8(str, wcslen(str)) : std::string();
 }
 
 
-std::string coco_stdStringUTF8
-(
-    const wchar_t* str,
-    int index,
-    int length
-)
+std::string coco_stdStringUTF8(const wchar_t* str, unsigned length)
 {
-    const int len = (str && *str) ? length : 0;
+    const unsigned len = (str && *str) ? length : 0;
     std::string dest;
     dest.reserve(len);
 
-
-    for (int i = 0; i < len; ++i)
+    for (unsigned i = 0; i < len; ++i)
     {
-        wchar_t wc = str[index+i];
+        wchar_t wc = str[i];
 
         if (!(wc & ~0x0000007F))
         {
@@ -629,25 +592,22 @@ std::string coco_stdStringUTF8
 }
 
 
-// * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
+// * * * * * * * * * * * *  End of String Routines * * * * * * * * * * * * * //
 
-Token::Token()
+
+Token::Token(wchar_t* value)
 :
     kind(0),
     pos(0),
     col(0),
     line(0),
-    val(NULL),
+    val(value),
     next(NULL)
 {}
 
 
-// Note: this delete may not be correct if the token was actually
-// allocated by the internal heap mechanism
 Token::~Token()
-{
-	coco_string_delete(val);
-}
+{}
 
 
 // ----------------------------------------------------------------------------

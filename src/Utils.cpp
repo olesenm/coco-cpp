@@ -54,8 +54,8 @@ std::wstring coco_stdWString(const std::string& str)
 
 bool coco_string_equal(const wchar_t* str1, const char* str2)
 {
-    const int str1Len = coco_string_length(str1);
-    const int str2Len = coco_string_length(str2);
+    const int str1Len = str1 ? wcslen(str1) : 0;
+    const int str2Len = str2 ? strlen(str2) : 0;
 
     if (str1Len != str2Len)
     {

@@ -48,22 +48,7 @@ License
 
 namespace Coco {
 
-// * * * * * * * * * *  Wide Character String Routines * * * * * * * * * * * //
-
-// string handling, wide character
-
-wchar_t* coco_string_create(const wchar_t* str)
-{
-	const int len = coco_string_length(str);
-	wchar_t* dest = new wchar_t[len + 1];
-	if (len)
-	{
-		wcsncpy(dest, str, len);
-	}
-	dest[len] = 0;
-	return dest;
-}
-
+// * * * * * * * * * * * Miscellaneous String Routines * * * * * * * * * * * //
 
 //
 // string handling, byte character
@@ -71,24 +56,19 @@ wchar_t* coco_string_create(const wchar_t* str)
 
 std::string coco_stdString(const wchar_t* str)
 {
-    return str ? coco_stdString(str, 0, wcslen(str)) : std::string();
+    return str ? coco_stdString(str, wcslen(str)) : std::string();
 }
 
 
-std::string coco_stdString
-(
-    const wchar_t* str,
-    int index,
-    int length
-)
+std::string coco_stdString(const wchar_t* str, unsigned length)
 {
-    const int len = (str && *str) ? length : 0;
+    const unsigned len = (str && *str) ? length : 0;
     std::string dest;
     dest.reserve(len);
 
-    for (int i = 0; i < len; ++i)
+    for (unsigned i = 0; i < len; ++i)
     {
-        dest += char(str[index+i] & 0xFF);
+        dest += char(str[i] & 0xFF);
     }
 
     return dest;
@@ -97,25 +77,19 @@ std::string coco_stdString
 
 std::string coco_stdStringUTF8(const wchar_t* str)
 {
-    return str ? coco_stdStringUTF8(str, 0, wcslen(str)) : std::string();
+    return str ? coco_stdStringUTF8(str, wcslen(str)) : std::string();
 }
 
 
-std::string coco_stdStringUTF8
-(
-    const wchar_t* str,
-    int index,
-    int length
-)
+std::string coco_stdStringUTF8(const wchar_t* str, unsigned length)
 {
-    const int len = (str && *str) ? length : 0;
+    const unsigned len = (str && *str) ? length : 0;
     std::string dest;
     dest.reserve(len);
 
-
-    for (int i = 0; i < len; ++i)
+    for (unsigned i = 0; i < len; ++i)
     {
-        wchar_t wc = str[index+i];
+        wchar_t wc = str[i];
 
         if (!(wc & ~0x0000007F))
         {
@@ -186,25 +160,22 @@ std::string coco_stdStringUTF8
 }
 
 
-// * * * * * * * * * End of Wide Character String Routines * * * * * * * * * //
+// * * * * * * * * * * * *  End of String Routines * * * * * * * * * * * * * //
 
-Token::Token()
+
+Token::Token(wchar_t* value)
 :
     kind(0),
     pos(0),
     col(0),
     line(0),
-    val(NULL),
+    val(value),
     next(NULL)
 {}
 
 
-// Note: this delete may not be correct if the token was actually
-// allocated by the internal heap mechanism
 Token::~Token()
-{
-	coco_string_delete(val);
-}
+{}
 
 
 // ----------------------------------------------------------------------------

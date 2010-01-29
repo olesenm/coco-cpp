@@ -46,9 +46,10 @@ $namespace=Coco         // grammar directive
 private:
 	static const int isIdent = 0;
 	static const int isLiteral = 1;
+	static const wchar_t* noString;  //!< used in declarations of literal tokens
+
 	bool genScanner;
 	wchar_t* tokenString;   //!< used in declarations of literal tokens
-	wchar_t* noString;      //!< used in declarations of literal tokens
 
 public:
 	Tab *tab;               //!< other Coco objects referenced in this ATG
@@ -57,18 +58,21 @@ public:
 
 /*-------------------------------------------------------------------------*/
 
-[initialize]   // Add to Parser constructor
+[initialize]   // Added to Parser constructor
 	genScanner = false;
 	tokenString = NULL;
-	noString = coco_string_create(L"-none-");
 	tab = NULL;
 	dfa = NULL;
 	pgen = NULL;
 [/initialize]
 
-[destroy]      // Add to Parser destructor
-	coco_string_delete(noString);
+[destroy]      // Added to Parser destructor
+	coco_string_delete(tokenString);
 [/destroy]
+
+[code]         // Added to Parser.cpp
+const wchar_t* Parser::noString = L"-none-";
+[/code]
 
 /*-------------------------------------------------------------------------*/
 

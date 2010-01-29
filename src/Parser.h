@@ -105,9 +105,10 @@ public:
 private:
 	static const int isIdent = 0;
 	static const int isLiteral = 1;
+	static const wchar_t* noString;  //!< used in declarations of literal tokens
+
 	bool genScanner;
 	wchar_t* tokenString;   //!< used in declarations of literal tokens
-	wchar_t* noString;      //!< used in declarations of literal tokens
 
 public:
 	Tab *tab;               //!< other Coco objects referenced in this ATG

@@ -511,7 +511,12 @@ void ParserGen::WriteParser()
 	nrOfNs = tab->GenNamespaceOpen(gen);
 
 	// insert extra user-defined code
-	CopySourcePart(extraCodePos, 0);
+	if (extraCodePos != NULL)
+	{
+		fwprintf(gen, L"\n\n");
+		CopySourcePart(extraCodePos, 0);
+		fwprintf(gen, L"\n");
+	}
 
 	CopyFramePart("-->pragmas"); GenCodePragmas();
 	CopyFramePart("-->productions"); GenProductions();

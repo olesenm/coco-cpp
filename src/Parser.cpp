@@ -37,6 +37,10 @@ License
 
 namespace Coco {
 
+
+const wchar_t* Parser::noString = L"-none-";
+
+
 // ----------------------------------------------------------------------------
 // Parser Implementation
 // ----------------------------------------------------------------------------
@@ -867,7 +871,6 @@ Parser::Parser(Scanner* scan, Errors* err)
 	// user-defined initializations:
 genScanner = false;
 	tokenString = NULL;
-	noString = coco_string_create(L"-none-");
 	tab = NULL;
 	dfa = NULL;
 	pgen = NULL;
@@ -918,7 +921,7 @@ Parser::~Parser()
 	if (deleteErrorsDestruct_) { delete errors; } // delete default error handling
 	delete dummyToken;
 	// user-defined destruction:
-coco_string_delete(noString);
+coco_string_delete(tokenString);
 }
 
 

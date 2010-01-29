@@ -31,6 +31,7 @@ License
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <sstream>
 
 #include "Parser.h"
 
@@ -1006,9 +1007,10 @@ std::wstring Errors::strerror(int n)
 		case 59: return L"invalid TokenFactor"; break;
 		default:
 		{
-			wchar_t format[20];
-			coco_swprintf(format, 20, L"error %d", n);
-			return format;
+			// std::wostringstream buf;  (this typedef might be missing)
+			std::basic_ostringstream<wchar_t> buf;
+			buf << "error " << n;
+			return buf.str();
 		}
 		break;
 	}

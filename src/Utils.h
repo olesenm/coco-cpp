@@ -46,6 +46,22 @@ License
 
 #include "Scanner.h"
 
+#ifdef _WIN32
+# if _MSC_VER >= 1400     // VC++ 8.0
+#  define coco_swprintf swprintf_s
+# elif _MSC_VER >= 1300   // VC++ 7.0
+#  define coco_swprintf _snwprintf
+# elif defined (__MINGW32__)        // MINGW has(had) wrong swprintf args
+#  define coco_swprintf _snwprintf
+# endif
+#endif
+
+// assume every other compiler knows swprintf
+#ifndef coco_swprintf
+# define coco_swprintf swprintf
+#endif
+
+
 namespace Coco
 {
 

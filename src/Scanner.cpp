@@ -30,9 +30,9 @@ License
 #include <sstream>
 
 // io.h and fcntl are used to ensure binary read from streams on windows
-#if _MSC_VER >= 1300
-#include <io.h>
-#include <fcntl.h>
+#ifdef _WIN32
+# include <io.h>
+# include <fcntl.h>
 #endif
 
 #include <climits>
@@ -338,7 +338,7 @@ Buffer::Buffer(FILE* istr, bool isUserStream)
 	isUserStream_(isUserStream)
 {
 // ensure binary read on windows
-#if _MSC_VER >= 1300
+#ifdef _WIN32
 	_setmode(_fileno(cStream), _O_BINARY);
 #endif
 
@@ -371,7 +371,7 @@ Buffer::Buffer(std::istream* istr, bool isUserStream)
 	stdStream(istr),
 	isUserStream_(isUserStream)
 {
-#if _MSC_VER >= 1300
+#if _WIN32
 	// TODO: ensure binary read on windows?
 #endif
 }

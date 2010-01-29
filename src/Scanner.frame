@@ -220,6 +220,7 @@ public:
 //! -# non seekable stream (network, console)
 class Buffer
 {
+$ifndef stdStreamOnly
 	unsigned char *buf; //!< input buffer
 	int bufCapacity;    //!< capacity of buf
 	int bufLen;         //!< length of buffer
@@ -227,11 +228,14 @@ class Buffer
 	int bufStart;       //!< position of first byte in buffer relative to input stream
 	int fileLen;        //!< length of input stream (may change if the stream is no file)
 	FILE* cStream;      //!< input stdio stream (normally seekable)
+$endif // stdStreamOnly
 	std::istream* stdStream;  //!< STL std stream (seekable)
 	bool isUserStream_;  //!< was the stream opened by the user?
 
+$ifndef stdStreamOnly
 	int ReadNextStreamChunk();
 	bool CanSeek() const; //!< true if stream can be seeked otherwise false
+$endif // stdStreamOnly
 
 protected:
 	Buffer(Buffer*);    //!< for the UTF8Buffer
@@ -241,6 +245,7 @@ public:
 	static const int MaxChar = 65535;
 	static const int EoF = MaxChar + 1;
 
+$ifndef stdStreamOnly
 	//! Copy buffer contents from constant character string
 	Buffer(const char* chars, int len);
 
@@ -250,6 +255,7 @@ public:
 	//! @brief Attach buffer to a stdio stream.
 	//! User streams are not closed in the destructor
 	Buffer(FILE*, bool isUserStream = true);
+$endif // stdStreamOnly
 
 	//! @brief Attach buffer to an STL standard stream
 	//! User streams are not closed in the destructor
@@ -446,6 +452,7 @@ public:
 	//! The scanner buffer
 	Buffer *buffer;
 
+$ifndef stdStreamOnly
 	//! Attach scanner to an existing character buffer
 	Scanner(const char* chars, int len);
 
@@ -462,6 +469,7 @@ public:
 
 	//! Open a file for reading and attach scanner
 	explicit Scanner(const std::string& fileName);
+$endif // stdStreamOnly
 
 	//! Attach scanner to an existing open STL standard stream
 	explicit Scanner(std::istream&);
@@ -732,6 +740,7 @@ Token::~Token()
 
 Buffer::Buffer(Buffer* b)
 :
+$ifndef stdStreamOnly
 	buf(b->buf),
 	bufCapacity(b->bufCapacity),
 	bufLen(b->bufLen),
@@ -739,16 +748,20 @@ Buffer::Buffer(Buffer* b)
 	bufStart(b->bufStart),
 	fileLen(b->fileLen),
 	cStream(b->cStream),
+$endif // stdStreamOnly
 	stdStream(b->stdStream),
 	isUserStream_(b->isUserStream_)
 {
 	// avoid accidental deletion on any of these members
+$ifndef stdStreamOnly
 	b->buf = NULL;
 	b->cStream = NULL;
+$endif // stdStreamOnly
 	b->stdStream = NULL;
 }
 
 
+$ifndef stdStreamOnly                            // stdStreamOnly
 Buffer::Buffer(const char* chars, int len)
 :
 	buf(new unsigned char[len]),
@@ -813,10 +826,12 @@ Buffer::Buffer(FILE* istr, bool isUserStream)
 	else bufPos = 0; // index 0 is already after the file, thus Pos = 0 is invalid
 	if (bufLen == fileLen && CanSeek()) Close();
 }
+$endif                                           // stdStreamOnly
 
 
 Buffer::Buffer(std::istream* istr, bool isUserStream)
 :
+$ifndef stdStreamOnly
 	buf(NULL),
 	bufCapacity(0),
 	bufLen(0),
@@ -824,6 +839,7 @@ Buffer::Buffer(std::istream* istr, bool isUserStream)
 	bufStart(0),
 	fileLen(0),
 	cStream(NULL),
+$endif    // stdStreamOnly
 	stdStream(istr),
 	isUserStream_(isUserStream)
 {
@@ -836,11 +852,13 @@ Buffer::Buffer(std::istream* istr, bool isUserStream)
 Buffer::~Buffer()
 {
 	Close();
+$ifndef stdStreamOnly
 	if (buf)
 	{
 		delete[] buf;
 		buf = NULL;
 	}
+$endif  // stdStreamOnly
 }
 
 
@@ -848,11 +866,13 @@ void Buffer::Close()
 {
 	if (!isUserStream_)
 	{
+$ifndef stdStreamOnly
 		if (cStream)
 		{
 			fclose(cStream);
 			cStream = NULL;
 		}
+$endif  // stdStreamOnly
 		if (stdStream)
 		{
 			delete stdStream;
@@ -874,6 +894,7 @@ int Buffer::Read()
 		return ch;
 	}
 
+$ifndef stdStreamOnly
 	if (bufPos < bufLen) {
 		return buf[bufPos++];
 	}
@@ -884,6 +905,7 @@ int Buffer::Read()
 	else if (cStream && !CanSeek() && (ReadNextStreamChunk() > 0)) {
 		return buf[bufPos++];
 	}
+$endif  // stdStreamOnly
 
 	return EoF;
 }
@@ -970,6 +992,7 @@ void Buffer::SetPos(int value)
 		return;
 	}
 
+$ifndef stdStreamOnly
 	if ((value >= fileLen) && cStream && !CanSeek())
 	{
 		// Wanted position is after buffer and the stream
@@ -1000,12 +1023,16 @@ void Buffer::SetPos(int value)
 	{
 		bufPos = fileLen - bufStart; // make Pos return fileLen
 	}
+$endif    // stdStreamOnly
 }
 
 
+$ifndef stdStreamOnly                            // stdStreamOnly
+//
 // Read the next chunk of bytes from the stream, increases the buffer
 // if needed and updates the fields fileLen and bufLen.
 // Returns the number of bytes read.
+//
 int Buffer::ReadNextStreamChunk()
 {
 	int freeLen = bufCapacity - bufLen;
@@ -1037,12 +1064,13 @@ bool Buffer::CanSeek() const
 {
 	return cStream && (ftell(cStream) != -1);
 }
-
+$endif                                           // stdStreamOnly
 
 // ----------------------------------------------------------------------------
 // Scanner Implementation
 // ----------------------------------------------------------------------------
 
+$ifndef stdStreamOnly                            // stdStreamOnly
 Scanner::Scanner(const char* buf, int len)
 :
 	buffer(new Buffer(buf, len))
@@ -1094,6 +1122,7 @@ Scanner::Scanner(const std::string& fileName)
 	buffer = new Buffer(istr, false);
 	Init();
 }
+$endif                                           // stdStreamOnly
 
 
 Scanner::Scanner(std::istream& istr)

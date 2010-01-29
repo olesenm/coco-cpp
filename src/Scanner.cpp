@@ -547,9 +547,11 @@ void Buffer::SetPos(int value)
 }
 
 
+//
 // Read the next chunk of bytes from the stream, increases the buffer
 // if needed and updates the fields fileLen and bufLen.
 // Returns the number of bytes read.
+//
 int Buffer::ReadNextStreamChunk()
 {
 	int freeLen = bufCapacity - bufLen;
@@ -581,7 +583,6 @@ bool Buffer::CanSeek() const
 {
 	return cStream && (ftell(cStream) != -1);
 }
-
 
 // ----------------------------------------------------------------------------
 // Scanner Implementation

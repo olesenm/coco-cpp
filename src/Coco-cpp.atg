@@ -1,17 +1,19 @@
-/*-----------------------------------------------------------------------------
- Coco-cpp.atg -- Attributed Grammar for Coco/R -*- C++ -*- version
- compile with:
-   coco-cpp Coco-cpp.atg
------------------------------------------------------------------------------*/
-[copy]
 /*---------------------------------------------------------------------------*\
-Compiler Generator Coco/R,
-Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
-extended by M. Loeberbauer & A. Woess, Univ. of Linz
-ported to C++ by Csaba Balazs, University of Szeged
-with improvements by Pat Terry, Rhodes University
-
+   Coco-cpp.atg -- Attributed Grammar for Coco/R  (-*- C++ -*- version)
+   compile with:
+       coco-cpp Coco-cpp.atg
+\*---------------------------------------------------------------------------*/
+[copy]
+/*---------------------------------*- C++ -*---------------------------------*\
+    Compiler Generator Coco/R,
+    Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
+    extended by M. Loeberbauer & A. Woess, Univ. of Linz
+    ported to C++ by Csaba Balazs, University of Szeged
+    with improvements by Pat Terry, Rhodes University
+-------------------------------------------------------------------------------
 License
+    This file is part of Compiler Generator Coco/R
+
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 2, or (at your option) any

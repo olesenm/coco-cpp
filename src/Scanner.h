@@ -1,11 +1,13 @@
-/*---------------------------------------------------------------------------*\
-Compiler Generator Coco/R,
-Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
-extended by M. Loeberbauer & A. Woess, Univ. of Linz
-ported to C++ by Csaba Balazs, University of Szeged
-with improvements by Pat Terry, Rhodes University
-
+/*---------------------------------*- C++ -*---------------------------------*\
+    Compiler Generator Coco/R,
+    Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
+    extended by M. Loeberbauer & A. Woess, Univ. of Linz
+    ported to C++ by Csaba Balazs, University of Szeged
+    with improvements by Pat Terry, Rhodes University
+-------------------------------------------------------------------------------
 License
+    This file is part of Compiler Generator Coco/R
+
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 2, or (at your option) any
@@ -117,9 +119,12 @@ std::string coco_stdStringUTF8(const wchar_t* str, unsigned length);
 /*---------------------------------------------------------------------------*\
                             Class Token Declaration
 \*---------------------------------------------------------------------------*/
-//! Scanner Token
-//! Note: since each Token is allocated by the internal heap mechanism,
-//! the destructor does not clean up the val member.
+/*!
+ * @brief Scanner Token
+ *
+ * @note since each Token is allocated by the internal heap mechanism,
+ * the destructor does not clean up the val member.
+ */
 class Token
 {
 public:
@@ -145,13 +150,15 @@ public:
 /*---------------------------------------------------------------------------*\
                            Class Buffer Declaration
 \*---------------------------------------------------------------------------*/
-//! Scanner Buffer
-//
-//! This Buffer supports the following cases:
-//! -# seekable stream (file)
-//!    -# whole stream in buffer
-//!    -# part of stream in buffer
-//! -# non seekable stream (network, console)
+/*!
+ * @brief Scanner Buffer Token
+ *
+ * This Buffer supports the following cases:
+ * -# seekable stream (file)
+ *    -# whole stream in buffer
+ *    -# part of stream in buffer
+ * -# non seekable stream (network, console)
+ */
 class Buffer
 {
 	unsigned char *buf; //!< input buffer
@@ -205,7 +212,7 @@ public:
 /*---------------------------------------------------------------------------*\
                          Class UTF8Buffer Declaration
 \*---------------------------------------------------------------------------*/
-//! A Scanner Buffer that handles UTF-8 characters
+//! A Scanner Buffer variant that decodes UTF-8 characters into 16bit unicode
 class UTF8Buffer : public Buffer
 {
 public:

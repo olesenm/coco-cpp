@@ -35,11 +35,11 @@ namespace Coco
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class Type>
-SortedList<Type>::Entry::Entry(Symbol* k, Type* v)
+SortedList<Type>::Entry::Entry(Symbol* k, Type* v, Entry* n)
 :
 	Key(k),
 	Value(v),
-	next(0)
+	next(n)
 {}
 
 

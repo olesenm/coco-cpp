@@ -127,9 +127,9 @@ public:
 -->declarations    // <-- add user-defined date and method declarations
 
 	//! Construct for the specified scanner
-	/**
-	 *  Use the default error handling, or optionally provide an error
-	 *  handler, which will not be deleted upon destruction.
+	/*!
+	 * Use the default error handling, or optionally provide an error
+	 * handler, which will not be deleted upon destruction.
 	 */
 	Parser(Scanner* scan, Errors* err = 0);
 	~Parser();

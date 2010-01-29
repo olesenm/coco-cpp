@@ -146,9 +146,12 @@ std::string coco_stdStringUTF8(const wchar_t* str, unsigned length);
 /*---------------------------------------------------------------------------*\
                             Class Token Declaration
 \*---------------------------------------------------------------------------*/
-//! Scanner Token
-//! Note: since each Token is allocated by the internal heap mechanism,
-//! the destructor does not clean up the val member.
+/*!
+ * @brief Scanner Token
+ *
+ * @note since each Token is allocated by the internal heap mechanism,
+ * the destructor does not clean up the val member.
+ */
 class Token
 {
 public:
@@ -174,13 +177,15 @@ public:
 /*---------------------------------------------------------------------------*\
                            Class Buffer Declaration
 \*---------------------------------------------------------------------------*/
-//! Scanner Buffer
-//
-//! This Buffer supports the following cases:
-//! -# seekable stream (file)
-//!    -# whole stream in buffer
-//!    -# part of stream in buffer
-//! -# non seekable stream (network, console)
+/*!
+ * @brief Scanner Buffer Token
+ *
+ * This Buffer supports the following cases:
+ * -# seekable stream (file)
+ *    -# whole stream in buffer
+ *    -# part of stream in buffer
+ * -# non seekable stream (network, console)
+ */
 class Buffer
 {
 $ifndef stdStreamOnly
@@ -240,7 +245,7 @@ $endif // stdStreamOnly
 /*---------------------------------------------------------------------------*\
                          Class UTF8Buffer Declaration
 \*---------------------------------------------------------------------------*/
-//! A Scanner Buffer that handles UTF-8 characters
+//! A Scanner Buffer variant that decodes UTF-8 characters into 16bit unicode
 class UTF8Buffer : public Buffer
 {
 public:

@@ -5,8 +5,10 @@
     Copyright (C) 2008-2009 OpenCFD Ltd.
 
     Modified namespace for inclusion in Coco/R
-
+-------------------------------------------------------------------------------
 License
+    This file is part of Compiler Generator Coco/R
+
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 2 of the License, or (at your
@@ -70,10 +72,10 @@ class StaticAssertionTest {};
 
 // external use:
 // ~~~~~~~~~~~~~
-/**
+/*!
  * @def StaticAssert(Test)
  * Assert that some test is true at compile-time
-*/
+ */
 #define StaticAssert(Test)                                                   \
     typedef ::Coco::StaticAssertionTest                                      \
     <                                                                        \

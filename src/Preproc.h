@@ -1,6 +1,6 @@
 /*---------------------------------*- C++ -*---------------------------------*\
-  Compiler Generator Coco/R
-  Copyright (C) 2010 Mark Olesen
+    Compiler Generator Coco/R
+    Copyright (C) 2010 Mark Olesen
 -------------------------------------------------------------------------------
 License
     This file is part of Compiler Generator Coco/R
@@ -50,7 +50,9 @@ namespace Coco
                            Class Preproc Declaration
 \*---------------------------------------------------------------------------*/
 
-/*! @brief A simple Pre-Processor
+/*!
+ * @brief A simple Pre-Processor
+ *
  * Handles the following directives:
  * - \$ifdef NAME
  * - \$ifndef NAME

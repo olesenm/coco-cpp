@@ -1,11 +1,13 @@
-/*---------------------------------------------------------------------------*\
-Compiler Generator Coco/R,
-Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
-extended by M. Loeberbauer & A. Woess, Univ. of Linz
-ported to C++ by Csaba Balazs, University of Szeged
-with improvements by Pat Terry, Rhodes University
-
+/*---------------------------------*- C++ -*---------------------------------*\
+    Compiler Generator Coco/R,
+    Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
+    extended by M. Loeberbauer & A. Woess, Univ. of Linz
+    ported to C++ by Csaba Balazs, University of Szeged
+    with improvements by Pat Terry, Rhodes University
+-------------------------------------------------------------------------------
 License
+    This file is part of Compiler Generator Coco/R
+
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 2, or (at your option) any
@@ -127,9 +129,9 @@ public:
 
 
 	//! Construct for the specified scanner
-	/**
-	 *  Use the default error handling, or optionally provide an error
-	 *  handler, which will not be deleted upon destruction.
+	/*!
+	 * Use the default error handling, or optionally provide an error
+	 * handler, which will not be deleted upon destruction.
 	 */
 	Parser(Scanner* scan, Errors* err = 0);
 	~Parser();

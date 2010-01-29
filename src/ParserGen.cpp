@@ -469,6 +469,7 @@ void ParserGen::WriteParser()
 
 	CopyFramePart("-->begin", false);                  // no output
 	tab->CopySourcePart(gen, tab->copyPos, 0, false);  // copy without emitLines
+	tab->AddNotice(gen);
 	CopyFramePart("-->headerdef");
 
 	if (preamblePos != NULL)
@@ -499,6 +500,7 @@ void ParserGen::WriteParser()
 	}
 
 	tab->CopySourcePart(gen, tab->copyPos, 0, false);  // copy without emitLines
+	tab->AddNotice(gen);
 	CopyFramePart("-->namespace_open");
 	if (Tab::singleOutput)
 	{

@@ -2035,6 +2035,11 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines)
 }
 
 
+void Tab::AddNotice(FILE *dest) const
+{
+    fwprintf(dest, L"// This file was generated with Coco/R - http://www.ssw.uni-linz.ac.at/coco/\n");
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Coco

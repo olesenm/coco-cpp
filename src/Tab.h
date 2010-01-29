@@ -333,6 +333,9 @@ public:
 		bool allowLines=true
 	);
 
+	//! add notice about generating program etc.
+	void AddNotice(FILE* dst) const;
+
 };
 
 

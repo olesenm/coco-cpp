@@ -361,12 +361,9 @@ void DFA::ConvertToStates(Node *p, Symbol *sym)
 
 
 // match string against current automaton; store it either as a fixedToken or as a litToken
-void DFA::MatchLiteral(const wchar_t* str, Symbol *sym)
+void DFA::MatchLiteral(const std::wstring& str, Symbol *sym)
 {
-	std::wstring s = tab->Unescape
-	(
-	    std::wstring(str, 1, coco_string_length(str)-2)
-	);
+	std::wstring s = tab->Unescape(str.substr(1, str.size()-2));
 	const int len = s.size();
 	int i;
 
@@ -578,7 +575,7 @@ void DFA::PrintStates()
 		}
 		else
 		{
-			fwprintf(trace, L"E(%-12ls)", state->endOf->name);
+			fwprintf(trace, L"E(%-12ls)", state->endOf->name.c_str());
 		}
 		fwprintf(trace, L"%3d:", state->nr);
 		if (state->firstAction == NULL) fwprintf(trace, L"\n");
@@ -596,7 +593,7 @@ void DFA::PrintStates()
 
 			if (action->typ == Node::clas)
 			{
-				fwprintf(trace, L"%ls", tab->classes[action->sym]->name);
+				fwprintf(trace, L"%ls", tab->classes[action->sym]->name.c_str());
 			}
 			else
 			{
@@ -671,7 +668,12 @@ void DFA::GetTargetStates
 			}
 			else
 			{
-				wprintf(L"Tokens %ls and %ls cannot be distinguished\n", endOf->name, t->state->endOf->name);
+				wprintf
+				(
+					L"Tokens %ls and %ls cannot be distinguished\n",
+					endOf->name.c_str(),
+					t->state->endOf->name.c_str()
+				);
 				errors->count++;
 			}
 		}
@@ -864,7 +866,7 @@ void DFA::CopyFramePart(const std::string& stop, const bool doOutput)
 }
 
 
-const wchar_t* DFA::SymName(Symbol *sym)  // real name value is stored in Tab.literals
+std::wstring DFA::SymName(Symbol *sym)  // real name value is stored in Tab.literals
 {
 	if   // Char::IsLetter(sym->name[0])
 	(
@@ -899,13 +901,7 @@ void DFA::GenLiterals()
 			Symbol *sym = (*(ts[i]))[j];
 			if (sym->tokenKind == Symbol::litToken)
 			{
-				wchar_t* name = coco_string_create(SymName(sym));
-				if (ignoreCase)
-				{
-					wchar_t *oldName = name;
-					name = coco_string_create_lower(name);
-					coco_string_delete(oldName);
-				}
+				std::wstring name = SymName(sym);
 				// sym.name stores literals with quotes, e.g. "\"Literal\""
 
 				fwprintf(gen, L"\tkeywords.set(L");
@@ -913,11 +909,14 @@ void DFA::GenLiterals()
 				for (int k = 0; name[k] != '\0'; k++)
 				{
 					char c = name[k];
+					if (ignoreCase && c >= 'A' && c <= 'Z')
+					{
+						c += ('a' - 'A'); // ToLower()
+					}
+
 					fwprintf(gen, (c >= 32 && c <= 0x7F) ? L"%lc" : L"\\x%04x", c);
 				}
 				fwprintf(gen, L", %d);\n", sym->n);
-
-				coco_string_delete(name);
 			}
 		}
 	}
@@ -1000,14 +999,12 @@ void DFA::WriteState(State *state)
 		fwprintf(gen, L"t->kind = %d; ", endOf->n);
 		if (endOf->tokenKind == Symbol::classLitToken)
 		{
+			fwprintf(gen, L"std::wstring literal(tval, tlen);");
 			if (ignoreCase)
 			{
-				fwprintf(gen, L"wchar_t *literal = coco_string_create_lower(tval, 0, tlen); t->kind = keywords.get(literal, t->kind); coco_string_delete(literal); break;}\n");
+				fwprintf(gen, L" coco_string_toLower(literal);");
 			}
-			else
-			{
-				fwprintf(gen, L"wchar_t *literal = coco_string_create(tval, 0, tlen); t->kind = keywords.get(literal, t->kind); coco_string_delete(literal); break;}\n");
-			}
+			fwprintf(gen, L" t->kind = keywords.get(literal, t->kind); break;}\n");
 		}
 		else
 		{

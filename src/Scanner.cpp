@@ -65,69 +65,6 @@ wchar_t* coco_string_create(const wchar_t* str)
 }
 
 
-wchar_t* coco_string_create(const wchar_t* str, int index, int length)
-{
-	const int len = (str && *str) ? length : 0;
-	wchar_t* dest = new wchar_t[len + 1];
-	if (len)
-	{
-		wcsncpy(dest, &(str[index]), len);
-	}
-	dest[len] = 0;
-	return dest;
-}
-
-
-wchar_t* coco_string_create_lower(const wchar_t* str)
-{
-	return str ? coco_string_create_lower(str, 0, wcslen(str)) : NULL;
-}
-
-
-wchar_t* coco_string_create_lower(const wchar_t* str, int index, int len)
-{
-	if (!str) { return NULL; }
-	wchar_t* dest = new wchar_t[len + 1];
-
-	for (int i = 0; i < len; ++i)
-	{
-		const wchar_t ch = str[index + i];
-		if (ch >= 'A' && ch <= 'Z')
-		{
-			dest[i] = ch + ('a' - 'A');   // lower-case
-		}
-		else
-		{
-			dest[i] = ch;
-		}
-	}
-	dest[len] = '\0';
-	return dest;
-}
-
-
-bool coco_string_equal(const wchar_t* str1, const char* str2)
-{
-	const int str1Len = coco_string_length(str1);
-	const int str2Len = coco_string_length(str2);
-
-	if (str1Len != str2Len)
-	{
-		return false;
-	}
-
-	for (int i = 0; i < str1Len; ++i)
-	{
-		if (str1[i] != wchar_t(str2[i]))
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
 //
 // string handling, byte character
 //
@@ -933,7 +870,7 @@ Token* Scanner::NextToken()
 		case 1:
 			case_1:
 			if ((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z') || ch == '_' || (ch >= 'a' && ch <= 'z')) {AddCh(); goto case_1;}
-			else {t->kind = 1; wchar_t *literal = coco_string_create(tval, 0, tlen); t->kind = keywords.get(literal, t->kind); coco_string_delete(literal); break;}
+			else {t->kind = 1; std::wstring literal(tval, tlen); t->kind = keywords.get(literal, t->kind); break;}
 		case 2:
 			case_2:
 			if ((ch >= '0' && ch <= '9')) {AddCh(); goto case_2;}

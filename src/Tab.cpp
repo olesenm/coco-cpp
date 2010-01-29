@@ -120,14 +120,18 @@ Tab::~Tab()
 }
 
 
-Symbol* Tab::NewSym(Node::nodeType typ, const wchar_t* name, int line)
+Symbol* Tab::NewSym(Node::nodeType typ, const std::wstring& name, int line)
 {
-	if (coco_string_length(name) == 2 && name[0] == '"')
+	Symbol *sym;
+	if (name.size() == 2 && name[0] == '"')
 	{
 		parser->SemErr(L"empty token not allowed");
-		name = coco_string_create(L"???");
+		sym = new Symbol(typ, L"???", line);
 	}
-	Symbol *sym = new Symbol(typ, name, line);
+	else
+	{
+		sym = new Symbol(typ, name, line);
+	}
 
 	if (typ == Node::t)
 	{
@@ -146,17 +150,17 @@ Symbol* Tab::NewSym(Node::nodeType typ, const wchar_t* name, int line)
 }
 
 
-Symbol* Tab::FindSym(const wchar_t* name)
+Symbol* Tab::FindSym(const std::wstring& name)
 {
 	for (int i=0; i < terminals.Count; i++)
 	{
 		Symbol *sym = terminals[i];
-		if (coco_string_equal(sym->name, name)) return sym;
+		if (sym->name == name) return sym;
 	}
 	for (int i=0; i < nonterminals.Count; i++)
 	{
 		Symbol *sym = nonterminals[i];
-		if (coco_string_equal(sym->name, name)) return sym;
+		if (sym->name == name) return sym;
 	}
 	return NULL;
 }
@@ -170,7 +174,7 @@ int Tab::Num(Node *p)
 
 void Tab::PrintSym(Symbol *sym) const
 {
-	fwprintf(trace, L"%3d %-14ls %s", sym->n, sym->name, nTyp[sym->typ]);
+	fwprintf(trace, L"%3d %-14ls %s", sym->n, sym->name.c_str(), nTyp[sym->typ]);
 
 	if (sym->attrPos) fwprintf(trace, L" true  "); else fwprintf(trace, L" false ");
 	if (sym->typ == Node::nt)
@@ -211,7 +215,11 @@ void Tab::PrintSymbolTable()
 	while (iter.HasNext())
 	{
 		HashTable<Symbol>::Entry *e = iter.Next();
-		fwprintf(trace, L"_%ls =  %ls.\n", e->val->name, e->key);
+		fwprintf
+		(
+			trace, L"_%ls =  %ls.\n",
+			e->val->name.c_str(), e->key.c_str()
+		);
 	}
 	fwprintf(trace, L"\n");
 }
@@ -225,13 +233,13 @@ void Tab::PrintSet(BitArray *s, int indent)
 		Symbol *sym = terminals[i];
 		if ((*s)[sym->n])
 		{
-			const int len = coco_string_length(sym->name);
+			const int len = sym->name.size();
 			if (col + len >= 80)
 			{
 				fwprintf(trace, L"\n");
 				for (col = 1; col < indent; col++) fwprintf(trace, L" ");
 			}
-			fwprintf(trace, L" %ls", sym->name);
+			fwprintf(trace, L" %ls", sym->name.c_str());
 			col += len + 1;
 		}
 	}
@@ -364,12 +372,9 @@ void Tab::DeleteNodes()
 }
 
 
-Graph* Tab::StrToGraph(const wchar_t* str)
+Graph* Tab::StrToGraph(const std::wstring& str)
 {
-	std::wstring s = Unescape
-	(
-	    std::wstring(str, 1, coco_string_length(str)-2)
-	);
+	std::wstring s = Unescape(str.substr(1, str.size()-2));
 
 	if (s.empty())
 		parser->SemErr(L"empty token not allowed");
@@ -485,11 +490,11 @@ void Tab::PrintNodes()
 		fwprintf(trace, L"%4d %s ", p->n, nTyp[p->typ]);
 		if (p->sym != NULL)
 		{
-			fwprintf(trace, L"%-14ls ", p->sym->name);
+			fwprintf(trace, L"%-14ls ", p->sym->name.c_str());
 		}
 		else if (p->typ == Node::clas)
 		{
-			fwprintf(trace, L"%-14ls ", classes[p->val]->name);
+			fwprintf(trace, L"%-14ls ", classes[p->val]->name.c_str());
 		}
 		else
 		{
@@ -533,13 +538,12 @@ void Tab::PrintNodes()
 //---------------------------------------------------------------------
 
 
-CharClass* Tab::NewCharClass(const wchar_t* name, CharSet *s)
+CharClass* Tab::NewCharClass(const std::wstring& name, CharSet *s)
 {
 	CharClass *c;
-	if (coco_string_equal(name, L"#"))
+	if (name == L"#")
 	{
-		wchar_t autoName[3] = { '#', wchar_t(dummyName++), '\0' };
-		c = new CharClass(autoName, s);
+		c = new CharClass(name + wchar_t(dummyName++), s);
 	}
 	else
 	{
@@ -551,12 +555,12 @@ CharClass* Tab::NewCharClass(const wchar_t* name, CharSet *s)
 }
 
 
-CharClass* Tab::FindCharClass(const wchar_t* name)
+CharClass* Tab::FindCharClass(const std::wstring& name)
 {
 	for (int i=0; i < classes.Count; i++)
 	{
 		CharClass *c = classes[i];
-		if (coco_string_equal(c->name, name)) return c;
+		if (c->name == name) return c;
 	}
 	return NULL;
 }
@@ -612,7 +616,7 @@ void Tab::WriteCharClasses()
 	{
 		CharClass *c = classes[i];
 
-		fwprintf(trace, L"%-12ls :", c->name);
+		fwprintf(trace, L"%-12ls :", c->name.c_str());
 		WriteCharSet(c->set);
 		fwprintf(trace, L"\n");
 	}
@@ -963,7 +967,7 @@ void Tab::CompDeletableSymbols()
 	{
 		Symbol *sym = nonterminals[i];
 		if (sym->deletable)
-			wprintf(L"  %ls deletable\n", sym->name);
+			wprintf(L"  %ls deletable\n", sym->name.c_str());
 	}
 }
 
@@ -995,7 +999,7 @@ void Tab::CompSymbolSets()
 		for (int i=0; i < nonterminals.Count; i++)
 		{
 			Symbol *sym = nonterminals[i];
-			fwprintf(trace, L"%ls\n", sym->name);
+			fwprintf(trace, L"%ls\n", sym->name.c_str());
 			fwprintf(trace, L" first:  "); PrintSet(sym->first, 10);
 			fwprintf(trace, L" follow: "); PrintSet(sym->follow, 10);
 			fwprintf(trace, L"\n");
@@ -1054,7 +1058,7 @@ std::wstring Tab::Char2Hex(const wchar_t ch)
 std::wstring Tab::Unescape(const std::wstring& str)
 {
 	const wchar_t* s = str.c_str();
-	const int len = coco_string_length(s);
+	const int len = str.size();
 
 	std::wstring buf;
 	buf.reserve(len);
@@ -1239,7 +1243,11 @@ bool Tab::NoCircularProductions()
 		CNode *n = list[i];
 		ok = false;
 		errors->count++;
-		wprintf(L"  %ls --> %ls", n->left->name, n->right->name);
+		wprintf
+		(
+			L"  %ls --> %ls",
+			n->left->name.c_str(), n->right->name.c_str()
+		);
 	}
 	return ok;
 }
@@ -1249,8 +1257,8 @@ bool Tab::NoCircularProductions()
 
 void Tab::LL1Error(int cond, Symbol *sym)
 {
-	wprintf(L"  LL1 warning in %ls: ", curSy->name);
-	if (sym != NULL) wprintf(L"%ls is ", sym->name);
+	wprintf(L"  LL1 warning in %ls: ", curSy->name.c_str());
+	if (sym != NULL) wprintf(L"%ls is ", sym->name.c_str());
 	switch (cond)
 	{
 		case 1: wprintf(L"start of several alternatives\n"); break;
@@ -1403,7 +1411,7 @@ bool Tab::NtsComplete()
 		if (sym->graph == NULL)
 		{
 			complete = false; errors->count++;
-			wprintf(L"  No production for %ls\n", sym->name);
+			wprintf(L"  No production for %ls\n", sym->name.c_str());
 		}
 	}
 	return complete;
@@ -1450,7 +1458,7 @@ bool Tab::AllNtReached()
 		{
 			ok = false;
 			errors->count++;
-			wprintf(L"  %ls cannot be reached\n", sym->name);
+			wprintf(L"  %ls cannot be reached\n", sym->name.c_str());
 		}
 	}
 	return ok;
@@ -1510,7 +1518,7 @@ bool Tab::AllNtToTerm()
 		{
 			ok = false;
 			errors->count++;
-			wprintf(L"  %ls cannot be derived to terminals\n", sym->name);
+			wprintf(L"  %ls cannot be derived to terminals\n", sym->name.c_str());
 		}
 	}
 	return ok;
@@ -1563,7 +1571,7 @@ void Tab::XRef()
 	for (int i=0; i < xref.Count; i++)
 	{
 		Symbol *sym = xref.GetKey(i);
-		fwprintf(trace, L"  %-12ls", sym->name);
+		fwprintf(trace, L"  %-12ls", sym->name.c_str());
 		ArrayList<int> *list = xref.Get(sym);
 		int col = 14;
 		for (int j=0; j <list->Count; j++)

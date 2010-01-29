@@ -49,7 +49,7 @@ private:
 	static const wchar_t* noString;  //!< used in declarations of literal tokens
 
 	bool genScanner;
-	wchar_t* tokenString;   //!< used in declarations of literal tokens
+	std::wstring tokenString;   //!< used in declarations of literal tokens
 
 public:
 	Tab *tab;               //!< other Coco objects referenced in this ATG
@@ -60,15 +60,10 @@ public:
 
 [initialize]   // Added to Parser constructor
 	genScanner = false;
-	tokenString = NULL;
 	tab = NULL;
 	dfa = NULL;
 	pgen = NULL;
 [/initialize]
-
-[destroy]      // Added to Parser destructor
-	coco_string_delete(tokenString);
-[/destroy]
 
 [code]         // Added to Parser.cpp
 const wchar_t* Parser::noString = L"-none-";
@@ -113,7 +108,7 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 
-Coco                            (. Symbol *sym; Graph *g; wchar_t* grammarName = NULL; CharSet *s; .)
+Coco                            (. Symbol *sym; Graph *g; std::wstring grammarName; CharSet *s; .)
 =
 
   // copyrights, notices, comments, etc. to add to the generated files
@@ -129,7 +124,7 @@ Coco                            (. Symbol *sym; Graph *g; wchar_t* grammarName =
   ]
 
   "COMPILER"                    (. genScanner = true; .)
-  ident                         (. grammarName = coco_string_create(t->val); .)
+  ident                         (. grammarName = t->val; .)
 
   // semantic declarations - ie, class members and methods
   [ ANY                         (. int beg = t->pos; int line = t->line; .)
@@ -203,7 +198,7 @@ Coco                            (. Symbol *sym; Graph *g; wchar_t* grammarName =
                                 WEAK
     '.'
   }
-  "END" ident                   (. if (!coco_string_equal(grammarName, t->val))
+  "END" ident                   (. if (grammarName != t->val)
                                      SemErr(L"name does not match grammar name");
                                    tab->gramSy = tab->FindSym(grammarName);
                                    if (tab->gramSy == NULL)
@@ -238,7 +233,6 @@ Coco                            (. Symbol *sym; Graph *g; wchar_t* grammarName =
                                      }
                                    }
                                    if (tab->ddt[6]) tab->PrintSymbolTable();
-                                   coco_string_delete(grammarName);
                                  .)
   '.'
 .
@@ -247,7 +241,7 @@ Coco                            (. Symbol *sym; Graph *g; wchar_t* grammarName =
 
 SetDecl                         (. CharSet *s; .)
 =
-  ident                         (. wchar_t *name = coco_string_create(t->val);
+  ident                         (. std::wstring name = t->val;
                                    CharClass *c = tab->FindCharClass(name);
                                    if (c != NULL) {
                                      SemErr(L"name declared twice");
@@ -257,7 +251,6 @@ SetDecl                         (. CharSet *s; .)
                                      SemErr(L"character set must not be empty");
                                    }
                                    tab->NewCharClass(name, s);
-                                   coco_string_delete(name);
                                  .)
   '.'
 .
@@ -334,7 +327,7 @@ Char<int &n>
 
 /*------------------------------------------------------------------------------------*/
 
-TokenDecl<Node::nodeType typ>   (. wchar_t* name = NULL; int kind; Graph *g; .)
+TokenDecl<Node::nodeType typ>   (. std::wstring name; int kind; Graph *g; .)
 =
   Sym<name, kind>               (. Symbol *sym = tab->FindSym(name);
                                    if (sym != NULL) SemErr(L"name declared twice");
@@ -342,12 +335,12 @@ TokenDecl<Node::nodeType typ>   (. wchar_t* name = NULL; int kind; Graph *g; .)
                                      sym = tab->NewSym(typ, name, t->line);
                                      sym->tokenKind = Symbol::fixedToken;
                                    }
-                                   tokenString = NULL;
+                                   tokenString.clear();
                                  .)
   SYNC
   ( '=' TokenExpr<g> '.'        (. if (kind == isLiteral) SemErr(L"a literal must not be declared with a structure");
                                    tab->Finish(g);
-                                   if (tokenString == NULL || coco_string_equal(tokenString, noString))
+                                   if (tokenString.empty() || tokenString == noString)
                                      dfa->ConvertToStates(g->l, sym);
                                    else { // TokenExpr is a single string
                                      if (tab->literals[tokenString] != NULL)
@@ -413,7 +406,7 @@ Term<Graph* &g>                 (. Graph *g2; Node *rslv = NULL; g = NULL; .)
 
 /*------------------------------------------------------------------------------------*/
 
-Factor<Graph* &g>               (. wchar_t* name = NULL; int kind; Position *pos; bool weak = false;
+Factor<Graph* &g>               (. std::wstring name; int kind; Position *pos; bool weak = false;
                                    g = NULL;
                                  .)
 =
@@ -510,7 +503,7 @@ TokenTerm<Graph* &g>            (. Graph *g2; .)
 
 /*------------------------------------------------------------------------------------*/
 
-TokenFactor<Graph* &g>          (. wchar_t* name = NULL; int kind; g = NULL; .)
+TokenFactor<Graph* &g>          (. std::wstring name; int kind; g = NULL; .)
 =
 ( Sym<name, kind>               (. if (kind == isIdent) {
                                      CharClass *c = tab->FindCharClass(name);
@@ -520,11 +513,11 @@ TokenFactor<Graph* &g>          (. wchar_t* name = NULL; int kind; g = NULL; .)
                                      }
                                      Node *p = tab->NewNode(Node::clas); p->val = c->n;
                                      g = new Graph(p);
-                                     tokenString = coco_string_create(noString);
+                                     tokenString = noString;
                                    } else { // str
                                      g = tab->StrToGraph(name);
-                                     if (tokenString == NULL) tokenString = coco_string_create(name);
-                                     else tokenString = coco_string_create(noString);
+                                     if (tokenString.empty()) tokenString = name;
+                                     else tokenString = noString;
                                    }
                                 .)
 | '(' TokenExpr<g> ')'
@@ -536,22 +529,29 @@ TokenFactor<Graph* &g>          (. wchar_t* name = NULL; int kind; g = NULL; .)
 
 /*------------------------------------------------------------------------------------*/
 
-Sym<wchar_t* &name, int &kind>  (. name = coco_string_create(L"???"); kind = isIdent; .)
+Sym<std::wstring &name, int &kind> (. name = L"???"; kind = isIdent; .)
 =
-( ident                         (. kind = isIdent; coco_string_delete(name); name = coco_string_create(t->val); .)
-| (string                       (. coco_string_delete(name); name = coco_string_create(t->val); .)
-  | char                        (. coco_string_delete(name); name = coco_string_create(t->val);
-                                   const int len = coco_string_length(name);
+( ident                         (. kind = isIdent; name = t->val; .)
+| (string                       (. name = t->val; .)
+  | char                        (. name = t->val;
                                    // change surrounding single quotes to double quotes (does not escape '"')
-                                   name[0] = name[len-1] = '"';
+                                   name[0] = name[name.size()-1] = '"';
                                 .)
   )                             (. kind = isLiteral;
                                    if (dfa->ignoreCase) {
-                                     wchar_t *oldName = name;
-                                     name = coco_string_create_lower(oldName);
-                                     coco_string_delete(oldName);
+                                     for
+                                     (
+                                         std::wstring::iterator iter = name.begin();
+                                         iter != name.end();
+                                         ++iter
+                                     )
+                                     {
+                                       if (*iter >= 'A' && *iter <= 'Z') {
+                                         *iter += ('a' - 'A'); // ToLower()
+                                       }
+                                     }
                                    }
-                                   if (wcscspn(name, L"\t\r\n ") < wcslen(name))
+                                   if (name.find_first_of(L"\t\r\n ") != std::wstring::npos)
                                      SemErr(L"literal tokens must not contain blanks");
                                 .)
 )

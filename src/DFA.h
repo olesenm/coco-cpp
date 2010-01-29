@@ -101,7 +101,7 @@ public:
 	void ConvertToStates(Node *p, Symbol *sym);
 
 	// match string against current automaton; store it either as a fixedToken or as a litToken
-	void MatchLiteral(const wchar_t* s, Symbol *sym);
+	void MatchLiteral(const std::wstring& str, Symbol *sym);
 	void SplitActions(State *state, Action *a, Action *b);
 	bool Overlap(Action *a, Action *b);
 	bool MakeUnique(State *state); // return true if actions were split
@@ -132,7 +132,7 @@ public:
 	void GenCommentHeader(Comment *com, int i);
 	void GenComment(Comment *com, int i);
 	void CopyFramePart(const std::string& stop, const bool doOutput=true);
-	const wchar_t* SymName(Symbol *sym); //!< real name value is stored in Tab.literals
+	std::wstring SymName(Symbol *sym); //!< real name value is stored in Tab.literals
 	void GenLiterals();
 	void WriteState(State *state);
 	void WriteStartTab();

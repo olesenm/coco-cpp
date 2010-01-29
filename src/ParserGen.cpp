@@ -170,7 +170,7 @@ void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked)
 		if (p->typ == Node::nt)
 		{
 			Indent(indent);
-			fwprintf(gen, L"%ls(", p->sym->name);
+			fwprintf(gen, L"%ls(", p->sym->name.c_str());
 			CopySourcePart(p->pos, 0);
 			fwprintf(gen, L");\n");
 		}
@@ -348,7 +348,7 @@ void ParserGen::GenTokensHeader()
 		{
 			fwprintf(gen, L",");   // finish previous enum
 		}
-		fwprintf(gen , L"\n\t\t_%ls=%d", sym->name, sym->n);
+		fwprintf(gen , L"\n\t\t_%ls=%d", sym->name.c_str(), sym->n);
 	}
 
 	// pragmas
@@ -363,7 +363,7 @@ void ParserGen::GenTokensHeader()
 		{
 			fwprintf(gen, L",");   // finish previous enum
 		}
-		fwprintf(gen , L"\n\t\t_%ls=%d", sym->name, sym->n);
+		fwprintf(gen , L"\n\t\t_%ls=%d", sym->name.c_str(), sym->n);
 	}
 
 	if (!first)
@@ -392,7 +392,7 @@ void ParserGen::GenProductionsHeader()
 	{
 		Symbol* sym = tab->nonterminals[i];
 		curSy = sym;
-		fwprintf(gen, L"\tvoid %ls(", sym->name);
+		fwprintf(gen, L"\tvoid %ls(", sym->name.c_str());
 		CopySourcePart(sym->attrPos, 0);
 		fwprintf(gen, L");\n");
 	}
@@ -405,7 +405,7 @@ void ParserGen::GenProductions()
 	{
 		Symbol* sym = tab->nonterminals[i];
 		curSy = sym;
-		fwprintf(gen, L"void Parser::%ls(", sym->name);
+		fwprintf(gen, L"void Parser::%ls(", sym->name.c_str());
 		CopySourcePart(sym->attrPos, 0);
 		fwprintf(gen, L")\n{\n");
 		CopySourcePart(sym->semPos, 1);
@@ -521,7 +521,7 @@ void ParserGen::WriteParser()
 	CopyFramePart("-->pragmas"); GenCodePragmas();
 	CopyFramePart("-->productions"); GenProductions();
 	CopyFramePart("-->parseRoot");
-	fwprintf(gen, L"\t%ls();\n", tab->gramSy->name);
+	fwprintf(gen, L"\t%ls();\n", tab->gramSy->name.c_str());
 	if (Tab::explicitEOF)
 	{
 		fwprintf(gen, L"\t// let grammar deal with end-of-file expectations\n");

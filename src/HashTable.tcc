@@ -36,8 +36,8 @@ namespace Coco
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<class Type, class CharT>
-HashTable<Type, CharT>::HashTable(int sz)
+template<class Type, class KeyType>
+HashTable<Type, KeyType>::HashTable(int sz)
 :
 	size_(sz),
 	table_(new Entry*[size_])
@@ -48,8 +48,8 @@ HashTable<Type, CharT>::HashTable(int sz)
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-template<class Type, class CharT>
-HashTable<Type, CharT>::~HashTable()
+template<class Type, class KeyType>
+HashTable<Type, KeyType>::~HashTable()
 {
 	for (int i = 0; i < size_; ++i)
 	{
@@ -68,13 +68,13 @@ HashTable<Type, CharT>::~HashTable()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-template<class Type, class CharT>
-typename HashTable<Type, CharT>::Entry*
-HashTable<Type, CharT>::GetEntry(const CharT *key) const
+template<class Type, class KeyType>
+typename HashTable<Type, KeyType>::Entry*
+HashTable<Type, KeyType>::GetEntry(const KeyType& key) const
 {
 	const int hashIndex = coco_string_hash(key) % size_;
 	Entry *e = table_[hashIndex];
-	while (e && !coco_string_equal(key, e->key))
+	while (e && key != e->key)
 	{
 		e = e->next;
 	}
@@ -82,8 +82,8 @@ HashTable<Type, CharT>::GetEntry(const CharT *key) const
 }
 
 
-template<class Type, class CharT>
-void HashTable<Type, CharT>::Set(const CharT *key, Type *val)
+template<class Type, class KeyType>
+void HashTable<Type, KeyType>::Set(const KeyType& key, Type *val)
 {
 	Entry *e = GetEntry(key);
 	if (e)
@@ -100,28 +100,28 @@ void HashTable<Type, CharT>::Set(const CharT *key, Type *val)
 }
 
 
-template<class Type, class CharT>
-Type* HashTable<Type, CharT>::Get(const CharT *key) const
+template<class Type, class KeyType>
+Type* HashTable<Type, KeyType>::Get(const KeyType& key) const
 {
 	Entry *e = GetEntry(key);
 	return e ? e->val : NULL;
 }
 
 
-template<class Type, class CharT>
-typename HashTable<Type, CharT>::Iterator
-HashTable<Type, CharT>::GetIterator()
+template<class Type, class KeyType>
+typename HashTable<Type, KeyType>::Iterator
+HashTable<Type, KeyType>::GetIterator()
 {
-	return typename HashTable<Type, CharT>::Iterator(this);
+	return typename HashTable<Type, KeyType>::Iterator(this);
 }
 
 
 // * * * * * * * * * * * * * * * * Iterator  * * * * * * * * * * * * * * * * //
 
-template<class Type, class CharT>
-HashTable<Type, CharT>::Iterator::Iterator
+template<class Type, class KeyType>
+HashTable<Type, KeyType>::Iterator::Iterator
 (
-	HashTable<Type, CharT> *ht
+	HashTable<Type, KeyType> *ht
 )
 :
 	hashTable_(ht),
@@ -130,8 +130,8 @@ HashTable<Type, CharT>::Iterator::Iterator
 {}
 
 
-template<class Type, class CharT>
-bool HashTable<Type, CharT>::Iterator::HasNext()
+template<class Type, class KeyType>
+bool HashTable<Type, KeyType>::Iterator::HasNext()
 {
 	while (!cur_ && pos_ < hashTable_->size_)
 	{
@@ -142,9 +142,9 @@ bool HashTable<Type, CharT>::Iterator::HasNext()
 }
 
 
-template<class Type, class CharT>
-typename HashTable<Type, CharT>::Entry*
-HashTable<Type, CharT>::Iterator::Next()
+template<class Type, class KeyType>
+typename HashTable<Type, KeyType>::Entry*
+HashTable<Type, KeyType>::Iterator::Next()
 {
 	if (HasNext())
 	{

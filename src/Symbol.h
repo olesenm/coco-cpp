@@ -34,6 +34,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Position.h"
 #include "Utils.h"
 
+#include <string>
+
 namespace Coco
 {
 
@@ -59,7 +61,7 @@ public:
 
 	int      n;           //!< symbol number
 	Node::nodeType  typ;  //!< node type: t, nt, pr, unknown, rslv
-	wchar_t  *name;       //!< symbol name
+	std::wstring name;    //!< symbol name
 	Node     *graph;      //!< nt: to first node of syntax graph
 	symbolType tokenKind; //!< t:  token kind (fixedToken, classToken, ...)
 	bool     deletable;   //!< nt: true if nonterminal is deletable
@@ -73,11 +75,11 @@ public:
 	                      //!< nt: pos of local declarations in source text (or null)
 
 	//! Construct from components
-	Symbol(Node::nodeType nodeTyp, const wchar_t* symName, int lineNr)
+	Symbol(Node::nodeType nodeTyp, const std::wstring& symName, int lineNr)
 	:
 		n(0),
 		typ(nodeTyp),
-		name(coco_string_create(symName)),
+		name(symName),
 		graph(0),
 		tokenKind(fixedToken),
 		deletable(false),
@@ -93,7 +95,6 @@ public:
 	//! Destructor frees name
 	virtual ~Symbol()
 	{
-		coco_string_delete(name);
 		if (attrPos) { delete attrPos; }
 		if (semPos)  { delete semPos; }
 		if (first)   { delete first; }

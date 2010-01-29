@@ -49,8 +49,6 @@ public:
 	Graph(Node *p) : l(p), r(p) {}
 	Graph(Node *left, Node *right) : l(left), r(right) {}
 
-	virtual ~Graph()
-	{}
 };
 
 

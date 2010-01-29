@@ -50,15 +50,6 @@ namespace Coco {
 //! Create by copying str
 wchar_t* coco_string_create(const wchar_t* str);
 
-//! Create a substring of str starting at index and length characters long
-wchar_t* coco_string_create(const wchar_t* str, int index, int length);
-
-//! Create a lowercase string from str
-wchar_t* coco_string_create_lower(const wchar_t* str);
-
-//! Create a lowercase substring of str starting at index and length characters long
-wchar_t* coco_string_create_lower(const wchar_t* str, int index, int length);
-
 //! Free storage and nullify the argument
 inline void coco_string_delete(wchar_t* &str)
 {
@@ -78,47 +69,34 @@ inline int coco_string_length(const char* str)
 	return str ? strlen(str) : 0;
 }
 
-//! Compare strings, return true if they are equal
-inline bool coco_string_equal(const wchar_t* str1, const wchar_t* str2)
+
+//! Simple string transformation
+template<class StringT>
+inline void coco_string_toLower(StringT& str)
 {
-	return !wcscmp(str1, str2);
-}
-
-//! Compare strings, return true if they are equal
-inline bool coco_string_equal(const char* str1, const char* str2)
-{
-	return !strcmp(str1, str2);
-}
-
-//! Compare string contents, return true if they are equal
-bool  coco_string_equal(const wchar_t* str1, const char* str2);
-
-
-//! Simple string hashing function
-template<class CharT>
-inline int coco_string_hash(const CharT* str)
-{
-	int h = 0;
-	if (str)
+	for
+	(
+		typename StringT::iterator iter = str.begin();
+		iter != str.end();
+		++iter
+	)
 	{
-		while (*str != 0)
+		if (*iter >= 'A' && *iter <= 'Z')
 		{
-			h = (h * 7) ^ *str;
-			++str;
+			*iter += ('a' - 'A');   // lower-case
 		}
 	}
-	return h < 0 ? -h : h;
 }
 
 
 //! Simple string hashing function
-template<class CharT>
-inline int coco_string_hash(const std::basic_string<CharT>& str)
+template<class StringT>
+inline int coco_string_hash(const StringT& str)
 {
 	int h = 0;
 	for
 	(
-		typename std::basic_string<CharT>::const_iterator iter = str.begin();
+		typename StringT::const_iterator iter = str.begin();
 		iter != str.end();
 		++iter
 	)
@@ -320,19 +298,17 @@ class KeywordMap
 	//! HashTable entry
 	struct Entry
 	{
-		wchar_t *key;     //<! The lookup key
-		int val;          //<! The data
-		Entry *next;      //<! Pointer next Entry in sub-list
+		std::wstring key;  //<! The lookup key
+		int val;           //<! The data
+		Entry *next;       //<! Pointer next Entry in sub-list
 
-		Entry(const wchar_t *k, int v, Entry *n=0)
+		Entry(const std::wstring& k, int v, Entry *n=0)
 		:
-			key(coco_string_create(k)), val(v), next(n)
+			key(k), val(v), next(n)
 		{}
 
 		virtual ~Entry()
-		{
-			coco_string_delete(key);
-		}
+		{}
 	};
 
 	static const int size_ = 128;   //<! fixed HashTable size
@@ -361,16 +337,16 @@ public:
 		delete[] table_;
 	}
 
-	void set(const wchar_t *key, int val)
+	void set(const std::wstring& key, int val)
 	{
 		const int hashIndex = coco_string_hash(key) % size_;
 		table_[hashIndex] = new Entry(key, val, table_[hashIndex]);
 	}
 
-	int get(const wchar_t *key, int defaultVal)
+	int get(const std::wstring& key, int defaultVal)
 	{
 		Entry *e = table_[coco_string_hash(key) % size_];
-		while (e && !coco_string_equal(e->key, key)) e = e->next;
+		while (e && e->key != key) e = e->next;
 		return e ? e->val : defaultVal;
 	}
 };

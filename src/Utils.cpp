@@ -52,6 +52,28 @@ std::wstring coco_stdWString(const std::string& str)
 }
 
 
+bool coco_string_equal(const wchar_t* str1, const char* str2)
+{
+    const int str1Len = coco_string_length(str1);
+    const int str2Len = coco_string_length(str2);
+
+    if (str1Len != str2Len)
+    {
+        return false;
+    }
+
+    for (int i = 0; i < str1Len; ++i)
+    {
+        if (str1[i] != wchar_t(str2[i]))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
 bool getLine(FILE* is, std::string& line)
 {
     line.clear();

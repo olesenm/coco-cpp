@@ -108,7 +108,7 @@ private:
 	static const wchar_t* noString;  //!< used in declarations of literal tokens
 
 	bool genScanner;
-	wchar_t* tokenString;   //!< used in declarations of literal tokens
+	std::wstring tokenString;   //!< used in declarations of literal tokens
 
 public:
 	Tab *tab;               //!< other Coco objects referenced in this ATG
@@ -139,7 +139,7 @@ public:
 	void Expression(Graph* &g);
 	void SimSet(CharSet* &s);
 	void Char(int &n);
-	void Sym(wchar_t* &name, int &kind);
+	void Sym(std::wstring &name, int &kind);
 	void Term(Graph* &g);
 	void Resolver(Position* &pos);
 	void Factor(Graph* &g);

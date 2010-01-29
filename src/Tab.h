@@ -137,10 +137,10 @@ public:
 	//---------------------------------------------------------------------
 
 	//! Create a new symbol (terminal, nonterminal or pragma)
-	Symbol* NewSym(Node::nodeType typ, const wchar_t* name, int line);
+	Symbol* NewSym(Node::nodeType typ, const std::wstring& name, int line);
 
 	//! Find symbol by name in terminals and nonterminals
-	Symbol* FindSym(const wchar_t* name);
+	Symbol* FindSym(const std::wstring& name);
 
 	//! Return node number
 	static int Num(Node *p);
@@ -170,7 +170,7 @@ public:
 	void MakeOption(Graph *g);
 	static void Finish(Graph *g);
 	void DeleteNodes();
-	Graph* StrToGraph(const wchar_t* str);
+	Graph* StrToGraph(const std::wstring& str);
 
 	//! set transition code in the graph rooted at p
 	static void SetContextTrans(Node *p);
@@ -191,8 +191,8 @@ public:
 	//  Character class management
 	//---------------------------------------------------------------------
 
-	CharClass* NewCharClass(const wchar_t* name, CharSet *s);
-	CharClass* FindCharClass(const wchar_t* name);
+	CharClass* NewCharClass(const std::wstring& name, CharSet *s);
+	CharClass* FindCharClass(const std::wstring& name);
 	CharClass* FindCharClass(CharSet *s);
 	CharSet* CharClassSet(int i);
 

@@ -59,7 +59,7 @@ SortedList<Type>::~SortedList()
 template<class Type>
 int SortedList<Type>::Compare(Symbol *x, Symbol *y)
 {
-	return coco_string_compare(x->name, y->name);
+	return x->name < y->name;
 }
 
 

@@ -202,7 +202,7 @@ void printUsage(const char* message = NULL)
 int main(int argc, char *argv[])
 #endif
 {
-	wprintf(L"Coco/R C++ (28 Jan 2010)\n");
+	wprintf(L"Coco/R C++ (29 Jan 2010)\n");
 
 #ifdef _WIN32
 	std::wstring srcName;
@@ -350,9 +350,6 @@ int main(int argc, char *argv[])
 		// create Scanner/Parser and attach Tab, DFA and ParserGen
 		Coco::Scanner scanner(srcName);
 		Coco::Parser  parser(&scanner);
-		Coco::Tab     tab(&parser);
-
-		tab.srcName   = srcName;
 
 #ifdef _WIN32
 		std::wstring traceFileName = Tab::outDir;
@@ -381,9 +378,13 @@ int main(int argc, char *argv[])
 #endif
 
 		// attach Tab before creating Scanner/Parser generators
-		parser.tab  = &tab;
+		// Note: the parser takes care of deleting the tab, dfa, pgen
+		parser.tab  = new Coco::Tab(&parser);
 		parser.dfa  = new Coco::DFA(&parser);
 		parser.pgen = new Coco::ParserGen(&parser);
+
+		// srcName is need when emitting #line
+		parser.tab->srcName = srcName;
 
 		parser.Parse();
 
@@ -428,9 +429,6 @@ int main(int argc, char *argv[])
 		{
 			return 1;
 		}
-
-		delete parser.pgen;
-		delete parser.dfa;
 	}
 
 	return 0;

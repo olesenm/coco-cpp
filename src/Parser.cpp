@@ -40,7 +40,7 @@ License
 namespace Coco {
 
 
-const wchar_t* Parser::noString = L"-none-";
+const std::wstring Parser::noString(L"-none-");
 
 
 
@@ -960,6 +960,9 @@ Parser::~Parser()
 		delete dummyToken;
 	}
 	// user-defined destruction:
+delete tab;   // cleanup sub-elements
+	delete pgen;
+	delete dfa;
 }
 
 

@@ -115,15 +115,15 @@ public:
 private:
 	static const int isIdent = 0;
 	static const int isLiteral = 1;
-	static const wchar_t* noString;  //!< used in declarations of literal tokens
+	static const std::wstring noString;  //!< used in declarations of literal tokens
 
 	bool genScanner;
 	std::wstring tokenString;   //!< used in declarations of literal tokens
 
 public:
-	Tab *tab;               //!< other Coco objects referenced in this ATG
-	DFA *dfa;
-	ParserGen *pgen;
+	Tab *tab;        // other Coco objects referenced in this ATG
+	DFA *dfa;        // other Coco objects referenced in this ATG
+	ParserGen *pgen; // other Coco objects referenced in this ATG
 
 /*-------------------------------------------------------------------------*/
 

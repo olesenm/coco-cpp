@@ -33,11 +33,26 @@ About this file
     The '-->TAG' text markers are used to delimit code chunks and typically
     correspond to places where additional information is added by the
     DFA or ParserGen code. These tag must be the first token to appear
-    on a line. Any trailing information is ignored.
+    on a line. Lines containing this text marker are not output.
 
     All information prior to the first 'begin' text marker is discarded.
     If the grammar contains a '[copy]' .. '[/copy]' section, its contents
     will added instead.
+
+    Note that the frame file also includes a modest preprocessor capability.
+    Preprocessor directives start with '$' and are limited to these values:\n
+        - \$ifdef NAME
+        - \$ifndef NAME
+        - \$else
+        - \$endif
+
+    These preprocessor directives can be useful to selective enable/disable
+    parts of the frame code by adding corresponding '\$define=NAME'
+    and '\$undef=NAME' directives to the ATG grammar.
+
+    Note that since the '-->TAG' text markers are seen before the
+    preprocessor directives, the directives have no effect there.
+
 \*---------------------------------------------------------------------------*/
 -->begin    // <-- ignore all preliminary text
 

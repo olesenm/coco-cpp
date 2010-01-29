@@ -293,6 +293,38 @@ Buffer::Buffer(Buffer* b)
 }
 
 
+Buffer::Buffer(const char* chars, int len)
+:
+	buf(new unsigned char[len]),
+	bufCapacity(len),
+	bufLen(len),
+	bufPos(0),
+	bufStart(0),
+	fileLen(len),
+	cStream(NULL),
+	stdStream(NULL),
+	isUserStream_(false)
+{
+	memcpy(this->buf, chars, len*sizeof(char));
+}
+
+
+Buffer::Buffer(const unsigned char* chars, int len)
+:
+	buf(new unsigned char[len]),
+	bufCapacity(len),
+	bufLen(len),
+	bufPos(0),
+	bufStart(0),
+	fileLen(len),
+	cStream(NULL),
+	stdStream(NULL),
+	isUserStream_(false)
+{
+	memcpy(this->buf, chars, len*sizeof(char));
+}
+
+
 Buffer::Buffer(FILE* istr, bool isUserStream)
 :
 	buf(NULL),
@@ -339,42 +371,9 @@ Buffer::Buffer(std::istream* istr, bool isUserStream)
 	stdStream(istr),
 	isUserStream_(isUserStream)
 {
-	// ensure binary read on windows
 #if _MSC_VER >= 1300
-	// TODO
+	// TODO: ensure binary read on windows?
 #endif
-}
-
-
-Buffer::Buffer(const char* chars, int len)
-:
-	buf(new unsigned char[len]),
-	bufCapacity(len),
-	bufLen(len),
-	bufPos(0),
-	bufStart(0),
-	fileLen(len),
-	cStream(NULL),
-	stdStream(NULL),
-	isUserStream_(false)
-{
-	memcpy(this->buf, chars, len*sizeof(char));
-}
-
-
-Buffer::Buffer(const unsigned char* chars, int len)
-:
-	buf(new unsigned char[len]),
-	bufCapacity(len),
-	bufLen(len),
-	bufPos(0),
-	bufStart(0),
-	fileLen(len),
-	cStream(NULL),
-	stdStream(NULL),
-	isUserStream_(false)
-{
-	memcpy(this->buf, chars, len*sizeof(char));
 }
 
 
@@ -398,7 +397,7 @@ void Buffer::Close()
 			fclose(cStream);
 			cStream = NULL;
 		}
-		else if (stdStream)
+		if (stdStream)
 		{
 			delete stdStream;
 			stdStream = 0;
@@ -429,9 +428,8 @@ int Buffer::Read()
 	else if (cStream && !CanSeek() && (ReadNextStreamChunk() > 0)) {
 		return buf[bufPos++];
 	}
-	else {
-		return EoF;
-	}
+
+	return EoF;
 }
 
 
@@ -589,6 +587,22 @@ bool Buffer::CanSeek() const
 // Scanner Implementation
 // ----------------------------------------------------------------------------
 
+Scanner::Scanner(const char* buf, int len)
+:
+	buffer(new Buffer(buf, len))
+{
+	Init();
+}
+
+
+Scanner::Scanner(const unsigned char* buf, int len)
+:
+	buffer(new Buffer(buf, len))
+{
+	Init();
+}
+
+
 Scanner::Scanner(FILE* istr)
 :
 	buffer(new Buffer(istr, true))
@@ -596,26 +610,6 @@ Scanner::Scanner(FILE* istr)
 	Init();
 }
 
-
-Scanner::Scanner(std::istream& istr)
-:
-	buffer(new Buffer(&istr, true))
-{
-	Init();
-}
-
-
-Scanner::Scanner(const std::string& fileName)
-{
-	FILE* istr;
-	if ((istr = fopen(fileName.c_str(), "rb")) == NULL)
-	{
-		wprintf(L"--- Cannot open file %s\n", fileName.c_str());
-		::exit(1);
-	}
-	buffer = new Buffer(istr, false);
-	Init();
-}
 
 #ifdef _WIN32
 Scanner::Scanner(const std::wstring& fileName)
@@ -633,17 +627,22 @@ Scanner::Scanner(const std::wstring& fileName)
 #endif
 
 
-Scanner::Scanner(const unsigned char* buf, int len)
-:
-	buffer(new Buffer(buf, len))
+Scanner::Scanner(const std::string& fileName)
 {
+	FILE* istr;
+	if ((istr = fopen(fileName.c_str(), "rb")) == NULL)
+	{
+		wprintf(L"--- Cannot open file %s\n", fileName.c_str());
+		::exit(1);
+	}
+	buffer = new Buffer(istr, false);
 	Init();
 }
 
 
-Scanner::Scanner(const char* buf, int len)
+Scanner::Scanner(std::istream& istr)
 :
-	buffer(new Buffer(buf, len))
+	buffer(new Buffer(&istr, true))
 {
 	Init();
 }
@@ -742,9 +741,6 @@ void Scanner::Init()
 		delete oldBuf; oldBuf = NULL;
 		NextCh();
 	}
-	// likely need this chunk of code for non-windows systems, they don't
-	// rely on a byte order mark. Should make it selectable via a directive
-	// or command-line option etc.
 
 	pt = tokens = CreateToken(); // first token is a dummy
 }

@@ -33,11 +33,26 @@ About this file
     The '-->TAG' text markers are used to delimit code chunks and typically
     correspond to places where additional information is added by the
     DFA or ParserGen code. These tag must be the first token to appear
-    on a line. Any trailing information is ignored.
+    on a line. Lines containing this text marker are not output.
 
     All information prior to the first 'begin' text marker is discarded.
     If the grammar contains a '[copy]' .. '[/copy]' section, its contents
     will added instead.
+
+    Note that the frame file also includes a modest preprocessor capability.
+    Preprocessor directives start with '$' and are limited to these values:\n
+        - \$ifdef NAME
+        - \$ifndef NAME
+        - \$else
+        - \$endif
+
+    These preprocessor directives can be useful to selective enable/disable
+    parts of the frame code by adding corresponding '\$define=NAME'
+    and '\$undef=NAME' directives to the ATG grammar.
+
+    Note that since the '-->TAG' text markers are seen before the
+    preprocessor directives, the directives have no effect there.
+
 \*---------------------------------------------------------------------------*/
 -->begin    // <-- ignore all preliminary text
 
@@ -205,7 +220,6 @@ public:
 //! -# non seekable stream (network, console)
 class Buffer
 {
-private:
 	unsigned char *buf; //!< input buffer
 	int bufCapacity;    //!< capacity of buf
 	int bufLen;         //!< length of buffer
@@ -227,6 +241,12 @@ public:
 	static const int MaxChar = 65535;
 	static const int EoF = MaxChar + 1;
 
+	//! Copy buffer contents from constant character string
+	Buffer(const char* chars, int len);
+
+	//! Copy buffer contents from constant character string
+	Buffer(const unsigned char* chars, int len);
+
 	//! @brief Attach buffer to a stdio stream.
 	//! User streams are not closed in the destructor
 	Buffer(FILE*, bool isUserStream = true);
@@ -234,12 +254,6 @@ public:
 	//! @brief Attach buffer to an STL standard stream
 	//! User streams are not closed in the destructor
 	explicit Buffer(std::istream*, bool isUserStream = true);
-
-	//! Copy buffer contents from constant character string
-	Buffer(const char* chars, int len);
-
-	//! Copy buffer contents from constant character string
-	Buffer(const unsigned char* chars, int len);
 
 	//! Close stream (but not user streams) and free buf (if any)
 	virtual ~Buffer();
@@ -391,7 +405,6 @@ public:
 //! A Coco/R Scanner
 class Scanner
 {
-private:
 -->constantsheader   // <-- add in maxT and noSym
 	static const int eofSym = 0;    //!< end-of-file token id
 	static const char EOL = '\n';   //!< end-of-line character
@@ -433,25 +446,25 @@ public:
 	//! The scanner buffer
 	Buffer *buffer;
 
+	//! Attach scanner to an existing character buffer
+	Scanner(const char* chars, int len);
+
+	//! Attach scanner to an existing character buffer
+	Scanner(const unsigned char* chars, int len);
+
 	//! Attach scanner to an existing open file handle
 	Scanner(FILE*);
-
-	//! Attach scanner to an existing open STL standard stream
-	explicit Scanner(std::istream&);
-
-	//! Open a file for reading and attach scanner
-	explicit Scanner(const std::string& fileName);
 
 #ifdef _WIN32
 	//! Open a file for reading and attach scanner - Windows only
 	explicit Scanner(const std::wstring& fileName);
 #endif
 
-	//! Attach scanner to an existing character buffer
-	Scanner(const unsigned char* chars, int len);
+	//! Open a file for reading and attach scanner
+	explicit Scanner(const std::string& fileName);
 
-	//! Attach scanner to an existing character buffer
-	Scanner(const char* chars, int len);
+	//! Attach scanner to an existing open STL standard stream
+	explicit Scanner(std::istream&);
 
 	~Scanner();        //!< free heap and allocated memory
 	Token* Scan();     //!< get the next token (possibly a token already seen during peeking)
@@ -736,6 +749,38 @@ Buffer::Buffer(Buffer* b)
 }
 
 
+Buffer::Buffer(const char* chars, int len)
+:
+	buf(new unsigned char[len]),
+	bufCapacity(len),
+	bufLen(len),
+	bufPos(0),
+	bufStart(0),
+	fileLen(len),
+	cStream(NULL),
+	stdStream(NULL),
+	isUserStream_(false)
+{
+	memcpy(this->buf, chars, len*sizeof(char));
+}
+
+
+Buffer::Buffer(const unsigned char* chars, int len)
+:
+	buf(new unsigned char[len]),
+	bufCapacity(len),
+	bufLen(len),
+	bufPos(0),
+	bufStart(0),
+	fileLen(len),
+	cStream(NULL),
+	stdStream(NULL),
+	isUserStream_(false)
+{
+	memcpy(this->buf, chars, len*sizeof(char));
+}
+
+
 Buffer::Buffer(FILE* istr, bool isUserStream)
 :
 	buf(NULL),
@@ -782,42 +827,9 @@ Buffer::Buffer(std::istream* istr, bool isUserStream)
 	stdStream(istr),
 	isUserStream_(isUserStream)
 {
-	// ensure binary read on windows
 #if _MSC_VER >= 1300
-	// TODO
+	// TODO: ensure binary read on windows?
 #endif
-}
-
-
-Buffer::Buffer(const char* chars, int len)
-:
-	buf(new unsigned char[len]),
-	bufCapacity(len),
-	bufLen(len),
-	bufPos(0),
-	bufStart(0),
-	fileLen(len),
-	cStream(NULL),
-	stdStream(NULL),
-	isUserStream_(false)
-{
-	memcpy(this->buf, chars, len*sizeof(char));
-}
-
-
-Buffer::Buffer(const unsigned char* chars, int len)
-:
-	buf(new unsigned char[len]),
-	bufCapacity(len),
-	bufLen(len),
-	bufPos(0),
-	bufStart(0),
-	fileLen(len),
-	cStream(NULL),
-	stdStream(NULL),
-	isUserStream_(false)
-{
-	memcpy(this->buf, chars, len*sizeof(char));
 }
 
 
@@ -841,7 +853,7 @@ void Buffer::Close()
 			fclose(cStream);
 			cStream = NULL;
 		}
-		else if (stdStream)
+		if (stdStream)
 		{
 			delete stdStream;
 			stdStream = 0;
@@ -872,9 +884,8 @@ int Buffer::Read()
 	else if (cStream && !CanSeek() && (ReadNextStreamChunk() > 0)) {
 		return buf[bufPos++];
 	}
-	else {
-		return EoF;
-	}
+
+	return EoF;
 }
 
 
@@ -1032,6 +1043,22 @@ bool Buffer::CanSeek() const
 // Scanner Implementation
 // ----------------------------------------------------------------------------
 
+Scanner::Scanner(const char* buf, int len)
+:
+	buffer(new Buffer(buf, len))
+{
+	Init();
+}
+
+
+Scanner::Scanner(const unsigned char* buf, int len)
+:
+	buffer(new Buffer(buf, len))
+{
+	Init();
+}
+
+
 Scanner::Scanner(FILE* istr)
 :
 	buffer(new Buffer(istr, true))
@@ -1039,26 +1066,6 @@ Scanner::Scanner(FILE* istr)
 	Init();
 }
 
-
-Scanner::Scanner(std::istream& istr)
-:
-	buffer(new Buffer(&istr, true))
-{
-	Init();
-}
-
-
-Scanner::Scanner(const std::string& fileName)
-{
-	FILE* istr;
-	if ((istr = fopen(fileName.c_str(), "rb")) == NULL)
-	{
-		wprintf(L"--- Cannot open file %s\n", fileName.c_str());
-		::exit(1);
-	}
-	buffer = new Buffer(istr, false);
-	Init();
-}
 
 #ifdef _WIN32
 Scanner::Scanner(const std::wstring& fileName)
@@ -1076,17 +1083,22 @@ Scanner::Scanner(const std::wstring& fileName)
 #endif
 
 
-Scanner::Scanner(const unsigned char* buf, int len)
-:
-	buffer(new Buffer(buf, len))
+Scanner::Scanner(const std::string& fileName)
 {
+	FILE* istr;
+	if ((istr = fopen(fileName.c_str(), "rb")) == NULL)
+	{
+		wprintf(L"--- Cannot open file %s\n", fileName.c_str());
+		::exit(1);
+	}
+	buffer = new Buffer(istr, false);
 	Init();
 }
 
 
-Scanner::Scanner(const char* buf, int len)
+Scanner::Scanner(std::istream& istr)
 :
-	buffer(new Buffer(buf, len))
+	buffer(new Buffer(&istr, true))
 {
 	Init();
 }
@@ -1147,18 +1159,15 @@ void Scanner::Init()
 		delete oldBuf; oldBuf = NULL;
 		NextCh();
 	}
-	// likely need this chunk of code for non-windows systems, they don't
-	// rely on a byte order mark. Should make it selectable via a directive
-	// or command-line option etc.
 $ifdef forceUTF8
-#ifndef _WIN32
 	else
 	{
+		// forceUTF8 was defined
+		// use UTF8Buffer without relying on a byte order mark.
 		Buffer *oldBuf = buffer;
 		buffer = new UTF8Buffer(oldBuf); col = 0;
 		delete oldBuf; oldBuf = NULL;
 	}
-#endif
 $endif
 
 	pt = tokens = CreateToken(); // first token is a dummy

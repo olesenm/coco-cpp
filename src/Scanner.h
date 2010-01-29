@@ -191,7 +191,6 @@ public:
 //! -# non seekable stream (network, console)
 class Buffer
 {
-private:
 	unsigned char *buf; //!< input buffer
 	int bufCapacity;    //!< capacity of buf
 	int bufLen;         //!< length of buffer
@@ -213,6 +212,12 @@ public:
 	static const int MaxChar = 65535;
 	static const int EoF = MaxChar + 1;
 
+	//! Copy buffer contents from constant character string
+	Buffer(const char* chars, int len);
+
+	//! Copy buffer contents from constant character string
+	Buffer(const unsigned char* chars, int len);
+
 	//! @brief Attach buffer to a stdio stream.
 	//! User streams are not closed in the destructor
 	Buffer(FILE*, bool isUserStream = true);
@@ -220,12 +225,6 @@ public:
 	//! @brief Attach buffer to an STL standard stream
 	//! User streams are not closed in the destructor
 	explicit Buffer(std::istream*, bool isUserStream = true);
-
-	//! Copy buffer contents from constant character string
-	Buffer(const char* chars, int len);
-
-	//! Copy buffer contents from constant character string
-	Buffer(const unsigned char* chars, int len);
 
 	//! Close stream (but not user streams) and free buf (if any)
 	virtual ~Buffer();
@@ -377,7 +376,6 @@ public:
 //! A Coco/R Scanner
 class Scanner
 {
-private:
 	static const int maxT = 49;
 	static const int noSym = 49;
 	static const int eofSym = 0;    //!< end-of-file token id
@@ -420,25 +418,25 @@ public:
 	//! The scanner buffer
 	Buffer *buffer;
 
+	//! Attach scanner to an existing character buffer
+	Scanner(const char* chars, int len);
+
+	//! Attach scanner to an existing character buffer
+	Scanner(const unsigned char* chars, int len);
+
 	//! Attach scanner to an existing open file handle
 	Scanner(FILE*);
-
-	//! Attach scanner to an existing open STL standard stream
-	explicit Scanner(std::istream&);
-
-	//! Open a file for reading and attach scanner
-	explicit Scanner(const std::string& fileName);
 
 #ifdef _WIN32
 	//! Open a file for reading and attach scanner - Windows only
 	explicit Scanner(const std::wstring& fileName);
 #endif
 
-	//! Attach scanner to an existing character buffer
-	Scanner(const unsigned char* chars, int len);
+	//! Open a file for reading and attach scanner
+	explicit Scanner(const std::string& fileName);
 
-	//! Attach scanner to an existing character buffer
-	Scanner(const char* chars, int len);
+	//! Attach scanner to an existing open STL standard stream
+	explicit Scanner(std::istream&);
 
 	~Scanner();        //!< free heap and allocated memory
 	Token* Scan();     //!< get the next token (possibly a token already seen during peeking)

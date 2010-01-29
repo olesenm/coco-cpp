@@ -1916,28 +1916,30 @@ bool Tab::CopyFramePart
 	std::string line;
 	while (getLine(src, line))
 	{
-		if (line.find(stop) != std::string::npos)
+		std::string::size_type fnd = line.find(stop);
+
+		if (fnd != std::string::npos && fnd == line.find_first_not_of(" \t"))
 		{
-			return true;        // stop found
+			return true;   // stop found and first token in line
 		}
 
 		if (preproc_.okay(line) && doOutput)
 		{
-			std::string::size_type foundPrefix = line.find(Tab::prefixMacro);
-			if (foundPrefix == std::string::npos)
+			fnd = line.find(Tab::prefixMacro);
+			if (fnd == std::string::npos)
 			{
 				fwprintf(dst, L"%s\n", line.c_str());
 			}
 			else
 			{
-				fwprintf(dst, L"%s", line.substr(0, foundPrefix).c_str());
-				foundPrefix += prefixMacro.size();
+				fwprintf(dst, L"%s", line.substr(0, fnd).c_str());
+				fnd += prefixMacro.size();
 
 				if (isPrefixSet)
 				{
 					fwprintf(dst, L"%s", prefixName.c_str());
 				}
-				fwprintf(dst, L"%s\n", line.substr(foundPrefix).c_str());
+				fwprintf(dst, L"%s\n", line.substr(fnd).c_str());
 			}
 		}
 	}

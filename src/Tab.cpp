@@ -1633,7 +1633,7 @@ void Tab::DispatchDirective(const std::string& str)
 		{
 			wprintf
 			(
-				L"ignoring unknown bool value for pragma: '%ls'\n",
+				L"ignoring unknown bool value for pragma: '%s'\n",
 				str.c_str()
 			);
 		}
@@ -1652,7 +1652,7 @@ void Tab::DispatchDirective(const std::string& str)
 		{
 			wprintf
 			(
-				L"ignoring unknown bool value for pragma: '%ls'\n",
+				L"ignoring unknown bool value for pragma: '%s'\n",
 				str.c_str()
 			);
 		}
@@ -1671,14 +1671,14 @@ void Tab::DispatchDirective(const std::string& str)
 		{
 			wprintf
 			(
-				L"ignoring unknown bool value for pragma: '%ls'\n",
+				L"ignoring unknown bool value for pragma: '%s'\n",
 				str.c_str()
 			);
 		}
 	}
 	else
 	{
-		wprintf(L"ignoring unknown pragma: '%ls'\n", str.c_str());
+		wprintf(L"ignoring unknown pragma: '%s'\n", str.c_str());
 	}
 }
 

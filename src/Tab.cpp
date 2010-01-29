@@ -1676,6 +1676,14 @@ void Tab::DispatchDirective(const std::string& str)
 			);
 		}
 	}
+	else if (name == "define")
+	{
+		preproc_.define(value);
+	}
+	else if (name == "undef")
+	{
+		preproc_.undef(value);
+	}
 	else
 	{
 		wprintf(L"ignoring unknown pragma: '%s'\n", str.c_str());
@@ -1913,7 +1921,7 @@ bool Tab::CopyFramePart
 			return true;        // stop found
 		}
 
-		if (doOutput)
+		if (preproc_.okay(line) && doOutput)
 		{
 			std::string::size_type foundPrefix = line.find(Tab::prefixMacro);
 			if (foundPrefix == std::string::npos)

@@ -126,6 +126,7 @@ public:
 	~Parser();
 	void Parse();                          //!< Execute the parse operation
 	void SemErr(const std::wstring& msg);  //!< Handle semantic error
+	bool isUTF8() const;   //!< Return true if scanner buffer is UTF8
 
 	void Coco();
 	void SetDecl();

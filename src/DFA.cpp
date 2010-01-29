@@ -1039,6 +1039,7 @@ void DFA::WriteStartTab()
 
 void DFA::WriteScanner()
 {
+	tab->preproc_.reset();               // reset pre-processor logic
 	int oldPos = tab->buffer->GetPos();  // Pos is modified by CopySourcePart
 
 	fram = tab->OpenFrameFile("Scanner.frame");

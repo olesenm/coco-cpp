@@ -745,14 +745,6 @@ void Scanner::Init()
 	// likely need this chunk of code for non-windows systems, they don't
 	// rely on a byte order mark. Should make it selectable via a directive
 	// or command-line option etc.
-// #ifndef _WIN32
-// 	else
-// 	{
-// 		Buffer *oldBuf = buffer;
-// 		buffer = new UTF8Buffer(oldBuf); col = 0;
-// 		delete oldBuf; oldBuf = NULL;
-// 	}
-// #endif
 
 	pt = tokens = CreateToken(); // first token is a dummy
 }

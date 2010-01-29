@@ -112,6 +112,7 @@ public:
 	~Parser();
 	void Parse();                          //!< Execute the parse operation
 	void SemErr(const std::wstring& msg);  //!< Handle semantic error
+	bool isUTF8() const;   //!< Return true if scanner buffer is UTF8
 
 -->productionsheader   // <-- productions headers
 
@@ -148,6 +149,12 @@ void Parser::SemErr(const std::wstring& msg)
 {
 	if (errDist >= minErrDist) errors->Error(t->line, t->col, msg);
 	errDist = 0;
+}
+
+
+bool Parser::isUTF8() const
+{
+	return scanner && scanner->buffer && scanner->buffer->isUTF8();
 }
 
 

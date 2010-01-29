@@ -54,6 +54,12 @@ void Parser::SemErr(const std::wstring& msg)
 }
 
 
+bool Parser::isUTF8() const
+{
+	return scanner && scanner->buffer && scanner->buffer->isUTF8();
+}
+
+
 void Parser::Get()
 {
 	for (;;)

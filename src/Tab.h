@@ -39,6 +39,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 #include "Graph.h"
 #include "Sets.h"
 #include "CharClass.h"
+#include "Preproc.h"
 
 
 namespace Coco
@@ -125,7 +126,9 @@ public:
 	Node *dummyNode;
 	int dummyName;
 
+	mutable Preproc preproc_;
 
+	//! Construct and attach to Parser
 	Tab(Parser *parser);
 	~Tab();
 

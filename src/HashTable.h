@@ -29,6 +29,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #ifndef COCO_HASHTABLE_H__
 #define COCO_HASHTABLE_H__
 
+#include <string>
+
 namespace Coco
 {
 
@@ -47,10 +49,21 @@ public:
 	//! An entry within the HashTable
 	struct Entry
 	{
-		CharT *key;
-		Type  *val;
-		Entry *next;
+		CharT *key;        //<! The lookup key
+		Type  *val;        //<! The data
+		Entry *next;       //<! Pointer next Entry in sub-list
+
+		Entry(const CharT *k, Type *v, Entry *n=0)
+		:
+			key(coco_string_create(k)), val(v), next(n)
+		{}
+
+		virtual ~Entry()
+		{
+			coco_string_delete(key);
+		}
 	};
+
 
 
 	//! Construct with a default size
@@ -74,7 +87,7 @@ public:
 
 
 	//! Insert a new Entry
-	void Set(CharT *key, Type *value);
+	void Set(const CharT *key, Type *value);
 
 	//- Find and return the value associated with the hashed Entry
 	Type* Get(const CharT *key) const;
@@ -89,9 +102,10 @@ public:
 	}
 
 private:
-	int size_;
-	Entry** data_;
-	Entry* GetObj(const CharT *key) const;
+	const int size_;   //<! fixed HashTable size
+	Entry** table_;
+
+	Entry* GetEntry(const CharT *key) const;
 
 };
 

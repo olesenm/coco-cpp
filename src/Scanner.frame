@@ -140,6 +140,24 @@ inline int coco_string_hash(const CharT* str)
 }
 
 
+//! Simple string hashing function
+template<class CharT>
+inline int coco_string_hash(const std::basic_string<CharT>& str)
+{
+	int h = 0;
+	for
+	(
+		typename std::basic_string<CharT>::const_iterator iter = str.begin();
+		iter != str.end();
+		++iter
+	)
+	{
+		h = (h * 7) ^ *iter;
+	}
+	return h < 0 ? -h : h;
+}
+
+
 //
 // String conversions
 // ~~~~~~~~~~~~~~~~~~
@@ -271,38 +289,41 @@ public:
 //------------------------------------------------------------------------------
 // StartStates
 //------------------------------------------------------------------------------
-//! maps characters (integers) to start states of tokens
+//! maps characters (integers) to start states of tokens as a HashTable
 class StartStates
 {
-	struct Elem
+	//! HashTable entry
+	struct Entry
 	{
-		int key, val;
-		Elem *next;
+		int key;        //<! The lookup key
+		int val;        //<! The data
+		Entry *next;    //<! Pointer next Entry in sub-list
 
-		Elem(int k, int v)
+		Entry(int k, int v, Entry *n=0)
 		:
-			key(k), val(v), next(0)
+			key(k), val(v), next(n)
 		{}
 	};
 
-	Elem **table_;
+	static const int size_ = 128;   //<! fixed HashTable size
+	Entry **table_;
 
 public:
 	StartStates()
 	:
-		table_(new Elem*[128])
+		table_(new Entry*[size_])
 	{
-		memset(table_, 0, 128*sizeof(Elem*));
+		memset(table_, 0, size_*sizeof(Entry*));
 	}
 
 	virtual ~StartStates()
 	{
-		for (int i = 0; i < 128; ++i)
+		for (int i = 0; i < size_; ++i)
 		{
-			Elem *e = table_[i];
+			Entry *e = table_[i];
 			while (e)
 			{
-				Elem *next = e->next;
+				Entry *next = e->next;
 				delete e;
 				e = next;
 			}
@@ -312,15 +333,13 @@ public:
 
 	void set(int key, int val)
 	{
-		const int k = unsigned(key) % 128;
-		Elem *e = new Elem(key, val);
-		e->next = table_[k];
-		table_[k] = e;
+		const int hashIndex = unsigned(key) % size_;
+		table_[hashIndex] = new Entry(key, val, table_[hashIndex]);
 	}
 
 	int state(int key)
 	{
-		Elem *e = table_[unsigned(key) % 128];
+		Entry *e = table_[unsigned(key) % size_];
 		while (e && e->key != key) e = e->next;
 		return e ? e->val : 0;
 	}
@@ -330,44 +349,46 @@ public:
 //------------------------------------------------------------------------------
 // KeywordMap
 //------------------------------------------------------------------------------
-//! maps strings to integers (identifiers to keyword kinds)
+//! maps strings to integers (identifiers to keyword kinds) as a HashTable
 class KeywordMap
 {
-	struct Elem
+	//! HashTable entry
+	struct Entry
 	{
-		wchar_t *key;
-		int val;
-		Elem *next;
+		wchar_t *key;     //<! The lookup key
+		int val;          //<! The data
+		Entry *next;      //<! Pointer next Entry in sub-list
 
-		Elem(const wchar_t *k, int v)
+		Entry(const wchar_t *k, int v, Entry *n=0)
 		:
-			key(coco_string_create(k)), val(v), next(0)
+			key(coco_string_create(k)), val(v), next(n)
 		{}
 
-		virtual ~Elem()
+		virtual ~Entry()
 		{
 			coco_string_delete(key);
 		}
 	};
 
-	Elem **table_;
+	static const int size_ = 128;   //<! fixed HashTable size
+	Entry **table_;
 
 public:
 	KeywordMap()
 	:
-		table_(new Elem*[128])
+		table_(new Entry*[size_])
 	{
-		memset(table_, 0, 128*sizeof(Elem*));
+		memset(table_, 0, size_*sizeof(Entry*));
 	}
 
 	virtual ~KeywordMap()
 	{
-		for (int i = 0; i < 128; ++i)
+		for (int i = 0; i < size_; ++i)
 		{
-			Elem *e = table_[i];
+			Entry *e = table_[i];
 			while (e)
 			{
-				Elem *next = e->next;
+				Entry *next = e->next;
 				delete e;
 				e = next;
 			}
@@ -377,15 +398,13 @@ public:
 
 	void set(const wchar_t *key, int val)
 	{
-		const int k = coco_string_hash(key) % 128;
-		Elem *e = new Elem(key, val);
-		e->next = table_[k];
-		table_[k] = e;
+		const int hashIndex = coco_string_hash(key) % size_;
+		table_[hashIndex] = new Entry(key, val, table_[hashIndex]);
 	}
 
 	int get(const wchar_t *key, int defaultVal)
 	{
-		Elem *e = table_[coco_string_hash(key) % 128];
+		Entry *e = table_[coco_string_hash(key) % size_];
 		while (e && !coco_string_equal(e->key, key)) e = e->next;
 		return e ? e->val : defaultVal;
 	}

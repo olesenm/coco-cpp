@@ -40,9 +40,9 @@ template<class Type, class CharT>
 HashTable<Type, CharT>::HashTable(int sz)
 :
 	size_(sz),
-	data_(new Entry*[size_])
+	table_(new Entry*[size_])
 {
-	memset(data_, 0, size_ * sizeof(Entry*));
+	memset(table_, 0, size_ * sizeof(Entry*));
 }
 
 
@@ -53,16 +53,16 @@ HashTable<Type, CharT>::~HashTable()
 {
 	for (int i = 0; i < size_; ++i)
 	{
-		Entry *o = data_[i];
-		while (o)
+		Entry *e = table_[i];
+		while (e)
 		{
-			Entry *del = o;
-			o = o->next;
+			Entry *del = e;
+			e = e->next;
 			delete del;
 		}
 	}
-	delete[] data_;
-	data_ = 0;
+	delete[] table_;
+	table_ = 0;
 }
 
 
@@ -70,36 +70,32 @@ HashTable<Type, CharT>::~HashTable()
 
 template<class Type, class CharT>
 typename HashTable<Type, CharT>::Entry*
-HashTable<Type, CharT>::GetObj(const CharT *key) const
+HashTable<Type, CharT>::GetEntry(const CharT *key) const
 {
-	const int k = coco_string_hash(key) % size_;
-	Entry *o = data_[k];
-	while (o && !coco_string_equal(key, o->key))
+	const int hashIndex = coco_string_hash(key) % size_;
+	Entry *e = table_[hashIndex];
+	while (e && !coco_string_equal(key, e->key))
 	{
-		o = o->next;
+		e = e->next;
 	}
-	return o;
+	return e;
 }
 
 
 template<class Type, class CharT>
-void HashTable<Type, CharT>::Set(CharT *key, Type *val)
+void HashTable<Type, CharT>::Set(const CharT *key, Type *val)
 {
-	Entry *o = GetObj(key);
-	if (o)
+	Entry *e = GetEntry(key);
+	if (e)
 	{
 		// existing entry - overwrite
-		o->val = val;
+		e->val = val;
 	}
 	else
 	{
 		// new entry
-		const int k = coco_string_hash(key) % size_;
-		o = new Entry();
-		o->key = key;
-		o->val = val;
-		o->next = data_[k];
-		data_[k] = o;
+		const int hashIndex = coco_string_hash(key) % size_;
+		table_[hashIndex] = new Entry(key, val, table_[hashIndex]);
 	}
 }
 
@@ -107,8 +103,8 @@ void HashTable<Type, CharT>::Set(CharT *key, Type *val)
 template<class Type, class CharT>
 Type* HashTable<Type, CharT>::Get(const CharT *key) const
 {
-	Entry *o = GetObj(key);
-	return o ? o->val : NULL;
+	Entry *e = GetEntry(key);
+	return e ? e->val : NULL;
 }
 
 
@@ -139,7 +135,7 @@ bool HashTable<Type, CharT>::Iterator::HasNext()
 {
 	while (!cur_ && pos_ < hashTable_->size_)
 	{
-		cur_ = hashTable_->data_[pos_];
+		cur_ = hashTable_->table_[pos_];
 		++pos_;
 	}
 	return cur_ != NULL;

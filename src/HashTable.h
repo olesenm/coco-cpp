@@ -51,7 +51,7 @@ public:
 	//! An entry within the HashTable
 	struct Entry
 	{
-		KeyType key;       //<! The lookup key
+		const KeyType key; //<! The lookup key
 		Type  *val;        //<! The data
 		Entry *next;       //<! Pointer next Entry in sub-list
 

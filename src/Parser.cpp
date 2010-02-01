@@ -29,9 +29,9 @@ License
     Coco/R itself) does not fall under the GNU General Public License.
 \*---------------------------------------------------------------------------*/
 // This file was generated with Coco/R C++ (1 Feb 2010)
+// http://www.ssw.uni-linz.ac.at/coco/
 // with these defines:
 
-// http://www.ssw.uni-linz.ac.at/coco/
 
 #include <cstdio>
 #include <cstdlib>

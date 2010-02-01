@@ -35,7 +35,7 @@ License
 namespace Coco
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 BitArray::BitArray(const int length, const bool defaultValue)
 {
@@ -56,12 +56,16 @@ BitArray::BitArray(const BitArray &copy)
 }
 
 
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
 BitArray::~BitArray()
 {
 	delete[] Data;
 	Data = 0;
 }
 
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 int BitArray::getCount() const
 {
@@ -158,6 +162,8 @@ bool BitArray::Equal(const BitArray *right) const
 	}
 	return true;
 }
+
+// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
 const BitArray& BitArray::operator=(const BitArray &right)
 {

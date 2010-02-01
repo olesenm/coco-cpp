@@ -37,7 +37,7 @@ License
 namespace Coco
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Action::Action(Node::nodeType theTyp, int symNr, Node::transitionType trans)
 :
@@ -48,6 +48,8 @@ Action::Action(Node::nodeType theTyp, int symNr, Node::transitionType trans)
 	next(NULL)
 {}
 
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 void Action::AddTarget(Target *t)  // add t to the action.targets
 {

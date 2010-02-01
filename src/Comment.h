@@ -44,9 +44,9 @@ namespace Coco
 class Comment
 {
 public:
-	std::wstring start; //!< The start character sequence
-	std::wstring stop;  //!< The stop character sequence
-	bool nested;    //!< Can comments be nested?
+	const std::wstring start;      //!< The start character sequence
+	const std::wstring stop;       //!< The stop character sequence
+	bool nested;                   //!< Can comments be nested?
 	Comment *next;
 
 	//! Construct from components - default to unnested comments

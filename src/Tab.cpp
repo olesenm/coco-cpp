@@ -84,7 +84,7 @@ std::string Tab::prefixName;
 
 FILE* Tab::trace = stderr;
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Tab::Tab(Parser *theParser)
 :
@@ -107,6 +107,8 @@ Tab::Tab(Parser *theParser)
 }
 
 
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
 Tab::~Tab()
 {
 	if (copyPos) { delete copyPos; }
@@ -121,6 +123,8 @@ Tab::~Tab()
 	classes.Delete();
 }
 
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 Symbol* Tab::NewSym(Node::nodeType typ, const std::wstring& name, int line)
 {

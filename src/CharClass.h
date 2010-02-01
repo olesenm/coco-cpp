@@ -48,18 +48,15 @@ namespace Coco
 class CharClass
 {
 public:
-	int n;              //!< class number
-	std::wstring name;  //!< class name
-	CharSet* set;       //!< the CharSet representing the class
+	int n;                         //!< class number
+	const std::wstring name;       //!< class name
+	CharSet* set;                  //!< the CharSet representing the class
 
 	CharClass(const std::wstring& className, CharSet* s)
 	:
 		n(0),
 		name(className),
 		set(s)
-	{}
-
-	virtual ~CharClass()
 	{}
 
 };

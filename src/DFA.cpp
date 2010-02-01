@@ -48,7 +48,7 @@ namespace Coco
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
 //---------- Output primitives
 std::string DFA::Ch(wchar_t ch)
@@ -1181,21 +1181,23 @@ void DFA::WriteScanner()
 }
 
 
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
 DFA::DFA(Parser *theParser)
 :
 	maxStates(0),
 	lastStateNr(-1),
 	firstState(NULL),
 	lastState(NULL),
-	ignoreCase(false),
 	dirtyDFA(false),
-	hasCtxMoves(false),
 	existLabel(NULL),
+	firstMelted(NULL),
+	firstComment(NULL),
 	parser(theParser),
 	tab(parser->tab),
 	errors(parser->errors),
-	firstMelted(NULL),
-	firstComment(NULL)
+	ignoreCase(false),
+	hasCtxMoves(false)
 {
 	firstState = NewState();
 }

@@ -29,9 +29,9 @@ License
     Coco/R itself) does not fall under the GNU General Public License.
 \*---------------------------------------------------------------------------*/
 // This file was generated with Coco/R C++ (1 Feb 2010)
+// http://www.ssw.uni-linz.ac.at/coco/
 // with these defines:
 
-// http://www.ssw.uni-linz.ac.at/coco/
 
 #ifndef COCO_SCANNER_H__
 #define COCO_SCANNER_H__
@@ -169,7 +169,7 @@ class Buffer
 	int fileLen;        //!< length of input stream (may change if the stream is no file)
 	FILE* cStream;      //!< input stdio stream (normally seekable)
 	std::istream* stdStream;  //!< STL std stream (seekable)
-	bool isUserStream_;  //!< was the stream opened by the user?
+	bool isUserStream_;       //!< was the stream opened by the user?
 
 	int ReadNextStreamChunk();
 	bool CanSeek() const; //!< true if stream can be seeked otherwise false
@@ -290,16 +290,13 @@ class KeywordMap
 	//! HashTable entry
 	struct Entry
 	{
-		std::wstring key;  //<! The lookup key
-		int val;           //<! The data
-		Entry *next;       //<! Pointer next Entry in sub-list
+		const std::wstring key;  //<! The lookup key
+		int val;                 //<! The data
+		Entry *next;             //<! Pointer next Entry in sub-list
 
 		Entry(const std::wstring& k, int v, Entry *n=0)
 		:
 			key(k), val(v), next(n)
-		{}
-
-		virtual ~Entry()
 		{}
 	};
 

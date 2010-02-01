@@ -35,7 +35,7 @@ License
 namespace Coco
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 State::State()
 :
@@ -46,6 +46,8 @@ State::State()
 	next(0)
 {}
 
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 void State::AddAction(Action *act)
 {

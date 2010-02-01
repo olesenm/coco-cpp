@@ -52,33 +52,38 @@ class BitArray;
 //! Parser generator -- Generation of the Recursive Descent Parser
 class ParserGen
 {
-public:
 	//! Type of errors
 	enum errorType
 	{
-		tErr    = 0,   //!< terminal error
-		altErr  = 1,   //!< alt error
-		syncErr = 2,   //!< sync error
-		maxTerm = 3    //!< sets of size < maxTerm are enumerated
+		tErr    = 0,      //!< terminal error
+		altErr  = 1,      //!< alt error
+		syncErr = 2,      //!< sync error
+		maxTerm = 3       //!< sets of size < maxTerm are enumerated
 	};
 
+	int errorNr;          //!< highest parser error number
+	Symbol *curSy;        //!< symbol whose production is currently generated
+
+	FILE* fram;           //!< parser frame file
+	FILE* gen;            //!< generated parser source file
+	std::wstring err;     //!< generated parser error messages
+
+	ArrayList<BitArray> symSet;
+
+	// other Coco objects
+	Tab *tab;
+	Errors *errors;
+
+public:
 	Position *preamblePos;   //!< position of preamble (eg, includes) in attributed grammar
 	Position *semDeclPos;    //!< position of global semantic declarations
 	Position *initCodePos;   //!< position of initialization code
 	Position *deinitCodePos; //!< position of de-initialization (destructor) code
 	Position *extraCodePos;  //!< position of extra code for the Parser.cpp
 
-	int errorNr;            //!< highest parser error number
-	Symbol *curSy;          //!< symbol whose production is currently generated
 
-	FILE* fram;             //!< parser frame file
-	FILE* gen;              //!< generated parser source file
-	std::wstring err;       //!< generated parser error messages
-
-	ArrayList<BitArray> symSet;
-
-	Tab *tab;               //!< other Coco objects
-	Errors *errors;
+	ParserGen(Parser *parser);
+	~ParserGen();
 
 	void Indent(int n);     //!< indent with tabs to the specified level
 
@@ -100,9 +105,6 @@ public:
 	void InitSets();
 	void WriteParser();
 	void PrintStatistics() const;
-
-	ParserGen(Parser *parser);
-	~ParserGen();
 
 };
 

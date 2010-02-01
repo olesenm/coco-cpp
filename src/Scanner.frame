@@ -1,10 +1,10 @@
 /*---------------------------------*- C++ -*---------------------------------*\
-Compiler Generator Coco/R,
-Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
-extended by M. Loeberbauer & A. Woess, Univ. of Linz
-ported to C++ by Csaba Balazs, University of Szeged
-with improvements by Pat Terry, Rhodes University
-
+    Compiler Generator Coco/R,
+    Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
+    extended by M. Loeberbauer & A. Woess, Univ. of Linz
+    ported to C++ by Csaba Balazs, University of Szeged
+    with improvements by Pat Terry, Rhodes University
+-------------------------------------------------------------------------------
 License
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
@@ -204,7 +204,7 @@ $ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	FILE* cStream;      //!< input stdio stream (normally seekable)
 $endif                                           // <-- STREAMS_ONLY
 	std::istream* stdStream;  //!< STL std stream (seekable)
-	bool isUserStream_;  //!< was the stream opened by the user?
+	bool isUserStream_;       //!< was the stream opened by the user?
 
 $ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	int ReadNextStreamChunk();
@@ -331,16 +331,13 @@ class KeywordMap
 	//! HashTable entry
 	struct Entry
 	{
-		std::wstring key;  //<! The lookup key
-		int val;           //<! The data
-		Entry *next;       //<! Pointer next Entry in sub-list
+		const std::wstring key;  //<! The lookup key
+		int val;                 //<! The data
+		Entry *next;             //<! Pointer next Entry in sub-list
 
 		Entry(const std::wstring& k, int v, Entry *n=0)
 		:
 			key(k), val(v), next(n)
-		{}
-
-		virtual ~Entry()
 		{}
 	};
 

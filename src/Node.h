@@ -76,8 +76,8 @@ public:
 		contextTrans = 1   //!< context transition
 	};
 
-	int      n;     //!< node number
-	nodeType typ;   //!< node type
+	int      n;           //!< node number
+	const nodeType typ;   //!< node type
 	Symbol   *sym;  //!< nt, t, wt: symbol represented by this node
 	int      val;   //!< chr: ordinal character value, clas: index of character class
 	transitionType code;  //!< chr, clas: transition code

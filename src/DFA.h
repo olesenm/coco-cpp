@@ -56,9 +56,7 @@ class BitArray;
 //! Generation of the Scanner Automaton
 class DFA
 {
-public:
 	int maxStates;
-
 	int lastStateNr;    //!< highest state number
 	State *firstState;
 	State *lastState;   //!< last allocated state
@@ -67,18 +65,20 @@ public:
 	FILE* gen;          //!< generated scanner file
 	Symbol *curSy;      //!< current token to be recognized (in FindTrans)
 	Node *curGraph;     //!< start of graph for current token (in FindTrans)
-	bool ignoreCase;    //!< true if input should be treated case-insensitively
 	bool dirtyDFA;      //!< DFA may become nondeterministic in MatchLiteral
-	bool hasCtxMoves;   //!< DFA has context transitions
 	bool *existLabel;   //!< checking the Labels (to avoid the warning messages)
+
+	Melted *firstMelted;    //!< head of melted state list
+	Comment *firstComment;  //!< list of comments
 
 	//! other Coco objects
 	Parser     *parser;
 	Tab        *tab;
 	Errors     *errors;
 
-	Melted *firstMelted;    //!< head of melted state list
-	Comment *firstComment;  //!< list of comments
+public:
+	bool ignoreCase;    //!< true if input should be treated case-insensitively
+	bool hasCtxMoves;   //!< DFA has context transitions
 
 	//---------- Output primitives
 	static std::string Ch(wchar_t ch);

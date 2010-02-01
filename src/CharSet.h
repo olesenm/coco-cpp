@@ -61,7 +61,8 @@ public:
 
 	Range *head;
 
-	CharSet() : head(0) {}
+	//! Construct null
+	CharSet();
 
 	virtual ~CharSet();
 

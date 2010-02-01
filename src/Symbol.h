@@ -63,8 +63,8 @@ public:
 	};
 
 	int      n;           //!< symbol number
-	Node::nodeType  typ;  //!< node type: t, nt, pr, unknown, rslv
-	std::wstring name;    //!< symbol name
+	const Node::nodeType typ;  //!< node type: t, nt, pr, unknown, rslv
+	const std::wstring name;   //!< symbol name
 	Node     *graph;      //!< nt: to first node of syntax graph
 	symbolType tokenKind; //!< t:  token kind (fixedToken, classToken, ...)
 	bool     deletable;   //!< nt: true if nonterminal is deletable

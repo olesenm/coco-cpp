@@ -34,7 +34,7 @@ License
 namespace Coco
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * * //
 
 std::wstring coco_stdWString(const std::string& str)
 {

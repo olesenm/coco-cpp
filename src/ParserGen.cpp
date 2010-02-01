@@ -43,7 +43,7 @@ namespace Coco
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 void ParserGen::Indent(int n)
 {
@@ -546,22 +546,25 @@ void ParserGen::PrintStatistics() const
 	fwprintf(trace, L"%d sets\n", symSet.Count);
 }
 
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 ParserGen::ParserGen(Parser *parser)
 :
-	preamblePos(NULL),
-	semDeclPos(NULL),
-	initCodePos(NULL),
-	deinitCodePos(NULL),
-	extraCodePos(NULL),
 	errorNr(-1),
 	curSy(NULL),
 	fram(NULL),
 	gen(NULL),
 	tab(parser->tab),
-	errors(parser->errors)
+	errors(parser->errors),
+	preamblePos(NULL),
+	semDeclPos(NULL),
+	initCodePos(NULL),
+	deinitCodePos(NULL),
+	extraCodePos(NULL)
 {}
 
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 ParserGen::~ParserGen()
 {

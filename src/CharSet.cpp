@@ -37,7 +37,23 @@ License
 namespace Coco
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+CharSet::CharSet()
+:
+	head(0)
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+CharSet::~CharSet()
+{
+	Clear();
+}
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 bool CharSet::Get(int i) const
 {
@@ -249,12 +265,6 @@ void CharSet::Fill()
 {
 	Clear();
 	head = new Range(0, Buffer::MaxChar);
-}
-
-
-CharSet::~CharSet()
-{
-	Clear();
 }
 
 

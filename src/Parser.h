@@ -93,9 +93,9 @@ class Parser
 		_badString=4,
 		_char=5,
 		_ddtSym=50,
-		_directive=51
+		_directive=51,
+		maxT = 49    //<! max term (w/o pragmas)
 	};
-	static const int maxT = 49;
 	static const int minErrDist = 2; //!< min. distance before reporting errors
 
 	Token *dummyToken;

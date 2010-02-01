@@ -708,7 +708,7 @@ bool Scanner::Comment0() {
 	NextCh();
 	if (ch == '/') {
 		NextCh();
-		for(;;) {
+		while (true) {
 			if (ch == 10) {
 				level--;
 				if (level == 0) { oldEols = line - line0; NextCh(); return true; }
@@ -727,7 +727,7 @@ bool Scanner::Comment1() {
 	NextCh();
 	if (ch == '*') {
 		NextCh();
-		for(;;) {
+		while (true) {
 			if (ch == '*') {
 				NextCh();
 				if (ch == '/') {

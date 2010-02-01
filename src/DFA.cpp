@@ -54,9 +54,12 @@ namespace Coco
 std::string DFA::Ch(wchar_t ch)
 {
 	std::ostringstream buf;
-	if (ch < 32 || ch >= 0x7F || ch == '\'' || ch == '\\') {
+	if (ch < 32 || ch >= 0x7F || ch == '\'' || ch == '\\')
+	{
 		buf << int(ch);
-	} else {
+	}
+	else
+	{
 		buf << '\'' << char(ch & 0x7F) << '\'';
 	}
 	return buf.str();
@@ -101,7 +104,11 @@ void DFA::PutRange(CharSet *s)
 State* DFA::NewState()
 {
 	State *s = new State(); s->nr = ++lastStateNr;
-	if (firstState == NULL) firstState = s; else lastState->next = s;
+	if (firstState == NULL)
+		firstState = s;
+	else
+		lastState->next = s;
+
 	lastState = s;
 	return s;
 }
@@ -420,8 +427,8 @@ void DFA::MatchLiteral(const std::wstring& str, Symbol *sym)
 
 void DFA::SplitActions(State *state, Action *a, Action *b)
 {
-	Action *c; CharSet *seta, *setb, *setc;
-	seta = a->Symbols(tab); setb = b->Symbols(tab);
+	CharSet *seta = a->Symbols(tab);
+	CharSet *setb = b->Symbols(tab);
 	if (seta->Equals(setb))
 	{
 		a->AddTargets(b);
@@ -429,24 +436,24 @@ void DFA::SplitActions(State *state, Action *a, Action *b)
 	}
 	else if (seta->Includes(setb))
 	{
-		setc = seta->Clone(); setc->Subtract(setb);
+		CharSet *setc = seta->Clone(); setc->Subtract(setb);
 		b->AddTargets(a);
 		a->ShiftWith(setc, tab);
 	}
 	else if (setb->Includes(seta))
 	{
-		setc = setb->Clone(); setc->Subtract(seta);
+		CharSet *setc = setb->Clone(); setc->Subtract(seta);
 		a->AddTargets(b);
 		b->ShiftWith(setc, tab);
 	}
 	else
 	{
-		setc = seta->Clone(); setc->And(setb);
+		CharSet *setc = seta->Clone(); setc->And(setb);
 		seta->Subtract(setc);
 		setb->Subtract(setc);
 		a->ShiftWith(seta, tab);
 		b->ShiftWith(setb, tab);
-		c = new Action(Node::invalid_, 0, Node::normalTrans);  // typ and sym are set in ShiftWith
+		Action *c = new Action(Node::invalid_, 0, Node::normalTrans);  // typ and sym are set in ShiftWith
 		c->AddTargets(a);
 		c->AddTargets(b);
 		c->ShiftWith(setc, tab);
@@ -457,15 +464,29 @@ void DFA::SplitActions(State *state, Action *a, Action *b)
 
 bool DFA::Overlap(Action *a, Action *b)
 {
-	CharSet *seta, *setb;
 	if (a->typ == Node::chr)
-		if (b->typ == Node::chr) return (a->sym == b->sym);
-		else {setb = tab->CharClassSet(b->sym); return setb->Get(a->sym);}
+	{
+		if (b->typ == Node::chr)
+		{
+			return (a->sym == b->sym);
+		}
+		else
+		{
+			CharSet *setb = tab->CharClassSet(b->sym);
+			return setb->Get(a->sym);}
+	}
 	else
 	{
-		seta = tab->CharClassSet(a->sym);
-		if (b->typ == Node::chr) return seta->Get(b->sym);
-		else {setb = tab->CharClassSet(b->sym); return seta->Intersects(setb);}
+		CharSet *seta = tab->CharClassSet(a->sym);
+		if (b->typ == Node::chr)
+		{
+			return seta->Get(b->sym);
+		}
+		else
+		{
+			CharSet *setb = tab->CharClassSet(b->sym);
+			return seta->Intersects(setb);
+		}
 	}
 }
 
@@ -474,12 +495,16 @@ bool DFA::MakeUnique(State *state) // return true if actions were split
 {
 	bool changed = false;
 	for (Action *a = state->firstAction; a != NULL; a = a->next)
+	{
 		for (Action *b = a->next; b != NULL; b = b->next)
+		{
 			if (Overlap(a, b))
 			{
 				SplitActions(state, a, b);
 				changed = true;
 			}
+		}
+	}
 	return changed;
 }
 
@@ -634,7 +659,9 @@ Action* DFA::FindAction(State *state, wchar_t ch)
 		{
 			CharSet *s = tab->CharClassSet(a->sym);
 			if (s->Get(ch))
+			{
 				return a;
+			}
 		}
 	}
 
@@ -709,14 +736,12 @@ Melted* DFA::NewMelted(BitArray *set, State *state)
 
 BitArray* DFA::MeltedSet(int nr)
 {
-	Melted *m = firstMelted;
-	while (m != NULL)
+	for (Melted *m = firstMelted; m != NULL; m = m->next)
 	{
 		if (m->state->nr == nr)
 			return m->set;
-		else
-			m = m->next;
 	}
+
 	//Errors::Exception("-- compiler error in Melted::Set");
 	//throw new Exception("-- compiler error in Melted::Set");
 	return NULL;
@@ -784,8 +809,7 @@ void DFA::NewComment(Node *from, Node *to, bool nested)
 
 void DFA::GenComBody(Comment *com)
 {
-	fwprintf(gen, L"\t\tfor(;;) {\n");
-
+	fwprintf(gen, L"\t\twhile (true) {\n");
 	fwprintf(gen, L"\t\t\tif (%s) {\n", ChCond(com->stop[0]).c_str());
 
 	if (com->stop.size() == 1)

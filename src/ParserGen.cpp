@@ -330,9 +330,7 @@ void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked)
 
 void ParserGen::GenTokensHeader()
 {
-	fwprintf(gen, L"\tenum {");
-
-	bool first = true;
+	fwprintf(gen, L"\tenum {\n");
 
 	// tokens
 	for (int i=0; i < tab->terminals.Count; i++)
@@ -342,36 +340,17 @@ void ParserGen::GenTokensHeader()
 		{
 			continue;
 		}
-		if (first)
-		{
-			first = false;
-		}
-		else
-		{
-			fwprintf(gen, L",");   // finish previous enum
-		}
-		fwprintf(gen , L"\n\t\t_%ls=%d", sym->name.c_str(), sym->n);
+		fwprintf(gen , L"\t\t_%ls=%d,\n", sym->name.c_str(), sym->n);
 	}
 
 	// pragmas
 	for (int i=0; i < tab->pragmas.Count; i++)
 	{
 		Symbol* sym = tab->pragmas[i];
-		if (first)
-		{
-			first = false;
-		}
-		else
-		{
-			fwprintf(gen, L",");   // finish previous enum
-		}
-		fwprintf(gen , L"\n\t\t_%ls=%d", sym->name.c_str(), sym->n);
+		fwprintf(gen , L"\t\t_%ls=%d,\n", sym->name.c_str(), sym->n);
 	}
 
-	if (!first)
-	{
-		fwprintf(gen, L"\n");    // finish final enum (w/o trailing comma)
-	}
+	fwprintf(gen, L"\t\tmaxT = %d    //<! max term (w/o pragmas)\n", tab->terminals.Count-1);
 	fwprintf(gen, L"\t};\n");
 }
 
@@ -480,10 +459,14 @@ void ParserGen::WriteParser()
 	int nrOfNs = tab->GenNamespaceOpen(gen);
 
 	CopyFramePart("-->constantsheader");
-	GenTokensHeader();  /* ML 2002/09/07 write the token kinds */
-	fwprintf(gen, L"\tstatic const int maxT = %d;\n", tab->terminals.Count-1);
-	CopyFramePart("-->declarations"); CopySourcePart(semDeclPos, 0);
-	CopyFramePart("-->productionsheader"); GenProductionsHeader();
+	GenTokensHeader();
+
+	CopyFramePart("-->declarations");
+	CopySourcePart(semDeclPos, 0);
+
+	CopyFramePart("-->productionsheader");
+	GenProductionsHeader();
+
 	CopyFramePart("-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);
 
@@ -501,6 +484,7 @@ void ParserGen::WriteParser()
 
 	tab->CopySourcePart(gen, tab->copyPos, 0, false);  // copy without emitLines
 	tab->AddNotice(gen);
+
 	CopyFramePart("-->namespace_open");
 	if (Tab::singleOutput)
 	{
@@ -522,14 +506,26 @@ void ParserGen::WriteParser()
 		fwprintf(gen, L"\n");
 	}
 
-	CopyFramePart("-->pragmas"); GenCodePragmas();
-	CopyFramePart("-->productions"); GenProductions();
+	CopyFramePart("-->pragmas");
+	GenCodePragmas();
+
+	CopyFramePart("-->productions");
+	GenProductions();
+
 	CopyFramePart("-->parseRoot");
 	fwprintf(gen, L"\t%ls();\n", tab->gramSy->name.c_str());
-	CopyFramePart("-->constructor"); CopySourcePart(initCodePos, 0);
-	CopyFramePart("-->initialization"); InitSets();
-	CopyFramePart("-->destructor"); CopySourcePart(deinitCodePos, 0);
-	CopyFramePart("-->errors"); fwprintf(gen, L"%ls", err.c_str());
+
+	CopyFramePart("-->constructor");
+	CopySourcePart(initCodePos, 0);
+
+	CopyFramePart("-->initialization");
+	InitSets();
+	CopyFramePart("-->destructor");
+	CopySourcePart(deinitCodePos, 0);
+
+	CopyFramePart("-->errors");
+	fwprintf(gen, L"%ls", err.c_str());
+
 	CopyFramePart("-->namespace_close");
 	tab->GenNamespaceClose(gen, nrOfNs);
 

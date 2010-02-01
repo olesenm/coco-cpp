@@ -526,14 +526,6 @@ void ParserGen::WriteParser()
 	CopyFramePart("-->productions"); GenProductions();
 	CopyFramePart("-->parseRoot");
 	fwprintf(gen, L"\t%ls();\n", tab->gramSy->name.c_str());
-	if (Tab::explicitEOF)
-	{
-		fwprintf(gen, L"\t// let grammar deal with end-of-file expectations\n");
-	}
-	else
-	{
-		fwprintf(gen, L"\tExpect(0); // expect end-of-file automatically added\n");
-	}
 	CopyFramePart("-->constructor"); CopySourcePart(initCodePos, 0);
 	CopyFramePart("-->initialization"); InitSets();
 	CopyFramePart("-->destructor"); CopySourcePart(deinitCodePos, 0);

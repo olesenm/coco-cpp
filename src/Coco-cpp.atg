@@ -2,6 +2,9 @@
    Coco-cpp.atg -- Attributed Grammar for Coco/R  (-*- C++ -*- version)
    compile with:
        coco-cpp Coco-cpp.atg
+
+   Note that $define=XXX grammar directives can be used to influence
+   the output. See the Scanner.frame and Parser.frame for known defines.
 \*---------------------------------------------------------------------------*/
 [copy]
 /*---------------------------------*- C++ -*---------------------------------*\

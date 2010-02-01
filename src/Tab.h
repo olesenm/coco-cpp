@@ -77,7 +77,6 @@ public:
 	static bool emitLines;         //!< emit line directives in generated parser
 	static bool singleOutput;      //!< include the Scanner code in the Parser file
 	static bool makeBackup;        //!< create .bak files for generated parser/scanner
-	static bool explicitEOF;       //!< user must explicitly add EOF in grammar
 	static bool ddt[10];           //!< debug and test switches
 
 	static FILE* trace;            //!< trace file

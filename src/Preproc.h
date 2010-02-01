@@ -85,6 +85,13 @@ public:
     }
 
 
+    //! Return list of defines
+    const std::set<std::string>& defines() const
+    {
+        return defines_;
+    }
+
+
     //! Add name to defines - split automatically on whitespace
     void define(const std::string& defs)
     {

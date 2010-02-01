@@ -53,6 +53,16 @@ About this file
     Note that since the '-->TAG' text markers are seen before the
     preprocessor directives, the directives have no effect there.
 
+Defines used
+    - STREAMS_ONLY
+      use STL std streams only, disabling buffered stdio etc.
+    - NO_UTF8
+      disable UTF-8 interpretation on the input stream.
+    - FORCE_UTF8
+      provided that NO_UTF8 hasn't been specified, for UTF-8 interpretation
+      on the input stream and don't rely entirely on the presence of a
+      byte order mark at the start of the file.
+
 \*---------------------------------------------------------------------------*/
 -->begin    // <-- ignore all preliminary text
 
@@ -162,13 +172,9 @@ public:
 	wchar_t* val;   //!< token value (normally allocated from the internal heap)
 	Token *next;    //!< Peek tokens are kept in linked list
 
-	//! The length of val, or 0 if val is NULL
-	inline int length() const
-	{
-		return val ? wcslen(val) : 0;
-	}
+	int length() const;    //!< The length of val, or 0 if val is NULL
 
-	//! Construct null Token with optional pointer to a string value
+	//! Construct null Token, optionally with pointer to a string value
 	Token(wchar_t* value = 0);
 	~Token();       //!< Destructor - does not cleanup val member
 };
@@ -188,7 +194,7 @@ public:
  */
 class Buffer
 {
-$ifndef stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	unsigned char *buf; //!< input buffer
 	int bufCapacity;    //!< capacity of buf
 	int bufLen;         //!< length of buffer
@@ -196,14 +202,14 @@ $ifndef stdStreamOnly
 	int bufStart;       //!< position of first byte in buffer relative to input stream
 	int fileLen;        //!< length of input stream (may change if the stream is no file)
 	FILE* cStream;      //!< input stdio stream (normally seekable)
-$endif // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 	std::istream* stdStream;  //!< STL std stream (seekable)
 	bool isUserStream_;  //!< was the stream opened by the user?
 
-$ifndef stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	int ReadNextStreamChunk();
 	bool CanSeek() const; //!< true if stream can be seeked otherwise false
-$endif // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 
 protected:
 	Buffer(Buffer*);    //!< for the UTF8Buffer
@@ -213,7 +219,7 @@ public:
 	static const int MaxChar = 65535;
 	static const int EoF = MaxChar + 1;
 
-$ifndef stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	//! Copy buffer contents from constant character string
 	Buffer(const char* chars, int len);
 
@@ -223,7 +229,7 @@ $ifndef stdStreamOnly
 	//! @brief Attach buffer to a stdio stream.
 	//! User streams are not closed in the destructor
 	Buffer(FILE*, bool isUserStream = true);
-$endif // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 
 	//! @brief Attach buffer to an STL standard stream
 	//! User streams are not closed in the destructor
@@ -245,6 +251,7 @@ $endif // stdStreamOnly
 /*---------------------------------------------------------------------------*\
                          Class UTF8Buffer Declaration
 \*---------------------------------------------------------------------------*/
+$ifndef NO_UTF8                                  // <-- NO_UTF8
 //! A Scanner Buffer variant that decodes UTF-8 characters into 16bit unicode
 class UTF8Buffer : public Buffer
 {
@@ -253,7 +260,7 @@ public:
 	virtual int Read();
 	virtual bool isUTF8() const;  //!< Return true - buffer is UTF8
 };
-
+$endif                                           // <-- NO_UTF8
 
 /*---------------------------------------------------------------------------*\
                          Class StartStates Declaration
@@ -425,7 +432,7 @@ public:
 	//! The scanner buffer
 	Buffer *buffer;
 
-$ifndef stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	//! Attach scanner to an existing character buffer
 	Scanner(const char* chars, int len);
 
@@ -442,7 +449,7 @@ $ifndef stdStreamOnly
 
 	//! Open a file for reading and attach scanner
 	explicit Scanner(const std::string& fileName);
-$endif // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 
 	//! Attach scanner to an existing open STL standard stream
 	explicit Scanner(std::istream&);
@@ -615,13 +622,19 @@ Token::~Token()
 {}
 
 
+int Token::length() const
+{
+    return val ? wcslen(val) : 0;
+}
+
+
 // ----------------------------------------------------------------------------
 // Buffer Implementation
 // ----------------------------------------------------------------------------
 
 Buffer::Buffer(Buffer* b)
 :
-$ifndef stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	buf(b->buf),
 	bufCapacity(b->bufCapacity),
 	bufLen(b->bufLen),
@@ -629,20 +642,20 @@ $ifndef stdStreamOnly
 	bufStart(b->bufStart),
 	fileLen(b->fileLen),
 	cStream(b->cStream),
-$endif // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 	stdStream(b->stdStream),
 	isUserStream_(b->isUserStream_)
 {
 	// avoid accidental deletion on any of these members
-$ifndef stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	b->buf = NULL;
 	b->cStream = NULL;
-$endif // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 	b->stdStream = NULL;
 }
 
 
-$ifndef stdStreamOnly                            // stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 Buffer::Buffer(const char* chars, int len)
 :
 	buf(new unsigned char[len]),
@@ -707,12 +720,12 @@ Buffer::Buffer(FILE* istr, bool isUserStream)
 	else bufPos = 0; // index 0 is already after the file, thus Pos = 0 is invalid
 	if (bufLen == fileLen && CanSeek()) Close();
 }
-$endif                                           // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 
 
 Buffer::Buffer(std::istream* istr, bool isUserStream)
 :
-$ifndef stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	buf(NULL),
 	bufCapacity(0),
 	bufLen(0),
@@ -720,7 +733,7 @@ $ifndef stdStreamOnly
 	bufStart(0),
 	fileLen(0),
 	cStream(NULL),
-$endif    // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 	stdStream(istr),
 	isUserStream_(isUserStream)
 {
@@ -733,13 +746,13 @@ $endif    // stdStreamOnly
 Buffer::~Buffer()
 {
 	Close();
-$ifndef stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	if (buf)
 	{
 		delete[] buf;
 		buf = NULL;
 	}
-$endif  // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 }
 
 
@@ -747,13 +760,13 @@ void Buffer::Close()
 {
 	if (!isUserStream_)
 	{
-$ifndef stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 		if (cStream)
 		{
 			fclose(cStream);
 			cStream = NULL;
 		}
-$endif  // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 		if (stdStream)
 		{
 			delete stdStream;
@@ -775,7 +788,7 @@ int Buffer::Read()
 		return ch;
 	}
 
-$ifndef stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	if (bufPos < bufLen) {
 		return buf[bufPos++];
 	}
@@ -786,12 +799,17 @@ $ifndef stdStreamOnly
 	else if (cStream && !CanSeek() && (ReadNextStreamChunk() > 0)) {
 		return buf[bufPos++];
 	}
-$endif  // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 
 	return EoF;
 }
 
+bool Buffer::isUTF8() const
+{
+	return false;
+}
 
+$ifndef NO_UTF8                                  // <-- NO_UTF8
 int UTF8Buffer::Read()
 {
 	int ch;
@@ -833,16 +851,11 @@ int UTF8Buffer::Read()
 }
 
 
-bool Buffer::isUTF8() const
-{
-	return false;
-}
-
-
 bool UTF8Buffer::isUTF8() const
 {
 	return true;
 }
+$endif                                           // <-- NO_UTF8
 
 
 int Buffer::Peek()
@@ -873,7 +886,7 @@ void Buffer::SetPos(int value)
 		return;
 	}
 
-$ifndef stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 	if ((value >= fileLen) && cStream && !CanSeek())
 	{
 		// Wanted position is after buffer and the stream
@@ -904,11 +917,11 @@ $ifndef stdStreamOnly
 	{
 		bufPos = fileLen - bufStart; // make Pos return fileLen
 	}
-$endif    // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 }
 
 
-$ifndef stdStreamOnly                            // stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 //
 // Read the next chunk of bytes from the stream, increases the buffer
 // if needed and updates the fields fileLen and bufLen.
@@ -945,13 +958,13 @@ bool Buffer::CanSeek() const
 {
 	return cStream && (ftell(cStream) != -1);
 }
-$endif                                           // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 
 // ----------------------------------------------------------------------------
 // Scanner Implementation
 // ----------------------------------------------------------------------------
 
-$ifndef stdStreamOnly                            // stdStreamOnly
+$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
 Scanner::Scanner(const char* buf, int len)
 :
 	buffer(new Buffer(buf, len))
@@ -1003,7 +1016,7 @@ Scanner::Scanner(const std::string& fileName)
 	buffer = new Buffer(istr, false);
 	Init();
 }
-$endif                                           // stdStreamOnly
+$endif                                           // <-- STREAMS_ONLY
 
 
 Scanner::Scanner(std::istream& istr)
@@ -1055,6 +1068,7 @@ void Scanner::Init()
 	pos = -1; line = 1; col = 0;
 	oldEols = 0;
 	NextCh();
+$ifndef NO_UTF8                                  // <-- NO_UTF8
 	if (ch == 0xEF)   // check optional byte order mark for UTF-8
 	{                 // Windows-specific magic
 		NextCh(); int ch1 = ch;
@@ -1069,16 +1083,17 @@ void Scanner::Init()
 		delete oldBuf; oldBuf = NULL;
 		NextCh();
 	}
-$ifdef forceUTF8
+$ifdef FORCE_UTF8                                // <-- FORCE_UTF8
 	else
 	{
-		// forceUTF8 was defined
+		// FORCE_UTF8 was defined
 		// use UTF8Buffer without relying on a byte order mark.
 		Buffer *oldBuf = buffer;
 		buffer = new UTF8Buffer(oldBuf); col = 0;
 		delete oldBuf; oldBuf = NULL;
 	}
-$endif
+$endif                                           // <-- FORCE_UTF8
+$endif                                           // <-- NO_UTF8
 
 	pt = tokens = CreateToken(); // first token is a dummy
 }

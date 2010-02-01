@@ -29,6 +29,7 @@ License
     Coco/R itself) does not fall under the GNU General Public License.
 \*---------------------------------------------------------------------------*/
 
+#include "CocoInfo.h"
 #include "Tab.h"
 #include "Parser.h"
 #include "BitArray.h"
@@ -61,7 +62,6 @@ const std::string Tab::prefixMacro = "$PREFIX$";
 bool Tab::emitLines = false;
 bool Tab::singleOutput = false;
 bool Tab::makeBackup = false;
-bool Tab::explicitEOF = false;
 bool Tab::ddt[10] =
 {
 	false, false, false, false, false,
@@ -1594,14 +1594,14 @@ void Tab::XRef()
 
 void Tab::DispatchDirective(const std::string& str)
 {
-	const std::string::size_type len1 = str.find('=');
-	if (len1 == std::string::npos)
+	const std::string::size_type fndEqual = str.find('=');
+	if (fndEqual == std::string::npos)
 	{
 		return;
 	}
 
-	const std::string name  = str.substr(0, len1);
-	const std::string value = str.substr(len1+1);
+	const std::string name  = str.substr(0, fndEqual);
+	const std::string value = str.substr(fndEqual+1);
 
 	if (value.empty())
 	{
@@ -1614,8 +1614,8 @@ void Tab::DispatchDirective(const std::string& str)
 		if (nsName.empty())
 		{
 			nsName = value;
+			wprintf(L"using namespace: '%s'\n", value.c_str());
 		}
-		wprintf(L"using namespace: '%s'\n", nsName.c_str());
 	}
 	else if (name == "prefix")
 	{
@@ -1623,50 +1623,12 @@ void Tab::DispatchDirective(const std::string& str)
 		if (prefixName.empty())
 		{
 			prefixName = value;
+			wprintf(L"using prefix: '%s'\n", value.c_str());
 		}
-		wprintf(L"using prefix: '%s'\n", prefixName.c_str());
 	}
 	else if (name == "trace")
 	{
 		SetDDT(value);
-	}
-	else if (name == "explicitEOF")
-	{
-		if (value == "true")
-		{
-			Tab::explicitEOF = true;
-		}
-		else if (value == "false")
-		{
-			Tab::explicitEOF = false;
-		}
-		else
-		{
-			wprintf
-			(
-				L"ignoring unknown bool value for pragma: '%s'\n",
-				str.c_str()
-			);
-		}
-	}
-	else if (name == "lines")
-	{
-		if (value == "true")
-		{
-			Tab::emitLines = true;
-		}
-		else if (value == "false")
-		{
-			Tab::emitLines = false;
-		}
-		else
-		{
-			wprintf
-			(
-				L"ignoring unknown bool value for pragma: '%s'\n",
-				str.c_str()
-			);
-		}
 	}
 	else if (name == "single")
 	{
@@ -1693,6 +1655,7 @@ void Tab::DispatchDirective(const std::string& str)
 	}
 	else if (name == "undef")
 	{
+		// this is for completeness, but probably isn't used anywhere
 		preproc_.undef(value);
 	}
 	else
@@ -2037,7 +2000,28 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines)
 
 void Tab::AddNotice(FILE *dest) const
 {
-    fwprintf(dest, L"// This file was generated with Coco/R - http://www.ssw.uni-linz.ac.at/coco/\n");
+	fwprintf
+	(
+		dest,
+		L"// This file was generated with Coco/R C++ (%s)\n// %s\n",
+		PACKAGE_DATE,
+		PACKAGE_URL
+	);
+
+	fwprintf(dest, L"// with these defines:\n");
+
+	for
+	(
+		std::set<std::string>::const_iterator iter = preproc_.defines().begin();
+		iter != preproc_.defines().end();
+		++iter
+	)
+	{
+		fwprintf(dest, L"//     - %s\n", iter->c_str());
+	}
+
+	fwprintf(dest, L"\n");
+
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -147,6 +147,7 @@ with the same syntax. For example,
 /*-------------------------------------------------------------------------*/
 
 #include <stdio.h>
+#include "CocoInfo.h"
 #include "Scanner.h"
 #include "Parser.h"
 #include "Utils.h"
@@ -189,7 +190,7 @@ void printUsage(const char* message = NULL)
 	wprintf(L"  1. In the specified -frames directory.\n");
 	wprintf(L"  2. The current directory.\n");
 	wprintf(L"  3. The same directory as the atg grammar.\n\n");
-	wprintf(L"http://www.ssw.uni-linz.ac.at/coco/\n\n");
+	wprintf(L"%s\n\n", PACKAGE_URL);
 }
 
 
@@ -202,7 +203,7 @@ void printUsage(const char* message = NULL)
 int main(int argc, char *argv[])
 #endif
 {
-	wprintf(L"Coco/R C++ (29 Jan 2010)\n");
+	wprintf(L"Coco/R C++ (%s)\n", PACKAGE_DATE);
 
 #ifdef _WIN32
 	std::wstring srcName;

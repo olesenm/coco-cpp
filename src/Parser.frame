@@ -53,6 +53,10 @@ About this file
     Note that since the '-->TAG' text markers are seen before the
     preprocessor directives, the directives have no effect there.
 
+Defines used
+    - EXPLICIT_EOF
+      grammar must deal with end-of-file expectations explicitly
+
 \*---------------------------------------------------------------------------*/
 -->begin    // <-- ignore all preliminary text
 
@@ -302,7 +306,12 @@ void Parser::Parse()
 	dummyToken = new Token(coco_string_create(L"Dummy Token"));
 	la = dummyToken;
 	Get();
--->parseRoot    // <-- call main production, optionally expect end-of-file
+-->parseRoot    // <-- call main production
+$ifdef EXPLICIT_EOF
+	// grammar must deal with end-of-file expectations explicitly
+$else
+	Expect(0);  // expect end-of-file automatically added
+$endif
 }
 
 

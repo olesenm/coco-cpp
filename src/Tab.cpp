@@ -34,7 +34,6 @@ License
 #include "Parser.h"
 #include "BitArray.h"
 #include "Utils.h"
-#include "SortedList.h"
 
 #include <sstream>
 
@@ -1537,17 +1536,18 @@ bool Tab::AllNtToTerm()
 
 void Tab::XRef()
 {
-	SortedList< ArrayList<int> > xref;
+	HashTable< ArrayList<int> > xref;
 
 	// collect lines where symbols have been defined
 	for (int i=0; i < nonterminals.Count; i++)
 	{
 		Symbol *sym = nonterminals[i];
-		ArrayList<int> *list = xref.Get(sym);
+		ArrayList<int> *list = xref.Get(sym->name);
+
 		if (list == NULL)
 		{
 			list = new ArrayList<int>();
-			xref.Set(sym, list);
+			xref.Set(sym->name, list);
 		}
 		int *intg = new int(- sym->line);
 		list->Add(intg);
@@ -1559,11 +1559,11 @@ void Tab::XRef()
 		Node *n = nodes[i];
 		if (n->typ == Node::t || n->typ == Node::wt || n->typ == Node::nt)
 		{
-			ArrayList<int> *list = xref.Get(n->sym);
+			ArrayList<int> *list = xref.Get(n->sym->name);
 			if (list == NULL)
 			{
 				list = new ArrayList<int>();
-				xref.Set(n->sym, list);
+				xref.Set(n->sym->name, list);
 			}
 			int *intg = new int(n->line);
 			list->Add(intg);
@@ -1574,24 +1574,36 @@ void Tab::XRef()
 	fwprintf(trace, L"Cross reference list:\n");
 	fwprintf(trace, L"--------------------\n\n");
 
-	for (int i=0; i < xref.Count; i++)
+	std::vector<std::wstring> symNames = xref.toc(true);
+	for
+	(
+		std::vector<std::wstring>::const_iterator iter = symNames.begin();
+		iter != symNames.end();
+		++iter
+	)
 	{
-		Symbol *sym = xref.GetKey(i);
-		fwprintf(trace, L"  %-12ls", sym->name.c_str());
-		ArrayList<int> *list = xref.Get(sym);
+		fwprintf(trace, L"  %-12ls", iter->c_str());
+		ArrayList<int> *list = xref.Get(*iter);
 		int col = 14;
-		for (int j=0; j <list->Count; j++)
+		for (int j=0; j <list->Count; ++j)
 		{
 			int line = *((*list)[j]);
 			if (col + 5 > 80)
 			{
 				fwprintf(trace, L"\n");
-				for (col = 1; col <= 14; col++) fwprintf(trace, L" ");
+				for (col = 1; col <= 14; ++col)
+					fwprintf(trace, L" ");
 			}
-			fwprintf(trace, L"%5d", line); col += 5;
+			fwprintf(trace, L"%5d", line);
+			col += 5;
 		}
 		fwprintf(trace, L"\n");
+
+		// free up some memory
+		list->Delete();
+		delete list;
 	}
+
 	fwprintf(trace, L"\n\n");
 }
 

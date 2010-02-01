@@ -69,26 +69,33 @@ namespace Coco
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//! Create by copying ASCII byte str
+//! Create (wide) string by copying ASCII byte str
 std::wstring coco_stdWString(const std::string& str);
 
 
-//! Compare strings, return true if they are equal
-inline bool coco_string_equal(const wchar_t* str1, const wchar_t* str2)
+//! Compare (narrow) strings, return true if they are equal
+inline bool coco_string_equal(const char* a, const char* b)
 {
-    return !wcscmp(str1, str2);
+    return !strcmp(a, b);
 }
 
 
-//! Compare strings, return true if they are equal
-inline bool coco_string_equal(const char* str1, const char* str2)
+//! Compare (wide) strings, return true if they are equal
+inline bool coco_string_equal(const wchar_t* a, const wchar_t* b)
 {
-    return !strcmp(str1, str2);
+    return !wcscmp(a, b);
 }
 
 
-//! Compare string contents, return true if they are equal
-bool  coco_string_equal(const wchar_t* str1, const char* str2);
+//! Compare string contents (narrow/wide), return true if they are equal
+bool coco_string_equal(const char* strn, const wchar_t* strw);
+
+
+//! Compare string contents (wide/narrow), return true if they are equal
+inline bool coco_string_equal(const wchar_t* strw, const char* strn)
+{
+    return coco_string_equal(strn, strw);
+}
 
 
 //! Roughly equivalent to std::getline, but uses stdio file handle

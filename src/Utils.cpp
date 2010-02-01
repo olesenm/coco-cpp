@@ -55,19 +55,19 @@ std::wstring coco_stdWString(const std::string& str)
 }
 
 
-bool coco_string_equal(const wchar_t* str1, const char* str2)
+bool coco_string_equal(const char* strn, const wchar_t* strw)
 {
-    const int str1Len = str1 ? wcslen(str1) : 0;
-    const int str2Len = str2 ? strlen(str2) : 0;
+    const int strnLen = strn ? strlen(strn) : 0;
+    const int strwLen = strw ? wcslen(strw) : 0;
 
-    if (str1Len != str2Len)
+    if (strnLen != strwLen)
     {
         return false;
     }
 
-    for (int i = 0; i < str1Len; ++i)
+    for (int i = 0; i < strnLen; ++i)
     {
-        if (str1[i] != wchar_t(str2[i]))
+        if (wchar_t(strn[i]) != strw[i])
         {
             return false;
         }

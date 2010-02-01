@@ -27,6 +27,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 -------------------------------------------------------------------------*/
 
 #include <string.h>
+#include <algorithm>
 
 #include "HashTable.h"
 #include "Utils.h"
@@ -114,6 +115,28 @@ HashTable<Type, KeyType>::GetIterator()
 {
 	return typename HashTable<Type, KeyType>::Iterator(this);
 }
+
+
+template<class Type, class KeyType>
+std::vector<KeyType> HashTable<Type, KeyType>::toc(const bool sorted)
+{
+	std::vector<KeyType> keys;
+
+	Iterator iter = this->GetIterator();
+	while (iter.HasNext())
+	{
+		Entry *e = iter.Next();
+		keys.push_back(e->key);
+	}
+
+	if (sorted)
+	{
+		std::sort(keys.begin(), keys.end());
+	}
+
+	return keys;
+}
+
 
 
 // * * * * * * * * * * * * * * * * Iterator  * * * * * * * * * * * * * * * * //

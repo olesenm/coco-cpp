@@ -32,6 +32,7 @@ License
 #define COCO_HASHTABLE_H__
 
 #include <string>
+#include <vector>
 
 namespace Coco
 {
@@ -60,7 +61,6 @@ public:
 			key(k), val(v), next(n)
 		{}
 	};
-
 
 
 	//! Construct with a default size
@@ -97,6 +97,9 @@ public:
 	{
 		return Get(key);
 	}
+
+	//! Return table of contents, optionally sorted
+	std::vector<KeyType> toc(const bool sorted=false);
 
 private:
 	const int size_;   //<! fixed HashTable size

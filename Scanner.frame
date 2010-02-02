@@ -46,6 +46,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #define coco_swprintf swprintf_s
 #elif _MSC_VER >= 1300
 #define coco_swprintf _snwprintf
+#elif defined __MINGW32__
+#define coco_swprintf _snwprintf
 #else
 // assume every other compiler knows swprintf
 #define coco_swprintf swprintf
@@ -255,6 +257,7 @@ private:
 	void CreateHeapBlock();
 	Token* CreateToken();
 	void AppendVal(Token *t);
+	void SetScannerBehindT();
 
 	void Init();
 	void NextCh();
@@ -837,6 +840,8 @@ Token* Scanner::NextToken() {
 -->scan1
 	) NextCh();
 -->scan2
+	int recKind = noSym;
+	int recEnd = pos;
 	t = CreateToken();
 	t->pos = pos; t->col = col; t->line = line;
 	int state = start.state(ch);
@@ -844,11 +849,25 @@ Token* Scanner::NextToken() {
 
 	switch (state) {
 		case -1: { t->kind = eofSym; break; } // NextCh already done
-		case 0: { t->kind = noSym; break; }   // NextCh already done
+		case 0: {
+			case_0:
+			if (recKind != noSym) {
+				tlen = recEnd - t->pos;
+				SetScannerBehindT();
+			}
+			t->kind = recKind; break;
+		} // NextCh already done
 -->scan3
 	}
 	AppendVal(t);
 	return t;
+}
+
+void Scanner::SetScannerBehindT() {
+	buffer->SetPos(t->pos);
+	NextCh();
+	line = t->line; col = t->col;
+	for (int i = 0; i < tlen; i++) NextCh();
 }
 
 // get the next token (possibly a token already seen during peeking)

@@ -46,6 +46,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 #define coco_swprintf swprintf_s
 #elif _MSC_VER >= 1300
 #define coco_swprintf _snwprintf
+#elif defined __MINGW32__
+#define coco_swprintf _snwprintf
 #else
 // assume every other compiler knows swprintf
 #define coco_swprintf swprintf
@@ -256,6 +258,7 @@ private:
 	void CreateHeapBlock();
 	Token* CreateToken();
 	void AppendVal(Token *t);
+	void SetScannerBehindT();
 
 	void Init();
 	void NextCh();

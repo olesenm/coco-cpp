@@ -449,8 +449,8 @@ TokenFactor<Graph* &g>        (. wchar_t* name = NULL; int kind; .)
                                    }
                                  .)
 | '(' TokenExpr<g> ')'
-| '[' TokenExpr<g> ']'      (. tab->MakeOption(g); .)
-| '{' TokenExpr<g> '}'      (. tab->MakeIteration(g); .)
+| '[' TokenExpr<g> ']'      (. tab->MakeOption(g); tokenString = coco_string_create(noString); .)
+| '{' TokenExpr<g> '}'      (. tab->MakeIteration(g); tokenString = coco_string_create(noString); .)
 )                               (. if (g == NULL) // invalid start of TokenFactor
                                      g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0)); .)
 .

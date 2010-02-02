@@ -644,6 +644,8 @@ Token* Scanner::NextToken() {
 			(ch >= 9 && ch <= 10) || ch == 13
 	) NextCh();
 	if ((ch == L'/' && Comment0()) || (ch == L'/' && Comment1())) return NextToken();
+	int recKind = noSym;
+	int recEnd = pos;
 	t = CreateToken();
 	t->pos = pos; t->col = col; t->line = line;
 	int state = start.state(ch);
@@ -651,13 +653,22 @@ Token* Scanner::NextToken() {
 
 	switch (state) {
 		case -1: { t->kind = eofSym; break; } // NextCh already done
-		case 0: { t->kind = noSym; break; }   // NextCh already done
+		case 0: {
+			case_0:
+			if (recKind != noSym) {
+				tlen = recEnd - t->pos;
+				SetScannerBehindT();
+			}
+			t->kind = recKind; break;
+		} // NextCh already done
 		case 1:
 			case_1:
+			recEnd = pos; recKind = 1;
 			if ((ch >= L'0' && ch <= L'9') || (ch >= L'A' && ch <= L'Z') || ch == L'_' || (ch >= L'a' && ch <= L'z')) {AddCh(); goto case_1;}
 			else {t->kind = 1; wchar_t *literal = coco_string_create(tval, 0, tlen); t->kind = keywords.get(literal, t->kind); coco_string_delete(literal); break;}
 		case 2:
 			case_2:
+			recEnd = pos; recKind = 2;
 			if ((ch >= L'0' && ch <= L'9')) {AddCh(); goto case_2;}
 			else {t->kind = 2; break;}
 		case 3:
@@ -669,25 +680,26 @@ Token* Scanner::NextToken() {
 		case 5:
 			if (ch <= 9 || (ch >= 11 && ch <= 12) || (ch >= 14 && ch <= L'&') || (ch >= L'(' && ch <= L'[') || (ch >= L']' && ch <= 65535)) {AddCh(); goto case_6;}
 			else if (ch == 92) {AddCh(); goto case_7;}
-			else {t->kind = noSym; break;}
+			else {goto case_0;}
 		case 6:
 			case_6:
 			if (ch == 39) {AddCh(); goto case_9;}
-			else {t->kind = noSym; break;}
+			else {goto case_0;}
 		case 7:
 			case_7:
 			if ((ch >= L' ' && ch <= L'~')) {AddCh(); goto case_8;}
-			else {t->kind = noSym; break;}
+			else {goto case_0;}
 		case 8:
 			case_8:
 			if ((ch >= L'0' && ch <= L'9') || (ch >= L'a' && ch <= L'f')) {AddCh(); goto case_8;}
 			else if (ch == 39) {AddCh(); goto case_9;}
-			else {t->kind = noSym; break;}
+			else {goto case_0;}
 		case 9:
 			case_9:
 			{t->kind = 5; break;}
 		case 10:
 			case_10:
+			recEnd = pos; recKind = 42;
 			if ((ch >= L'0' && ch <= L'9') || (ch >= L'A' && ch <= L'Z') || ch == L'_' || (ch >= L'a' && ch <= L'z')) {AddCh(); goto case_10;}
 			else {t->kind = 42; break;}
 		case 11:
@@ -696,11 +708,11 @@ Token* Scanner::NextToken() {
 			else if (ch == 10 || ch == 13) {AddCh(); goto case_4;}
 			else if (ch == L'"') {AddCh(); goto case_3;}
 			else if (ch == 92) {AddCh(); goto case_12;}
-			else {t->kind = noSym; break;}
+			else {goto case_0;}
 		case 12:
 			case_12:
 			if ((ch >= L' ' && ch <= L'~')) {AddCh(); goto case_11;}
-			else {t->kind = noSym; break;}
+			else {goto case_0;}
 		case 13:
 			{t->kind = 17; break;}
 		case 14:
@@ -737,20 +749,30 @@ Token* Scanner::NextToken() {
 			case_27:
 			{t->kind = 40; break;}
 		case 28:
+			recEnd = pos; recKind = 18;
 			if (ch == L'.') {AddCh(); goto case_16;}
 			else if (ch == L'>') {AddCh(); goto case_19;}
 			else if (ch == L')') {AddCh(); goto case_27;}
 			else {t->kind = 18; break;}
 		case 29:
+			recEnd = pos; recKind = 24;
 			if (ch == L'.') {AddCh(); goto case_18;}
 			else {t->kind = 24; break;}
 		case 30:
+			recEnd = pos; recKind = 30;
 			if (ch == L'.') {AddCh(); goto case_26;}
 			else {t->kind = 30; break;}
 
 	}
 	AppendVal(t);
 	return t;
+}
+
+void Scanner::SetScannerBehindT() {
+	buffer->SetPos(t->pos);
+	NextCh();
+	line = t->line; col = t->col;
+	for (int i = 0; i < tlen; i++) NextCh();
 }
 
 // get the next token (possibly a token already seen during peeking)

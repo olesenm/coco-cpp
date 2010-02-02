@@ -59,7 +59,7 @@ int main(int argc, char *argv_[]) {
 #error unknown compiler!
 #endif
 
-	wprintf(L"Coco/R (Jun 22, 2009)\n");
+	wprintf(L"Coco/R (Jan 11, 2010)\n");
 
 	wchar_t *srcName = NULL, *nsName = NULL, *frameDir = NULL, *ddtString = NULL, *traceFileName = NULL;
 	wchar_t *outDir = NULL;

@@ -667,12 +667,12 @@ void Parser::TokenFactor(Graph* &g) {
 			Get();
 			TokenExpr(g);
 			Expect(33);
-			tab->MakeOption(g); 
+			tab->MakeOption(g); tokenString = coco_string_create(noString); 
 		} else if (la->kind == 34) {
 			Get();
 			TokenExpr(g);
 			Expect(35);
-			tab->MakeIteration(g); 
+			tab->MakeIteration(g); tokenString = coco_string_create(noString); 
 		} else SynErr(51);
 		if (g == NULL) // invalid start of TokenFactor
 		 g = new Graph(tab->NewNode(Node::eps, (Symbol*)NULL, 0)); 

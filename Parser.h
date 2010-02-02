@@ -63,7 +63,7 @@ private:
 		_string=3,
 		_badString=4,
 		_char=5,
-		_ddtSym=42,
+		_ddtSym=42
 	};
 	int maxT;
 

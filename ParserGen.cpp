@@ -302,25 +302,31 @@ void ParserGen::GenCode (Node *p, int indent, BitArray *isChecked) {
 void ParserGen::GenTokensHeader() {
 	Symbol *sym;
 	int i;
+	bool isFirst = true;
 
 	fwprintf(gen, L"\tenum {\n");
 
 	// tokens
 	for (i=0; i<tab->terminals->Count; i++) {
 		sym = (Symbol*)((*(tab->terminals))[i]);
-		if (!isalpha(sym->name[0])) {
-			continue;
-		}
-		fwprintf(gen , L"\t\t_%ls=%d,\n", sym->name, sym->n);
+		if (!isalpha(sym->name[0])) { continue; }
+
+		if (isFirst) { isFirst = false; }
+		else { fwprintf(gen , L",\n"); }
+
+		fwprintf(gen , L"\t\t_%ls=%d", sym->name, sym->n);
 	}
 
 	// pragmas
 	for (i=0; i<tab->pragmas->Count; i++) {
+		if (isFirst) { isFirst = false; }
+		else { fwprintf(gen , L",\n"); }
+
 		sym = (Symbol*)((*(tab->pragmas))[i]);
-		fwprintf(gen , L"\t\t_%ls=%d,\n", sym->name, sym->n);
+		fwprintf(gen , L"\t\t_%ls=%d", sym->name, sym->n);
 	}
 
-	fwprintf(gen, L"\t};\n");
+	fwprintf(gen, L"\n\t};\n");
 }
 
 void ParserGen::GenCodePragmas() {

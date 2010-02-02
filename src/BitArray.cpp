@@ -38,21 +38,23 @@ namespace Coco
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 BitArray::BitArray(const int length, const bool defaultValue)
+:
+	size_(length),
+	data_(new unsigned char[(size_+7)>>3])
 {
-	Count = length;
-	Data = new unsigned char[ (length+7)>>3 ];
 	if (defaultValue)
-		memset(Data, 0xFF, (length+7)>>3);
+		memset(data_, 0xFF, (size_+7)>>3);
 	else
-		memset(Data, 0x00, (length+7)>>3);
+		memset(data_, 0x00, (size_+7)>>3);
 }
 
 
 BitArray::BitArray(const BitArray &copy)
+:
+	size_(copy.size_),
+	data_(new unsigned char[(size_+7)>>3])
 {
-	Count  = copy.Count;
-	Data = new unsigned char[ (copy.Count+7)>>3 ];
-	memcpy(Data, copy.Data, (copy.Count+7)>>3);
+	memcpy(data_, copy.data_, (size_+7)>>3);
 }
 
 
@@ -60,22 +62,22 @@ BitArray::BitArray(const BitArray &copy)
 
 BitArray::~BitArray()
 {
-	delete[] Data;
-	Data = 0;
+	delete[] data_;
+	data_ = 0;
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-int BitArray::getCount() const
+int BitArray::size() const
 {
-	return Count;
+	return size_;
 }
 
 
 bool BitArray::Get(const int index) const
 {
-	return (Data[(index>>3)] & (1 << (index&7))) != 0;
+	return (data_[(index>>3)] & (1 << (index&7))) != 0;
 }
 
 
@@ -83,13 +85,11 @@ void BitArray::Set(const int index, const bool value)
 {
 	if (value)
 	{
-		Data[(index>>3)] |= (1 << (index&7));
+		data_[(index>>3)] |= (1 << (index&7));
 	}
 	else
 	{
-		unsigned char mask = 0xFF;
-		mask ^= (1 << (index&7));
-		Data[(index>>3)] &= mask;
+		data_[(index>>3)] &= ~(1 << (index&7));
 	}
 }
 
@@ -97,65 +97,56 @@ void BitArray::Set(const int index, const bool value)
 void BitArray::SetAll(const bool value)
 {
 	if (value)
-		memset(Data, 0xFF, (Count+7)>>3);
+		memset(data_, 0xFF, (size_+7)>>3);
 	else
-		memset(Data, 0x00, (Count+7)>>3);
+		memset(data_, 0x00, (size_+7)>>3);
 }
 
 
 void BitArray::Not()
 {
-	for (int i=0; i<(Count+7)>>3; i++)
+	for (int i=0; i<(size_+7)>>3; ++i)
 	{
-		Data[i] ^= 0xFF;
+		data_[i] ^= 0xFF;
 	}
 }
 
-void BitArray::And(const BitArray *value)
+void BitArray::And(const BitArray& b)
 {
-	for (int i=0; (i<(Count+7)>>3) && (i<(value->Count+7)>>3); i++)
+	for (int i=0; (i<(size_+7)>>3) && (i<(b.size_+7)>>3); ++i)
 	{
-		Data[i] = (Data[i] & value->Data[i]);
-	}
-}
-
-
-void BitArray::Or(const BitArray *value)
-{
-	for (int i=0; (i<(Count+7)>>3) && (i<(value->Count+7)>>3); i++)
-	{
-		Data[i] = (Data[i] | value->Data[i]);
+		data_[i] &= b.data_[i];
 	}
 }
 
 
-void BitArray::Xor(const BitArray *value)
+void BitArray::Or(const BitArray& b)
 {
-	for (int i=0; (i<(Count+7)>>3) && (i<(value->Count+7)>>3); i++)
+	for (int i=0; (i<(size_+7)>>3) && (i<(b.size_+7)>>3); ++i)
 	{
-		Data[i] = (Data[i] ^ value->Data[i]);
+		data_[i] |= b.data_[i];
 	}
 }
 
 
-BitArray* BitArray::Clone() const
+void BitArray::Xor(const BitArray& b)
 {
-	BitArray *newBitArray = new BitArray(Count);
-	newBitArray->Count = Count;
-	memcpy(newBitArray->Data, Data, (Count+7)>>3);
-	return newBitArray;
+	for (int i=0; (i<(size_+7)>>3) && (i<(b.size_+7)>>3); ++i)
+	{
+		data_[i] ^= b.data_[i];
+	}
 }
 
 
-bool BitArray::Equal(const BitArray *right) const
+bool BitArray::Equal(const BitArray& right) const
 {
-	if (Count != right->Count)
+	if (size_ != right.size_)
 	{
 		return false;
 	}
-	for (int i = 0; i < Count; i++)
+	for (int i = 0; i < size_; ++i)
 	{
-		if ((Data[(i>>3)] & (1<<(i&7))) != (right->Data[(i>>3)] & (1<<(i&7))))
+		if ((data_[(i>>3)] & (1<<(i&7))) != (right.data_[(i>>3)] & (1<<(i&7))))
 		{
 			return false;
 		}
@@ -163,16 +154,17 @@ bool BitArray::Equal(const BitArray *right) const
 	return true;
 }
 
+
 // * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
-const BitArray& BitArray::operator=(const BitArray &right)
+BitArray& BitArray::operator=(const BitArray& right)
 {
-	if (&right != this)          // avoid self assignment
+	if (this != &right)          // avoid self assignment
 	{
-		delete[] Data;           // prevents memory leak
-		Count  = right.Count;
-		Data = new unsigned char[ (Count+7)>>3 ];
-		memcpy(Data, right.Data, (Count+7)>>3);
+		delete[] data_;           // prevents memory leak
+		size_ = right.size_;
+		data_ = new unsigned char[(size_+7)>>3];
+		memcpy(data_, right.data_, (size_+7)>>3);
 	}
 	return *this;   // enables cascaded assignments
 }

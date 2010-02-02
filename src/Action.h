@@ -49,6 +49,14 @@ class Target;
 //! action of finite automaton
 class Action
 {
+	// Private Member Functions
+
+		//! Disallow default bitwise copy construct
+		Action(const Action&);
+
+		//! Disallow default bitwise assignment
+		void operator=(const Action&);
+
 public:
 	Node::nodeType typ;   //!< type of action symbol: clas, chr
 	int sym;              //!< action symbol

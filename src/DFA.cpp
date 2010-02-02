@@ -900,14 +900,10 @@ std::wstring DFA::SymName(Symbol *sym)  // real name value is stored in Tab.lite
 	 || (sym->name[0] >= 'A' && sym->name[0] <= 'Z')
 	)
 	{
-		HashTable<Symbol>::Iterator iter = tab->literals.GetIterator();
-		while (iter.HasNext())
+		HashTable<Symbol>::constIterator iter = tab->literals.findPointer(sym);
+		if (iter.valid())
 		{
-			HashTable<Symbol>::Entry *e = iter.Next();
-			if (e->val == sym)
-			{
-				return e->key;
-			}
+			return iter.key();
 		}
 	}
 	return sym->name;

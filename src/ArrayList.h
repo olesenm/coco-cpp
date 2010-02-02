@@ -50,7 +50,7 @@ public:
 	int Count;
 
 	ArrayList(int size=10);     //!< Construct with default capacity
-	virtual ~ArrayList();
+	virtual ~ArrayList();       //<! Destructor
 
 	void Add(Type *ptr);        //!< Add pointer to the list
 	bool Remove(Type *ptr);     //!< Remove pointer from the list

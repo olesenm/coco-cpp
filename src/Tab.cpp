@@ -216,16 +216,20 @@ void Tab::PrintSymbolTable()
 	fwprintf(trace, L"\nLiteral Tokens:\n");
 	fwprintf(trace, L"--------------\n");
 
-	HashTable<Symbol>::Iterator iter = literals.GetIterator();
-	while (iter.HasNext())
+	for
+	(
+		HashTable<Symbol>::constIterator iter = literals.begin();
+		iter.valid();
+		iter.next()
+	)
 	{
-		HashTable<Symbol>::Entry *e = iter.Next();
 		fwprintf
 		(
 			trace, L"_%ls =  %ls.\n",
-			e->val->name.c_str(), e->key.c_str()
+			iter.value()->name.c_str(), iter.key().c_str()
 		);
 	}
+
 	fwprintf(trace, L"\n");
 }
 
@@ -813,13 +817,12 @@ Node* Tab::LeadingAny(Node *p)
 
 void Tab::FindAS(Node *p)  // find ANY sets
 {
-	Node *a;
 	while (p != NULL)
 	{
 		if (p->typ == Node::opt || p->typ == Node::iter)
 		{
 			FindAS(p->sub);
-			a = LeadingAny(p->sub);
+			Node *a = LeadingAny(p->sub);
 			if (a != NULL) Sets::Subtract(a->set, First(p->next));
 		}
 		else if (p->typ == Node::alt)
@@ -829,7 +832,7 @@ void Tab::FindAS(Node *p)  // find ANY sets
 			while (q != NULL)
 			{
 				FindAS(q->sub);
-				a = LeadingAny(q->sub);
+				Node *a = LeadingAny(q->sub);
 				if (a != NULL)
 				{
 					BitArray *tmp = First(q->down);
@@ -852,7 +855,7 @@ void Tab::FindAS(Node *p)  // find ANY sets
 		// A = [a]. A ANY
 		if (DelNode(p))
 		{
-			a = LeadingAny(p->next);
+			Node *a = LeadingAny(p->next);
 			if (a != NULL)
 			{
 				Node *q = (p->typ == Node::nt) ? p->sym->graph : p->sub;

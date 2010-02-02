@@ -42,66 +42,126 @@ namespace Coco
 \*---------------------------------------------------------------------------*/
 
 //! Functions for BitArray operations
-class Sets
+struct Sets
 {
-public:
-	static int First(BitArray *s)
+	//! Return the first element set in b, -1 if nothing is set
+	static int First(const BitArray& b)
 	{
-		const int max = s->getCount();
+		const int max = b.size();
 		for (int i=0; i<max; i++)
-			if ((*s)[i]) return i;
+		{
+			if (b[i])
+			{
+				return i;
+			}
+		}
 		return -1;
 	}
 
 
-	static int Elements(BitArray *s)
+	//! Return the number of elements set in b
+	static int Elements(const BitArray& b)
 	{
-		const int max = s->getCount();
 		int n = 0;
+		const int max = b.size();
 		for (int i=0; i<max; i++)
-			if ((*s)[i]) n++;
+		{
+			if (b[i])
+			{
+				n++;
+			}
+		}
 		return n;
 	}
 
 
 	//! Check: (a == b)?
-	static bool Equals(BitArray *a, BitArray *b)
+	static bool Equals(const BitArray& a, const BitArray& b)
 	{
-		const int max = a->getCount();
+		const int max = a.size();
 		for (int i=0; i<max; i++)
-			if ((*a)[i] != (*b)[i]) return false;
+		{
+			if (a[i] != b[i])
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 
 
 	//! Check: (a > b)?
-	static bool Includes(BitArray *a, BitArray *b)
+	static bool Includes(const BitArray& a, const BitArray& b)
 	{
-		const int max = a->getCount();
+		const int max = a.size();
 		for (int i=0; i<max; i++)
-			if ((*b)[i] && ! (*a)[i]) return false;
+		{
+			if (b[i] && ! a[i])
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 
 
 	//! Check: (a * b != {})
-	static bool Intersect(BitArray *a, BitArray *b)
+	static bool Intersect(const BitArray& a, const BitArray& b)
 	{
-		const int max = a->getCount();
+		const int max = a.size();
 		for (int i=0; i<max; i++)
-			if ((*a)[i] && (*b)[i]) return true;
+			if (a[i] && b[i]) return true;
 		return false;
 	}
 
 
 	//! Operation: a = a - b
-	static void Subtract(BitArray *a, BitArray *b)
+	static void Subtract(BitArray& a, const BitArray& b)
 	{
-		BitArray *c = b->Clone();
-		c->Not();
-		a->And(c);
-		delete c;
+		BitArray c(b);
+		c.Not();
+		a.And(c);
 	}
+
+
+	// Member Functions with pointers
+
+	//! Return the first element set in b, -1 if nothing is set
+	static inline int First(const BitArray *b)
+	{
+		return Sets::First(*b);
+	}
+
+	//! Return the number of elements set in b
+	static inline int Elements(const BitArray *b)
+	{
+		return Sets::Elements(*b);
+	}
+
+	//! Check: (a == b)?
+	static inline bool Equals(const BitArray *a, const BitArray *b)
+	{
+		return Sets::Equals(*a, *b);
+	}
+
+	//! Check: (a > b)?
+	static inline bool Includes(const BitArray *a, const BitArray *b)
+	{
+		return Sets::Includes(*a, *b);
+	}
+
+	//! Check: (a * b != {})
+	static inline bool Intersect(const BitArray *a, const BitArray *b)
+	{
+		return Sets::Intersect(*a, *b);
+	}
+
+	//! Operation: a = a - b
+	static inline void Subtract(BitArray *a, const BitArray *b)
+	{
+		Sets::Subtract(*a, *b);
+	}
+
 };
 
 

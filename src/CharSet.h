@@ -39,46 +39,128 @@ namespace Coco
                            Class CharSet Declaration
 \*---------------------------------------------------------------------------*/
 
-//! A Character set
+//! A set containing ranges of characters
 class CharSet
 {
+	// Private Member Functions
+
+		//! Disallow default bitwise assignment
+		void operator=(const CharSet&);
+
 public:
 	//! A character range within a character set
 	class Range
 	{
 	public:
-		int from;
-		int to;
-		Range *next;
+		int from;         //<! The start character in range
+		int to;           //<! The end character in range
+		Range *next;      //<! Linked list element
 
-		Range(int fromValue, int toValue)
+		Range(int fromCh, int toCh)
 		:
-			from(fromValue),
-			to(toValue),
+			from(fromCh),
+			to(toCh),
 			next(0)
 		{}
 	};
 
+	//! Linked list of character ranges
 	Range *head;
 
-	//! Construct null
-	CharSet();
 
+	// Constructors
+
+		//! Construct null
+		CharSet();
+
+		//! Construct by copying
+		CharSet(const CharSet&);
+
+	//! Destructor
 	virtual ~CharSet();
 
-	bool Get(int i) const;
-	void Set(int i);
-	CharSet* Clone() const;
-	bool Equals(CharSet *s) const;
-	int Elements() const;
-	int First() const;
-	void Or(CharSet *s);
-	void And(CharSet *s);
-	void Subtract(CharSet *s);
-	bool Includes(CharSet *s) const;
-	bool Intersects(CharSet *s) const;
-	void Clear();
-	void Fill();
+	// Member Functions
+
+		//! Remove all ranges
+		void Clear();
+
+		//! Replace existing ranges with a range from 0 to Buffer::MaxChar
+		void Fill();
+
+		//! Return true if the index I is within a range
+		bool Get(int i) const;
+
+		//! Set the index I to be included in a range
+		void Set(int i);
+
+		//! Return the number of elements (characters) addressed by the ranges
+		int Elements() const;
+
+		//! Return the first character in the set
+		int First() const;
+
+		//! Return true if ranges are identical
+		bool Equals(const CharSet& b) const;
+
+		//! Logical 'and' with the ranges in b
+		void And(const CharSet& b);
+
+		//! Logical 'or' with the ranges in b
+		void Or(const CharSet& b);
+
+		//! With ranges in b removed
+		void Subtract(const CharSet& b);
+
+		//! Return true if 'b' is contained with the ranges
+		bool Includes(const CharSet& b) const;
+
+		//! Return true if 'b' intersects with the ranges
+		bool Intersects(const CharSet& b) const;
+
+	// Member Functions with pointers
+
+		//! Construct as a copy
+		inline CharSet* Clone() const
+		{
+			return new CharSet(*this);
+		}
+
+		//! Return true if ranges are identical
+		inline bool Equals(CharSet *b) const
+		{
+			return this->Equals(*b);
+		}
+
+		//! Logical 'and' with the ranges in b
+		inline void And(const CharSet *b)
+		{
+			this->And(*b);
+		}
+
+		//! Logical 'or' with the ranges in b
+		inline void Or(const CharSet *b)
+		{
+			this->Or(*b);
+		}
+
+		//! With ranges in b removed
+		inline void Subtract(const CharSet *b)
+		{
+			this->Subtract(*b);
+		}
+
+		//! Return true if 'b' is contained with the ranges
+		inline bool Includes(const CharSet *b) const
+		{
+			return this->Includes(*b);
+		}
+
+		//! Return true if 'b' intersects with the ranges
+		inline bool Intersects(const CharSet *b) const
+		{
+			return this->Intersects(*b);
+		}
+
 };
 
 

@@ -4,6 +4,8 @@
     extended by M. Loeberbauer & A. Woess, Univ. of Linz
     ported to C++ by Csaba Balazs, University of Szeged
     with improvements by Pat Terry, Rhodes University
+
+    Some portions of code from OpenFOAM - Copyright (C) 2008-2009 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of Compiler Generator Coco/R
@@ -41,14 +43,30 @@ namespace Coco
                           Class HashTable Declaration
 \*---------------------------------------------------------------------------*/
 
-//! A simple HashTable implementation
+//! @brief A simple HashTable implementation
+/**
+ * @note This hash table is only vaguely STL-like. In accordance with
+ * its present purpose, this hash table only supports a constIterator
+ * and no deletions. For simplicity, the constIterator increment is
+ * simply via a next() method. Instead of comparing to an end value,
+ * the constIterator valid() method is used.
+ * For example,
+ * @code
+ *    for
+ *    (
+ *         HashTable<foo>::constIterator iter = myHash.begin();
+ *         iter.valid();
+ *         iter.next()
+ *    )
+ *    {
+ *        std::cerr<< "key: " << iter.key() << "\n";
+ *    }
+ * @endcode
+ *
+ */
 template<class Type, class KeyType=std::wstring>
 class HashTable
 {
-public:
-	class Iterator;            //!< Forward declaration of iterators
-	friend class Iterator;     //!< Declare friendship with the iterator
-
 	//! An entry within the HashTable
 	struct Entry
 	{
@@ -62,24 +80,45 @@ public:
 		{}
 	};
 
+public:
+	class constIterator;        // Forward declaration of constIterator
+	friend class constIterator; //!< Declare friendship with constIterator
 
 	//! Construct with a default size
 	HashTable(int size = 128);
 
 	~HashTable();
 
-	//! An iterator for HashTable
-	class Iterator
+	//! A const iterator for HashTable
+	class constIterator
 	{
-		HashTable<Type, KeyType> *hashTable_;
-		int pos_;
-		Entry* cur_;
+		friend class HashTable;     //!< Declare friendship with HashTable
+
+		//! Pointer to the HashTable for which this is an iterator
+		const HashTable<Type, KeyType> *hashTable_;
+
+		//! Current element
+		Entry* entryPtr_;
+
+		//! Current hash index
+		int hashIndex_;
 
 	public:
-		explicit Iterator(HashTable<Type, KeyType> *ht);
 
-		bool HasNext();
-		Entry* Next();
+		//! Construct from hash table, moving to its 'begin' position
+		explicit constIterator(const HashTable<Type, KeyType>* ht);
+
+		//! Return true if iterator is valid (ie, not at the end)
+		bool valid() const;
+
+		//! Increment to the next position
+		void next();
+
+		//! Return the Key corresponding to the iterator
+		const KeyType& key() const;
+
+		//! Return the value corresponding to the iterator
+		const Type* value() const;
 	};
 
 
@@ -89,8 +128,11 @@ public:
 	//- Find and return the value associated with the hashed Entry
 	Type* Get(const KeyType& key) const;
 
-	//! Return an Iterator to the first entry
-	Iterator GetIterator();
+	//! Return a constIterator to the first entry
+	constIterator begin() const;
+
+	//! Return a constIterator to the first matching pointer
+	constIterator findPointer(const Type* ptr) const;
 
 	//! Same as the Get() method
 	inline Type* operator[](const KeyType& key) const
@@ -99,7 +141,7 @@ public:
 	}
 
 	//! Return table of contents, optionally sorted
-	std::vector<KeyType> toc(const bool sorted=false);
+	std::vector<KeyType> toc(const bool sorted=false) const;
 
 private:
 	const int size_;   //<! fixed HashTable size

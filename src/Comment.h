@@ -54,7 +54,7 @@ public:
 	(
 		const std::wstring& startStr,
 		const std::wstring& stopStr,
-		bool isNested = false
+		const bool isNested = false
 	)
 	:
 		start(startStr),

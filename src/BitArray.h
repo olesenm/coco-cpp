@@ -42,32 +42,94 @@ namespace Coco
 //! Compact storage of bits using byte-wise storage
 class BitArray
 {
+	// Private data
+
+		int size_;
+		unsigned char* data_;
+
 public:
-	BitArray(int length = 0, bool defaultValue = false);
-	BitArray(const BitArray &copy);
+
+	// Constructors
+
+		//! Construct null or with specified size and default value
+		BitArray(int length = 0, const bool defaultValue = false);
+
+		//! Construct as a copy
+		BitArray(const BitArray &copy);
+
+	//! Destructor
 	virtual ~BitArray();
 
-	int getCount() const;
+	// Member Functions
 
-	bool Get(const int index) const;
-	void Set(const int index, const bool value);
-	void SetAll(const bool value);
-	bool Equal(const BitArray *right) const;
-	bool operator[](const int index) const { return Get(index); };
+		//! Return size
+		int size() const;
 
-	const BitArray& operator=(const BitArray &right);
+		//! Get value at index I.
+		bool Get(const int index) const;
 
-	void Not();
-	void And(const BitArray *value);
-	void Or(const BitArray *value);
-	void Xor(const BitArray *value);
+		//! Set value at index I.
+		void Set(const int index, const bool value);
 
-	BitArray* Clone() const;
+		//! Set all bits to a particular value
+		void SetAll(const bool value);
 
-private:
-	int Count;
-	unsigned char* Data;
-	void setMem(int length, bool value);
+		//! Invert bits
+		void Not();
+
+		//! And with the bits in b
+		void And(const BitArray& b);
+
+		//! Or with the bits in b
+		void Or(const BitArray& b);
+
+		//! Xor with the bits in b
+		void Xor(const BitArray& b);
+
+		//! Return true if bits are identical
+		bool Equal(const BitArray& b) const;
+
+		//! Get value at index I.
+		inline bool operator[](const int index) const
+		{
+			return Get(index);
+		};
+
+		//! Assign from BitArray
+		BitArray& operator=(const BitArray& right);
+
+	// Member Functions with pointers
+
+		//! Construct as a copy
+		inline BitArray* Clone() const
+		{
+			return new BitArray(*this);
+		}
+
+		//! And with the bits in b
+		inline void And(const BitArray *b)
+		{
+			this->And(*b);
+		}
+
+		//! Or with the bits in b
+		inline void Or(const BitArray *b)
+		{
+			this->Or(*b);
+		}
+
+		//! Xor with the bits in b
+		inline void Xor(const BitArray *b)
+		{
+			this->Xor(*b);
+		}
+
+		//! Return true if bits are identical
+		inline bool Equal(const BitArray *b) const
+		{
+			return this->Equal(*b);
+		}
+
 
 };
 

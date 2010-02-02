@@ -45,6 +45,26 @@ CharSet::CharSet()
 {}
 
 
+CharSet::CharSet(const CharSet& copy)
+{
+	Range *prev = NULL;
+	for (Range *r = copy.head; r != NULL; r = r->next)
+	{
+		// duplicate the range
+		Range *dup = new Range(r->from, r->to);
+		if (prev)
+		{
+			prev->next = dup;
+		}
+		else
+		{
+			this->head = dup;
+		}
+		prev = dup;
+	}
+}
+
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 CharSet::~CharSet()
@@ -54,6 +74,24 @@ CharSet::~CharSet()
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+void CharSet::Clear()
+{
+	while (head != NULL)
+	{
+		Range *del = head;
+		head = head->next;
+		delete del;
+	}
+}
+
+
+void CharSet::Fill()
+{
+	Clear();
+	head = new Range(0, Buffer::MaxChar);
+}
+
 
 bool CharSet::Get(int i) const
 {
@@ -106,42 +144,6 @@ void CharSet::Set(int i)
 }
 
 
-CharSet* CharSet::Clone() const
-{
-	CharSet *s = new CharSet();
-	Range *prev = NULL;
-	for (Range *cur = head; cur != NULL; cur = cur->next)
-	{
-		Range *r = new Range(cur->from, cur->to);
-		if (prev == NULL)
-		{
-			s->head = r;
-		}
-		else
-		{
-			prev->next = r;
-		}
-		prev = r;
-	}
-	return s;
-}
-
-
-bool CharSet::Equals(CharSet *s) const
-{
-	Range *p = head, *q = s->head;
-	while (p != NULL && q != NULL)
-	{
-		if (p->from != q->from || p->to != q->to)
-		{
-			return false;
-		}
-		p = p->next; q = q->next;
-	}
-	return p == q;
-}
-
-
 int CharSet::Elements() const
 {
 	int n = 0;
@@ -160,9 +162,50 @@ int CharSet::First() const
 }
 
 
-void CharSet::Or(CharSet *s)
+bool CharSet::Equals(const CharSet& b) const
 {
-	for (Range *p = s->head; p != NULL; p = p->next)
+	Range *p = head;
+	Range *q = b.head;
+	while (p != NULL && q != NULL)
+	{
+		if (p->from != q->from || p->to != q->to)
+		{
+			return false;
+		}
+		p = p->next; q = q->next;
+	}
+	return p == q;
+}
+
+
+void CharSet::And(const CharSet& b)
+{
+	CharSet tmp;
+	Range *p = head;
+	while (p != NULL)
+	{
+		for (int i = p->from; i <= p->to; i++)
+		{
+			if (b.Get(i))
+			{
+				tmp.Set(i);
+			}
+		}
+
+		// cleanup old storage - as per Clear
+		Range *del = p;
+		p = p->next;
+		delete del;
+	}
+
+	head = tmp.head;
+	tmp.head = NULL;       // avoid double deletion
+}
+
+
+void CharSet::Or(const CharSet& b)
+{
+	for (Range *p = b.head; p != NULL; p = p->next)
 	{
 		for (int i = p->from; i <= p->to; i++)
 		{
@@ -172,55 +215,33 @@ void CharSet::Or(CharSet *s)
 }
 
 
-void CharSet::And(CharSet *s)
+void CharSet::Subtract(const CharSet& b)
 {
-	CharSet *x = new CharSet();
+	CharSet tmp;
 	Range *p = head;
 	while (p != NULL)
 	{
 		for (int i = p->from; i <= p->to; i++)
 		{
-			if (s->Get(i))
+			if (!b.Get(i))
 			{
-				x->Set(i);
+				tmp.Set(i);
 			}
 		}
+
+		// cleanup old storage - as per Clear
 		Range *del = p;
 		p = p->next;
 		delete del;
 	}
-	head = x->head;
-	x->head = NULL;
-	delete x;
+	head = tmp.head;
+	tmp.head = NULL;       // avoid double deletion
 }
 
 
-void CharSet::Subtract(CharSet *s)
+bool CharSet::Includes(const CharSet& b) const
 {
-	CharSet *x = new CharSet();
-	Range *p = head;
-	while (p != NULL)
-	{
-		for (int i = p->from; i <= p->to; i++)
-		{
-			if (!s->Get(i))
-			{
-				x->Set(i);
-			}
-		}
-		Range *del = p;
-		p = p->next;
-		delete del;
-	}
-	head = x->head;
-	x->head = NULL;
-	delete x;
-}
-
-
-bool CharSet::Includes(CharSet *s) const
-{
-	for (Range *p = s->head; p != NULL; p = p->next)
+	for (Range *p = b.head; p != NULL; p = p->next)
 	{
 		for (int i = p->from; i <= p->to; i++)
 		{
@@ -234,9 +255,9 @@ bool CharSet::Includes(CharSet *s) const
 }
 
 
-bool CharSet::Intersects(CharSet *s) const
+bool CharSet::Intersects(const CharSet& b) const
 {
-	for (Range *p = s->head; p != NULL; p = p->next)
+	for (Range *p = b.head; p != NULL; p = p->next)
 	{
 		for (int i = p->from; i <= p->to; i++)
 		{
@@ -247,24 +268,6 @@ bool CharSet::Intersects(CharSet *s) const
 		}
 	}
 	return false;
-}
-
-
-void CharSet::Clear()
-{
-	while (head != NULL)
-	{
-		Range *del = head;
-		head = head->next;
-		delete del;
-	}
-}
-
-
-void CharSet::Fill()
-{
-	Clear();
-	head = new Range(0, Buffer::MaxChar);
 }
 
 

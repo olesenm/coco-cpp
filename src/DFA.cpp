@@ -171,8 +171,7 @@ void DFA::FindUsedStates(State *state, BitArray *used)
 
 void DFA::DeleteRedundantStates()
 {
-	//State *newState = new State[State::lastNr + 1];
-	State **newState = (State**) malloc (sizeof(State*) * (lastStateNr + 1));
+	State **newState = new State*[lastStateNr + 1];
 	BitArray *used = new BitArray(lastStateNr + 1);
 	FindUsedStates(firstState, used);
 
@@ -197,7 +196,8 @@ void DFA::DeleteRedundantStates()
 				 && !(s2->ctx)
 				)
 				{
-					used->Set(s2->nr, false); newState[s2->nr] = s1;
+					used->Set(s2->nr, false);
+					newState[s2->nr] = s1;
 				}
 			}
 		}
@@ -232,7 +232,7 @@ void DFA::DeleteRedundantStates()
 		}
 	}
 
-	free (newState);
+	delete[] newState;
 	delete used;
 }
 

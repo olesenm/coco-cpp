@@ -32,7 +32,7 @@ clean:
 docclean:
 	@echo "remove doxygen documentation"
 	@echo
-	/bin/rm -f html/*
+	/bin/rm -rf html/*
 
 distclean: docclean
 	/bin/rm -f *~ Coco Makefile config.status config.log config.cache

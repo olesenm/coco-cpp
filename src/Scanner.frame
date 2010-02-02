@@ -872,7 +872,13 @@ int Buffer::GetPos() const
 		return stdStream->tellg();
 	}
 
+$ifdef STREAMS_ONLY                              // <-- STREAMS_ONLY
+	wprintf(L"--- no stream for GetPos\n");
+	::exit(1);
+	return 0;
+$else                                            // <-- STREAMS_ONLY
 	return bufPos + bufStart;
+$endif                                           // <-- STREAMS_ONLY
 }
 
 
@@ -884,7 +890,10 @@ void Buffer::SetPos(int value)
 		return;
 	}
 
-$ifndef STREAMS_ONLY                             // <-- STREAMS_ONLY
+$ifdef STREAMS_ONLY                              // <-- STREAMS_ONLY
+	wprintf(L"--- no stream for SetPos, position: %d\n", value);
+	::exit(1);
+$else                                            // <-- STREAMS_ONLY
 	if ((value >= fileLen) && cStream && !CanSeek())
 	{
 		// Wanted position is after buffer and the stream

@@ -263,22 +263,37 @@ void DFA::Step(State *from, Node *p, BitArray *stepped)
 	}
 	else if (p->typ == Node::alt)
 	{
-		Step(from, p->sub, stepped); Step(from, p->down, stepped);
+		Step(from, p->sub, stepped);
+		Step(from, p->down, stepped);
 	}
-	else if (p->typ == Node::iter || p->typ == Node::opt)
+	else if (p->typ == Node::iter)
 	{
+		if (tab->DelSubGraph(p->sub))
+		{
+			parser->SemErr(L"contents of {...} must not be deletable");
+			return;
+		}
+
 		if (p->next != NULL && !((*stepped)[p->next->n]))
 		{
 			Step(from, p->next, stepped);
 		}
-
 		Step(from, p->sub, stepped);
-		if ((p->typ == Node::iter) && (p->state != from))
+
+		if (p->state != from)
 		{
 			BitArray *newStepped = new BitArray(tab->nodes.Count);
 			Step(p->state, p, newStepped);
 			delete newStepped;
 		}
+	}
+	else if (p->typ == Node::opt)
+	{
+		if (p->next != NULL && !((*stepped)[p->next->n]))
+		{
+			Step(from, p->next, stepped);
+		}
+		Step(from, p->sub, stepped);
 	}
 }
 
@@ -357,7 +372,11 @@ void DFA::FindTrans(Node *p, bool start, BitArray *marked)
 void DFA::ConvertToStates(Node *p, Symbol *sym)
 {
 	curGraph = p; curSy = sym;
-	if (tab->DelGraph(curGraph)) parser->SemErr(L"token might be empty");
+	if (tab->DelGraph(curGraph))
+	{
+		parser->SemErr(L"token might be empty");
+		return;
+	}
 	NumberNodes(curGraph, firstState, true);
 	FindTrans(curGraph, true, new BitArray(tab->nodes.Count));
 	if (p->typ == Node::iter)
@@ -967,7 +986,13 @@ void DFA::WriteState(State *state)
 	Symbol *endOf = state->endOf;
 	fwprintf(gen, L"\t\tcase %d:\n", state->nr);
 	if (existLabel[state->nr])
+	{
 		fwprintf(gen, L"\t\t\tcase_%d:\n", state->nr);
+	}
+	if (endOf != NULL && state->firstAction != NULL)
+	{
+		fwprintf(gen, L"\t\t\trecEnd = pos; recKind = %d;\n", endOf->n);
+	}
 	bool ctxEnd = state->ctx;
 
 	for (Action *action = state->firstAction; action != NULL; action = action->next)
@@ -1008,13 +1033,15 @@ void DFA::WriteState(State *state)
 	{
 		fwprintf(gen, L"\n");
 		fwprintf(gen, L"\t\t\t\ttlen -= apx;\n");
+		fwprintf(gen, L"\t\t\t\tSetScannerBehindT();\n");
+
 		fwprintf(gen, L"\t\t\t\tbuffer->SetPos(t->pos); NextCh(); line = t->line; col = t->col;\n");
 		fwprintf(gen, L"\t\t\t\tfor (int i = 0; i < tlen; i++) NextCh();\n");
 		fwprintf(gen, L"\t\t\t\t");
 	}
 	if (endOf == NULL)
 	{
-		fwprintf(gen, L"t->kind = noSym; break;}\n");
+		fwprintf(gen, L"goto case_0;}\n");
 	}
 	else
 	{

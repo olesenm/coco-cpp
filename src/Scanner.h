@@ -377,6 +377,7 @@ class Scanner
 	void CreateHeapBlock();       //!< add a heap block, freeing unused ones
 	Token* CreateToken();         //!< fit token on the heap
 	void AppendVal(Token* tok);   //!< adjust tok->val to point to the heap and copy tval into it
+	void SetScannerBehindT();
 
 	void Init();      //!< complete the initialization for the constructors
 	void NextCh();    //!< get the next input character into ch

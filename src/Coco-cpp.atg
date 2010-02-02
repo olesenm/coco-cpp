@@ -455,8 +455,8 @@ Factor<Graph* &g>               (. std::wstring name; int kind; Position *pos; b
                                      SemErr(L"attribute mismatch between declaration and use of this symbol");
                                  .)
 | '(' Expression<g> ')'
-| '[' Expression<g> ']'         (. tab->MakeOption(g); .)
-| '{' Expression<g> '}'         (. tab->MakeIteration(g); .)
+| '[' Expression<g> ']'         (. tab->MakeOption(g); tokenString = noString; .)
+| '{' Expression<g> '}'         (. tab->MakeIteration(g); tokenString = noString; .)
 | SemText<pos>                  (. Node *p = tab->NewNode(Node::sem);
                                    p->pos = pos;
                                    g = new Graph(p);

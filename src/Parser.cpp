@@ -732,14 +732,14 @@ void Parser::Factor(Graph* &g)
 		Get();
 		Expression(g);
 		Expect(41);
-		tab->MakeOption(g);
+		tab->MakeOption(g); tokenString = noString;
 		break;
 	}
 	case 42: {
 		Get();
 		Expression(g);
 		Expect(43);
-		tab->MakeIteration(g);
+		tab->MakeIteration(g); tokenString = noString;
 		break;
 	}
 	case 47: {

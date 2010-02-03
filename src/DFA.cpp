@@ -1034,9 +1034,6 @@ void DFA::WriteState(State *state)
 		fwprintf(gen, L"\n");
 		fwprintf(gen, L"\t\t\t\ttlen -= apx;\n");
 		fwprintf(gen, L"\t\t\t\tSetScannerBehindT();\n");
-
-		fwprintf(gen, L"\t\t\t\tbuffer->SetPos(t->pos); NextCh(); line = t->line; col = t->col;\n");
-		fwprintf(gen, L"\t\t\t\tfor (int i = 0; i < tlen; i++) NextCh();\n");
 		fwprintf(gen, L"\t\t\t\t");
 	}
 	if (endOf == NULL)

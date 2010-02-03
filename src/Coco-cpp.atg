@@ -12,7 +12,9 @@
     Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
     extended by M. Loeberbauer & A. Woess, Univ. of Linz
     ported to C++ by Csaba Balazs, University of Szeged
-    with improvements by Pat Terry, Rhodes University
+    with improvements
+        - Pat Terry, Rhodes University
+        - 2010 Mark Olesen
 -------------------------------------------------------------------------------
 License
     This file is part of Compiler Generator Coco/R

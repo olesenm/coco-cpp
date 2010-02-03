@@ -9,6 +9,7 @@ options:
   -parser        create new scanner/parser code for Coco/R first
   -pedantic      add -pedantic warnings
   -warn          enable additional gcc warnings
+  -Dxxx          pass-through compiler defines
   -Wxxx          pass-through gcc -Wxxx directly
 
 * compile coco-cpp executable
@@ -19,6 +20,7 @@ USAGE
 #------------------------------------------------------------------------------
 cd ${0%/*} || exit 1    # run from this directory
 
+unset defs
 warn="-Wall"  # warn 'all' is the absolute minimum
 
 # parse options
@@ -37,6 +39,9 @@ do
     -warn)
         warn="$warn -Wno-strict-aliasing -Wextra -Wno-unused-parameter -Wold-style-cast -Wnon-virtual-dtor"
         ;;
+    -D*)
+        defs="$defs $1"
+        ;;
     -W*)
         warn="$warn $1"
         ;;
@@ -50,10 +55,10 @@ done
 
 echo "compile Coco executable"
 echo "~~~~~~~~~~~~~~~~~~~~~~~"
-echo "g++ src/*.cpp -o coco-cpp -g -O2 $warn"
+echo "g++ $defs src/*.cpp -o coco-cpp -g -O2 $warn"
 echo
 
-g++ src/*.cpp -o coco-cpp -g -O2 $warn
+g++ $defs src/*.cpp -o coco-cpp -g -O2 $warn
 
 if [ $? -eq 0 ]
 then

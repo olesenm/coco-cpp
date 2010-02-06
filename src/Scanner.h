@@ -105,18 +105,25 @@ inline long coco_string_toLong(const wchar_t* str)
 }
 
 
-//! Create a byte string by copying str, restricted to 8bit values
+//! A byte string (restricted to 8bit values) by copying str
 std::string coco_stdString(const wchar_t* str);
 
-//! Create a byte substring of str, max length characters long
-//! Restricted to 8bit values
+//! A byte string (restricted to 8bit values) by copying str,
+//! up to length characters long
 std::string coco_stdString(const wchar_t* str, unsigned length);
 
-//! Create a UTF8 byte string by copying str
+//! A byte substring (restricted to 8bit values) of str,
+//! starting at index and length characters long
+std::string coco_stdString(const wchar_t* str, unsigned index, unsigned length);
+
+//! A UTF8 byte string by copying str
 std::string coco_stdStringUTF8(const wchar_t* str);
 
-//! Create a UTF8 byte substring, max length length characters long
+//! A UTF8 byte string by copying str, up to length characters long
 std::string coco_stdStringUTF8(const wchar_t* str, unsigned length);
+
+//! A UTF8 byte substring, starting at index and length characters long
+std::string coco_stdStringUTF8(const wchar_t* str, unsigned index, unsigned length);
 
 // * * * * * * * * * * * *  End of String Routines * * * * * * * * * * * * * //
 

@@ -64,11 +64,17 @@ namespace Coco {
 
 std::string coco_stdString(const wchar_t* str)
 {
-    return str ? coco_stdString(str, wcslen(str)) : std::string();
+    return str ? coco_stdString(str, 0, wcslen(str)) : std::string();
 }
 
 
 std::string coco_stdString(const wchar_t* str, unsigned length)
+{
+    return coco_stdString(str, 0, length);
+}
+
+
+std::string coco_stdString(const wchar_t* str, unsigned index, unsigned length)
 {
     const unsigned len = (str && *str) ? length : 0;
     std::string dest;
@@ -76,7 +82,7 @@ std::string coco_stdString(const wchar_t* str, unsigned length)
 
     for (unsigned i = 0; i < len; ++i)
     {
-        dest += char(str[i] & 0xFF);
+        dest += char(str[index+i] & 0xFF);
     }
 
     return dest;
@@ -85,11 +91,17 @@ std::string coco_stdString(const wchar_t* str, unsigned length)
 
 std::string coco_stdStringUTF8(const wchar_t* str)
 {
-    return str ? coco_stdStringUTF8(str, wcslen(str)) : std::string();
+    return str ? coco_stdStringUTF8(str, 0, wcslen(str)) : std::string();
 }
 
 
 std::string coco_stdStringUTF8(const wchar_t* str, unsigned length)
+{
+    return coco_stdStringUTF8(str, 0, length);
+}
+
+
+std::string coco_stdStringUTF8(const wchar_t* str, unsigned index, unsigned length)
 {
     const unsigned len = (str && *str) ? length : 0;
     std::string dest;
@@ -97,7 +109,7 @@ std::string coco_stdStringUTF8(const wchar_t* str, unsigned length)
 
     for (unsigned i = 0; i < len; ++i)
     {
-        wchar_t wc = str[i];
+        wchar_t wc = str[index+i];
 
         if (!(wc & ~0x0000007F))
         {

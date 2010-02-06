@@ -138,18 +138,25 @@ inline long coco_string_toLong(const wchar_t* str)
 }
 
 
-//! Create a byte string by copying str, restricted to 8bit values
+//! A byte string (restricted to 8bit values) by copying str
 std::string coco_stdString(const wchar_t* str);
 
-//! Create a byte substring of str, max length characters long
-//! Restricted to 8bit values
+//! A byte string (restricted to 8bit values) by copying str,
+//! up to length characters long
 std::string coco_stdString(const wchar_t* str, unsigned length);
 
-//! Create a UTF8 byte string by copying str
+//! A byte substring (restricted to 8bit values) of str,
+//! starting at index and length characters long
+std::string coco_stdString(const wchar_t* str, unsigned index, unsigned length);
+
+//! A UTF8 byte string by copying str
 std::string coco_stdStringUTF8(const wchar_t* str);
 
-//! Create a UTF8 byte substring, max length length characters long
+//! A UTF8 byte string by copying str, up to length characters long
 std::string coco_stdStringUTF8(const wchar_t* str, unsigned length);
+
+//! A UTF8 byte substring, starting at index and length characters long
+std::string coco_stdStringUTF8(const wchar_t* str, unsigned index, unsigned length);
 
 // * * * * * * * * * * * *  End of String Routines * * * * * * * * * * * * * //
 
@@ -500,11 +507,17 @@ $endif                                           // <-- STREAMS_ONLY
 
 std::string coco_stdString(const wchar_t* str)
 {
-    return str ? coco_stdString(str, wcslen(str)) : std::string();
+    return str ? coco_stdString(str, 0, wcslen(str)) : std::string();
 }
 
 
 std::string coco_stdString(const wchar_t* str, unsigned length)
+{
+    return coco_stdString(str, 0, length);
+}
+
+
+std::string coco_stdString(const wchar_t* str, unsigned index, unsigned length)
 {
     const unsigned len = (str && *str) ? length : 0;
     std::string dest;
@@ -512,7 +525,7 @@ std::string coco_stdString(const wchar_t* str, unsigned length)
 
     for (unsigned i = 0; i < len; ++i)
     {
-        dest += char(str[i] & 0xFF);
+        dest += char(str[index+i] & 0xFF);
     }
 
     return dest;
@@ -521,11 +534,17 @@ std::string coco_stdString(const wchar_t* str, unsigned length)
 
 std::string coco_stdStringUTF8(const wchar_t* str)
 {
-    return str ? coco_stdStringUTF8(str, wcslen(str)) : std::string();
+    return str ? coco_stdStringUTF8(str, 0, wcslen(str)) : std::string();
 }
 
 
 std::string coco_stdStringUTF8(const wchar_t* str, unsigned length)
+{
+    return coco_stdStringUTF8(str, 0, length);
+}
+
+
+std::string coco_stdStringUTF8(const wchar_t* str, unsigned index, unsigned length)
 {
     const unsigned len = (str && *str) ? length : 0;
     std::string dest;
@@ -533,7 +552,7 @@ std::string coco_stdStringUTF8(const wchar_t* str, unsigned length)
 
     for (unsigned i = 0; i < len; ++i)
     {
-        wchar_t wc = str[i];
+        wchar_t wc = str[index+i];
 
         if (!(wc & ~0x0000007F))
         {

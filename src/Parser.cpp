@@ -1069,19 +1069,19 @@ std::wstring Errors::strerror(int n)
 
 void Errors::Warning(const std::wstring& msg)
 {
-	wprintf(L"%ls\n", msg.c_str());
+	fwprintf(stderr, L"%ls\n", msg.c_str());
 }
 
 
 void Errors::Warning(int line, int col, const std::wstring& msg)
 {
-	wprintf(L"-- line %d col %d: %ls\n", line, col, msg.c_str());
+	fwprintf(stderr, L"-- line %d col %d: %ls\n", line, col, msg.c_str());
 }
 
 
 void Errors::Error(int line, int col, const std::wstring& msg)
 {
-	wprintf(L"-- line %d col %d: %ls\n", line, col, msg.c_str());
+	fwprintf(stderr, L"-- line %d col %d: %ls\n", line, col, msg.c_str());
 	count++;
 }
 
@@ -1094,7 +1094,7 @@ void Errors::SynErr(int line, int col, int n)
 
 void Errors::Exception(const std::wstring& msg)
 {
-	wprintf(L"%ls", msg.c_str());
+	fwprintf(stderr, L"%ls", msg.c_str());
 	::exit(1);
 }
 

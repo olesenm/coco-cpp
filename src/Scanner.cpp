@@ -446,7 +446,7 @@ void Buffer::SetPos(int value)
 
 	if ((value < 0) || (value > fileLen))
 	{
-		wprintf(L"--- buffer out of bounds access, position: %d\n", value);
+		fwprintf(stderr, L"--- buffer out of bounds access, position: %d\n", value);
 		::exit(1);
 	}
 
@@ -539,7 +539,7 @@ Scanner::Scanner(const std::wstring& fileName)
 
 	if ((istr = _wfopen(fileName.c_str(), L"rb")) == NULL)
 	{
-		wprintf(L"--- Cannot open file %ls\n", fileName.c_str());
+		fwprintf(stderr, L"--- Cannot open file %ls\n", fileName.c_str());
 		::exit(1);
 	}
 	buffer = new Buffer(istr, false);
@@ -553,7 +553,7 @@ Scanner::Scanner(const std::string& fileName)
 	FILE* istr;
 	if ((istr = fopen(fileName.c_str(), "rb")) == NULL)
 	{
-		wprintf(L"--- Cannot open file %s\n", fileName.c_str());
+		fwprintf(stderr, L"--- Cannot open file %s\n", fileName.c_str());
 		::exit(1);
 	}
 	buffer = new Buffer(istr, false);
@@ -653,7 +653,7 @@ void Scanner::Init()
 	heapTop = heap;
 	if (sizeof(Token) > HEAP_BLOCK_SIZE)
 	{
-		wprintf(L"--- Too small HEAP_BLOCK_SIZE\n");
+		fwprintf(stderr, L"--- Too small HEAP_BLOCK_SIZE\n");
 		::exit(1);
 	}
 #ifdef COCO_DEBUG_HEAP
@@ -674,7 +674,7 @@ void Scanner::Init()
 		NextCh(); int ch2 = ch;
 		if (ch1 != 0xBB || ch2 != 0xBF)
 		{
-			wprintf(L"Illegal byte order mark at start of file");
+			fwprintf(stderr, L"Illegal byte order mark at start of file");
 			::exit(1);
 		}
 		Buffer *oldBuf = buffer;
@@ -853,7 +853,7 @@ void Scanner::AppendVal(Token* tok)
 	{
 		if (reqMem > HEAP_BLOCK_SIZE)
 		{
-			wprintf(L"--- Too long token value\n");
+			fwprintf(stderr, L"--- Too long token value\n");
 			::exit(1);
 		}
 		CreateHeapBlock();

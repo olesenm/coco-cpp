@@ -61,7 +61,7 @@ Defines used
     - NO_UTF8
       disable UTF-8 interpretation on the input stream.
     - FORCE_UTF8
-      provided that NO_UTF8 hasn't been specified, for UTF-8 interpretation
+      provided that NO_UTF8 hasn't been specified, force UTF-8 interpretation
       on the input stream and don't rely entirely on the presence of a
       byte order mark at the start of the file.
 

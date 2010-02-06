@@ -1953,8 +1953,7 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines)
 		ch = buffer->Read();
 
 		// skip lead whitespace - only arises in some circumstances,
-		// such as when surrounding tokens are used to define the
-		// content.
+		// such as when surrounding tokens are used to define the content.
 		while
 		(
 		    buffer->GetPos() <= pos->end

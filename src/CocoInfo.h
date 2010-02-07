@@ -41,7 +41,7 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define PACKAGE_DATE   "1 Feb 2010"
+#define PACKAGE_DATE   "7 Feb 2010"
 #define PACKAGE_URL    "http://www.ssw.uni-linz.ac.at/coco/"
 
 

@@ -40,8 +40,8 @@ namespace Coco
 
 std::wstring coco_stdWString(const std::string& str)
 {
-    std::wstring dest;
-    dest.reserve(str.size());
+    std::wstring dst;
+    dst.reserve(str.size());
 
     for
     (
@@ -50,10 +50,10 @@ std::wstring coco_stdWString(const std::string& str)
         ++iter
     )
     {
-        dest += *iter;
+        dst += *iter;
     }
 
-    return dest;
+    return dst;
 }
 
 

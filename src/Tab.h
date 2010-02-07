@@ -306,9 +306,9 @@ public:
 	//---------------------------------------------------------------------
 
 	//! Generate begin of namespace enclosure
-	int GenNamespaceOpen(FILE*) const;
+	int GenNamespaceOpen(FILE* dst) const;
 	//! Generate end of namespace enclosure
-	static void GenNamespaceClose(FILE*, int nrOfNs);
+	static void GenNamespaceClose(FILE* dst, int nrOfNs);
 
 	//! Open a frame file for reading, return NULL on failure
 	FILE* OpenFrameFile(const std::string& frameName) const;

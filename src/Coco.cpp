@@ -39,7 +39,7 @@ http://www.ssw.uni-linz.ac.at/coco/
 @section usage Program Usage
 
 @verbatim
-Coco Grammar.atg {Option}
+coco-cpp Grammar.atg {Option}
 Options:
   -namespace <Name>      eg, My::Name::Space
   -prefix    <Name>      for unique Parser/Scanner file names
@@ -97,7 +97,7 @@ Coco-cpp.atg itself, it can be compiled within the 'Coco' namespace
 as specified on the command-line. For example,
 
 @verbatim
-    Coco -namespace Coco Coco-cpp.atg
+    coco-cpp -namespace Coco Coco-cpp.atg
 @endverbatim
 
 As an alternative, it can be specified within the Coco-cpp.atg file:
@@ -167,7 +167,7 @@ void printUsage(const char* message = NULL)
 		wprintf(L"\nError: %s\n\n", message);
 	}
 
-	wprintf(L"Usage: Coco Grammar.atg {Option}\n");
+	wprintf(L"Usage: coco-cpp Grammar.atg {Option}\n");
 	wprintf(L"Options:\n");
 	wprintf(L"  -namespace <Name>      eg, My::Name::Space\n");
 	wprintf(L"  -prefix    <Name>      for unique Parser/Scanner file names\n");

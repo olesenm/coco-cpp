@@ -105,11 +105,11 @@ TOKENS
 
 PRAGMAS
     ddtSym    = '$' { alphanum }.
-                        (. Tab::SetDDT(coco_stdString(la->val+1)); .)
+                        (. Tab::SetDDT(la->toString()); .)
 
     directive = '$' letter { letter } '='
         { alphanum | '-' | '.' | ':' } .
-                        (. tab->DispatchDirective(coco_stdString(la->val+1)); .)
+                        (. tab->DispatchDirective(la->toString()); .)
 
 
 COMMENTS FROM "/*" TO "*/" NESTED

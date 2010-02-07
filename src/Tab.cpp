@@ -1621,7 +1621,7 @@ void Tab::DispatchDirective(const std::string& str)
 		return;
 	}
 
-	const std::string name  = str.substr(0, fndEqual);
+	const std::string name  = str.substr(1, fndEqual-1);  // skip leading '$'
 	const std::string value = str.substr(fndEqual+1);
 
 	if (value.empty())
@@ -1720,7 +1720,7 @@ void Tab::SetDDT(const std::string& str)
 //
 // reduce multiple '::' -> ':', skip initial ':'
 //
-int Tab::GenNamespaceOpen(FILE* ostr) const
+int Tab::GenNamespaceOpen(FILE* ofh) const
 {
 	const std::string::size_type len = nsName.size();
 
@@ -1749,7 +1749,7 @@ int Tab::GenNamespaceOpen(FILE* ostr) const
 		{
 			fwprintf
 			(
-				ostr, L"namespace %s {\n",
+				ofh, L"namespace %s {\n",
 				nsName.substr(startPos, curLen).c_str()
 			);
 			++nrOfNs;
@@ -1761,18 +1761,18 @@ int Tab::GenNamespaceOpen(FILE* ostr) const
 }
 
 
-void Tab::GenNamespaceClose(FILE* ostr, int nrOfNs)
+void Tab::GenNamespaceClose(FILE* ofh, int nrOfNs)
 {
 	for (int i = 0; i < nrOfNs; ++i)
 	{
-		fwprintf(ostr, L"} // End namespace\n");
+		fwprintf(ofh, L"} // End namespace\n");
 	}
 }
 
 
 FILE* Tab::OpenFrameFile(const std::string& frameName) const
 {
-	FILE* istr = NULL;
+	FILE* ifh = NULL;
 
 #ifdef _WIN32
 	// On windows systems, wmain() passes 16bit unicode wide characters
@@ -1786,26 +1786,26 @@ FILE* Tab::OpenFrameFile(const std::string& frameName) const
 		fullName = frameDir;
 		fullName += coco_stdWString(frameName);
 
-		if ((istr = _wfopen(fullName.c_str(), L"r")) != NULL)
+		if ((ifh = _wfopen(fullName.c_str(), L"r")) != NULL)
 		{
-			return istr;
+			return ifh;
 		}
 	}
 
 	// 2: look in local directory
 	fullName = coco_stdWString(frameName);
-	if ((istr = _wfopen(fullName.c_str(), L"r")) != NULL)
+	if ((ifh = _wfopen(fullName.c_str(), L"r")) != NULL)
 	{
-		return istr;
+		return ifh;
 	}
 
 	// 3: look in srcDir
 	fullName = srcDir;
 	fullName += coco_stdWString(frameName);
 
-	if ((istr = _wfopen(fullName.c_str(), L"r")) != NULL)
+	if ((ifh = _wfopen(fullName.c_str(), L"r")) != NULL)
 	{
-		return istr;
+		return ifh;
 	}
 #else
 	// Other systems simply maintain the same character encoding
@@ -1818,36 +1818,36 @@ FILE* Tab::OpenFrameFile(const std::string& frameName) const
 		fullName = frameDir;
 		fullName += frameName;
 
-		if ((istr = fopen(fullName.c_str(), "r")) != NULL)
+		if ((ifh = fopen(fullName.c_str(), "r")) != NULL)
 		{
-			return istr;
+			return ifh;
 		}
 	}
 
 	// 2: look in local directory
 	fullName = frameName;
-	if ((istr = fopen(fullName.c_str(), "r")) != NULL)
+	if ((ifh = fopen(fullName.c_str(), "r")) != NULL)
 	{
-		return istr;
+		return ifh;
 	}
 
 	// 3: look in srcDir
 	fullName = srcDir;
 	fullName += frameName;
 
-	if ((istr = fopen(fullName.c_str(), "r")) != NULL)
+	if ((ifh = fopen(fullName.c_str(), "r")) != NULL)
 	{
-		return istr;
+		return ifh;
 	}
 #endif
 
-	return istr;
+	return ifh;
 }
 
 
 FILE* Tab::OpenGenFile(const std::string& genName) const
 {
-	FILE* ostr = NULL;
+	FILE* ofh = NULL;
 
 #ifdef _WIN32
 	std::wstring fullName = outDir;
@@ -1860,16 +1860,16 @@ FILE* Tab::OpenGenFile(const std::string& genName) const
 	if
 	(
 	    makeBackup
-	 && ((ostr = _wfopen(fullName.c_str(), L"r")) != NULL)
+	 && ((ofh = _wfopen(fullName.c_str(), L"r")) != NULL)
 	)
 	{
-		fclose(ostr);
+		fclose(ofh);
 		std::wstring bakName = fullName + L".bak";
 		_wremove(bakName.c_str());
 		_wrename(fullName.c_str(), bakName.c_str()); // copy with overwrite
 	}
 
-	ostr = _wfopen(fullName.c_str(), L"w");
+	ofh = _wfopen(fullName.c_str(), L"w");
 
 #else
 	std::string fullName = outDir;
@@ -1882,19 +1882,19 @@ FILE* Tab::OpenGenFile(const std::string& genName) const
 	if
 	(
 	    makeBackup
-	 && ((ostr = fopen(fullName.c_str(), "r")) != NULL)
+	 && ((ofh = fopen(fullName.c_str(), "r")) != NULL)
 	)
 	{
-		fclose(ostr);
+		fclose(ofh);
 		std::string bakName = fullName + ".bak";
 		remove(bakName.c_str());
 		rename(fullName.c_str(), bakName.c_str()); // copy with overwrite
 	}
 
-	ostr = fopen(fullName.c_str(), "w");
+	ofh = fopen(fullName.c_str(), "w");
 #endif
 
-	return ostr;
+	return ofh;
 }
 
 
@@ -1943,9 +1943,9 @@ bool Tab::CopyFramePart
 }
 
 
-void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines)
+void Tab::CopySourcePart(FILE* dst, Position *pos, int indent, bool allowLines)
 {
-	// Copy text described by pos from atg to dest
+	// Copy text described by pos from atg to destination
 	if (pos != NULL)
 	{
 		int ch, i;
@@ -1966,9 +1966,9 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines)
 		if (allowLines && emitLines && pos->line)
 		{
 #ifdef _WIN32
-			fwprintf(dest, L"\n#line %d \"%ls\"\n", pos->line, srcName.c_str());
+			fwprintf(dst, L"\n#line %d \"%ls\"\n", pos->line, srcName.c_str());
 #else
-			fwprintf(dest, L"\n#line %d \"%s\"\n", pos->line, srcName.c_str());
+			fwprintf(dst, L"\n#line %d \"%s\"\n", pos->line, srcName.c_str());
 #endif
 		}
 
@@ -1980,7 +1980,7 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines)
 			// eol is either CR or CRLF or LF
 			while (ch == '\r' || ch == '\n')
 			{
-				fwprintf(dest, L"\n");
+				fwprintf(dst, L"\n");
 				mightIndent = true;
 
 				if (ch == '\r') { ch = buffer->Read(); } // skip CR
@@ -2005,30 +2005,30 @@ void Tab::CopySourcePart(FILE *dest, Position *pos, int indent, bool allowLines)
 				if (mightIndent)
 				{
 					for (int t=0; t < indent; ++t)
-						fwprintf(dest, L"\t");
+						fwprintf(dst, L"\t");
 					mightIndent = false;
 				}
-				fwprintf(dest, L"%lc", ch);
+				fwprintf(dst, L"%lc", ch);
 			}
 			ch = buffer->Read();
 		}
 		Done:
-		if (indent > 0) fwprintf(dest, L"\n");
+		if (indent > 0) fwprintf(dst, L"\n");
 	}
 }
 
 
-void Tab::AddNotice(FILE *dest) const
+void Tab::AddNotice(FILE* dst) const
 {
 	fwprintf
 	(
-		dest,
+		dst,
 		L"// This file was generated with Coco/R C++ (%s)\n// %s\n",
 		PACKAGE_DATE,
 		PACKAGE_URL
 	);
 
-	fwprintf(dest, L"// with these defines:\n");
+	fwprintf(dst, L"// with these defines:\n");
 
 	for
 	(
@@ -2037,10 +2037,10 @@ void Tab::AddNotice(FILE *dest) const
 		++iter
 	)
 	{
-		fwprintf(dest, L"//     - %s\n", iter->c_str());
+		fwprintf(dst, L"//     - %s\n", iter->c_str());
 	}
 
-	fwprintf(dest, L"\n");
+	fwprintf(dst, L"\n");
 
 }
 

@@ -34,7 +34,7 @@ About this file
 
     The '-->TAG' text markers are used to delimit code chunks and typically
     correspond to places where additional information is added by the
-    DFA or ParserGen code. These tag must be the first token to appear
+    DFA or ParserGen code. These tags must be the first token to appear
     on a line. Lines containing this text marker are not output.
 
     All information prior to the first 'begin' text marker is discarded.
@@ -75,7 +75,7 @@ Defines used
 /*---------------------------------------------------------------------------*\
                            Class Errors Declaration
 \*---------------------------------------------------------------------------*/
-//! Parser error handing
+//! Parser error handling
 class Errors
 {
 public:
@@ -173,10 +173,10 @@ public:
 inline static wchar_t* coco_string_create(const wchar_t* str)
 {
 	const int len = wcslen(str);
-	wchar_t* dest = new wchar_t[len + 1];
-	wcsncpy(dest, str, len);
-	dest[len] = 0;
-	return dest;
+	wchar_t* dst = new wchar_t[len + 1];
+	wcsncpy(dst, str, len);
+	dst[len] = 0;
+	return dst;
 }
 
 

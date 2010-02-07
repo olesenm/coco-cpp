@@ -34,7 +34,7 @@ About this file
 
     The '-->TAG' text markers are used to delimit code chunks and typically
     correspond to places where additional information is added by the
-    DFA or ParserGen code. These tag must be the first token to appear
+    DFA or ParserGen code. These tags must be the first token to appear
     on a line. Lines containing this text marker are not output.
 
     All information prior to the first 'begin' text marker is discarded.
@@ -186,6 +186,43 @@ public:
 	//! Construct null Token, optionally with pointer to a string value
 	Token(wchar_t* value = 0);
 	~Token();       //!< Destructor - does not cleanup val member
+
+	//! Token val as byte string (restricted to 8bit values)
+	inline std::string toString() const
+	{
+		return coco_stdString(val);
+	}
+
+	//! Token val as byte string (restricted to 8bit values), up to length characters long
+	inline std::string toString(unsigned length) const
+	{
+		return coco_stdString(val, length);
+	}
+
+	//! Token val as byte string (restricted to 8bit values), starting at index and length characters long
+	inline std::string toString(unsigned index, unsigned length) const
+	{
+		return coco_stdString(val, index, length);
+	}
+
+	//! Token val as UTF8 byte string
+	inline std::string toStringUTF8() const
+	{
+		return coco_stdStringUTF8(val);
+	}
+
+	//! Token val as UTF8 byte string, up to length characters long
+	inline std::string toStringUTF8(unsigned length) const
+	{
+		return coco_stdStringUTF8(val, length);
+	}
+
+	//! Token val as UTF8 byte substring, starting at index and length characters long
+	inline std::string toStringUTF8(unsigned index, unsigned length) const
+	{
+		return coco_stdStringUTF8(this->val, index, length);
+	}
+
 };
 
 
@@ -193,7 +230,7 @@ public:
                            Class Buffer Declaration
 \*---------------------------------------------------------------------------*/
 /*!
- * @brief Scanner Buffer Token
+ * @brief Scanner Buffer
  *
  * This Buffer supports the following cases:
  * -# seekable stream (file)
@@ -270,6 +307,7 @@ public:
 	virtual bool isUTF8() const;  //!< Return true - buffer is UTF8
 };
 $endif                                           // <-- NO_UTF8
+
 
 /*---------------------------------------------------------------------------*\
                          Class StartStates Declaration
@@ -520,15 +558,15 @@ std::string coco_stdString(const wchar_t* str, unsigned length)
 std::string coco_stdString(const wchar_t* str, unsigned index, unsigned length)
 {
     const unsigned len = (str && *str) ? length : 0;
-    std::string dest;
-    dest.reserve(len);
+    std::string dst;
+    dst.reserve(len);
 
     for (unsigned i = 0; i < len; ++i)
     {
-        dest += char(str[index+i] & 0xFF);
+        dst += char(str[index+i] & 0xFF);
     }
 
-    return dest;
+    return dst;
 }
 
 
@@ -547,8 +585,8 @@ std::string coco_stdStringUTF8(const wchar_t* str, unsigned length)
 std::string coco_stdStringUTF8(const wchar_t* str, unsigned index, unsigned length)
 {
     const unsigned len = (str && *str) ? length : 0;
-    std::string dest;
-    dest.reserve(len);
+    std::string dst;
+    dst.reserve(len);
 
     for (unsigned i = 0; i < len; ++i)
     {
@@ -558,31 +596,31 @@ std::string coco_stdStringUTF8(const wchar_t* str, unsigned index, unsigned leng
         {
             // 0x00000000 - 0x0000007F [min. 8bit storage, 1-byte encoding)
             // 0aaaaaaa
-            dest += char(wc);
+            dst += char(wc);
         }
         else if (!(wc & ~0x000007FF))
         {
             // 0x00000080 - 0x000007FF [min. 16bit storage, 2-byte encoding]
             // 110bbbaa 10aaaaaa
-            dest += char(0xC0 | ((wc >> 6) & 0x1F));
-            dest += char(0x80 | ((wc) & 0x3F));
+            dst += char(0xC0 | ((wc >> 6) & 0x1F));
+            dst += char(0x80 | ((wc) & 0x3F));
         }
         else if (!(wc & ~0x0000FFFF))
         {
             // 0x00000800 - 0x0000FFFF [min. 16bit storage, 3-byte encoding]
             // 1110bbbb 10bbbbaa 10aaaaaa
-            dest += char(0xE0 | ((wc >> 12) & 0x0F));
-            dest += char(0x80 | ((wc >> 6) & 0x3F));
-            dest += char(0x80 | ((wc) & 0x3F));
+            dst += char(0xE0 | ((wc >> 12) & 0x0F));
+            dst += char(0x80 | ((wc >> 6) & 0x3F));
+            dst += char(0x80 | ((wc) & 0x3F));
         }
         else if (!(wc & ~0x001FFFFF))
         {
             // 0x00010000 - 0x001FFFFF [min. 24bit storage, 4-byte encoding]
             // 11110ccc 10ccbbbb 10bbbbaa 10aaaaaa
-            dest += char(0xF0 | ((wc >> 18) & 0x07));
-            dest += char(0x80 | ((wc >> 12) & 0x3F));
-            dest += char(0x80 | ((wc >> 6) & 0x3F));
-            dest += char(0x80 | ((wc) & 0x3F));
+            dst += char(0xF0 | ((wc >> 18) & 0x07));
+            dst += char(0x80 | ((wc >> 12) & 0x3F));
+            dst += char(0x80 | ((wc >> 6) & 0x3F));
+            dst += char(0x80 | ((wc) & 0x3F));
         }
 //
 // Not (yet) used - wchar_t storage is limited to 16bit on windows
@@ -592,34 +630,34 @@ std::string coco_stdStringUTF8(const wchar_t* str, unsigned index, unsigned leng
 //        {
 //            // 0x00200000 - 0x03FFFFFF [min. 32bit storage, 5-byte encoding]
 //            // 111110dd 10cccccc 10ccbbbb 10bbbbaa 10aaaaaa
-//            dest += char(0xF8 | ((wc >> 24) & 0x03));
-//            dest += char(0x80 | ((wc >> 18) & 0x3F));
-//            dest += char(0x80 | ((wc >> 12) & 0x3F));
-//            dest += char(0x80 | ((wc >> 6) & 0x3F));
-//            dest += char(0x80 | ((wc) & 0x3F));
+//            dst += char(0xF8 | ((wc >> 24) & 0x03));
+//            dst += char(0x80 | ((wc >> 18) & 0x3F));
+//            dst += char(0x80 | ((wc >> 12) & 0x3F));
+//            dst += char(0x80 | ((wc >> 6) & 0x3F));
+//            dst += char(0x80 | ((wc) & 0x3F));
 //        }
 //        else if (!(wc & ~0x7FFFFFFF))
 //        {
 //            // 0x04000000 - 0x7FFFFFFF [min. 32bit storage, 6-byte encoding]
 //            // 1111110d 10dddddd 10cccccc 10ccbbbb 10bbbbaa 10aaaaaa
-//            dest += char(0xFC | ((wc >> 30) & 0x01));
-//            dest += char(0x80 | ((wc >> 24) & 0x3F));
-//            dest += char(0x80 | ((wc >> 18) & 0x3F));
-//            dest += char(0x80 | ((wc >> 12) & 0x3F));
-//            dest += char(0x80 | ((wc >> 6) & 0x3F));
-//            dest += char(0x80 | ((wc) & 0x3F));
+//            dst += char(0xFC | ((wc >> 30) & 0x01));
+//            dst += char(0x80 | ((wc >> 24) & 0x3F));
+//            dst += char(0x80 | ((wc >> 18) & 0x3F));
+//            dst += char(0x80 | ((wc >> 12) & 0x3F));
+//            dst += char(0x80 | ((wc >> 6) & 0x3F));
+//            dst += char(0x80 | ((wc) & 0x3F));
 //        }
 //
         else
         {
             // report anything unknown/invalid as replacement character U+FFFD
-            dest += char(0xEF);
-            dest += char(0xBF);
-            dest += char(0xBD);
+            dst += char(0xEF);
+            dst += char(0xBF);
+            dst += char(0xBD);
         }
     }
 
-    return dest;
+    return dst;
 }
 
 
@@ -707,7 +745,7 @@ Buffer::Buffer(const unsigned char* chars, int len)
 }
 
 
-Buffer::Buffer(FILE* istr, bool isUserStream)
+Buffer::Buffer(FILE* ifh, bool isUserStream)
 :
 	buf(NULL),
 	bufCapacity(0),
@@ -715,7 +753,7 @@ Buffer::Buffer(FILE* istr, bool isUserStream)
 	bufPos(0),
 	bufStart(0),
 	fileLen(0),
-	cStream(istr),
+	cStream(ifh),
 	stdStream(NULL),
 	isUserStream_(isUserStream)
 {
@@ -1009,9 +1047,9 @@ Scanner::Scanner(const unsigned char* buf, int len)
 }
 
 
-Scanner::Scanner(FILE* istr)
+Scanner::Scanner(FILE* ifh)
 :
-	buffer(new Buffer(istr, true))
+	buffer(new Buffer(ifh, true))
 {
 	Init();
 }
@@ -1020,14 +1058,14 @@ Scanner::Scanner(FILE* istr)
 #ifdef _WIN32
 Scanner::Scanner(const std::wstring& fileName)
 {
-	FILE* istr;
+	FILE* ifh;
 
-	if ((istr = _wfopen(fileName.c_str(), L"rb")) == NULL)
+	if ((ifh = _wfopen(fileName.c_str(), L"rb")) == NULL)
 	{
 		fwprintf(stderr, L"--- Cannot open file %ls\n", fileName.c_str());
 		::exit(1);
 	}
-	buffer = new Buffer(istr, false);
+	buffer = new Buffer(ifh, false);
 	Init();
 }
 #endif
@@ -1035,13 +1073,13 @@ Scanner::Scanner(const std::wstring& fileName)
 
 Scanner::Scanner(const std::string& fileName)
 {
-	FILE* istr;
-	if ((istr = fopen(fileName.c_str(), "rb")) == NULL)
+	FILE* ifh;
+	if ((ifh = fopen(fileName.c_str(), "rb")) == NULL)
 	{
 		fwprintf(stderr, L"--- Cannot open file %s\n", fileName.c_str());
 		::exit(1);
 	}
-	buffer = new Buffer(istr, false);
+	buffer = new Buffer(ifh, false);
 	Init();
 }
 $endif                                           // <-- STREAMS_ONLY

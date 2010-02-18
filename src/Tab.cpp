@@ -140,19 +140,18 @@ Symbol* Tab::NewSym(Node::nodeType typ, const std::wstring& name, int line)
 		sym = new Symbol(typ, name, line);
 	}
 
-	if (typ == Node::t)
-	{
-		sym->n = terminals.Count; terminals.Add(sym);
+	switch (typ) {
+		case Node::t:
+			sym->n = terminals.Count; terminals.Add(sym);
+			break;
+		case Node::pr:
+			pragmas.Add(sym);
+			break;
+		case Node::nt:
+			sym->n = nonterminals.Count; nonterminals.Add(sym);
+			break;
+		default: break;    // nothing
 	}
-	else if (typ == Node::pr)
-	{
-		pragmas.Add(sym);
-	}
-	else if (typ == Node::nt)
-	{
-		sym->n = nonterminals.Count; nonterminals.Add(sym);
-	}
-
 	return sym;
 }
 
@@ -413,17 +412,19 @@ void Tab::SetContextTrans(Node *p)
 {
 	while (p != NULL)
 	{
-		if (p->typ == Node::chr || p->typ == Node::clas)
-		{
-			p->code = Node::contextTrans;
-		}
-		else if (p->typ == Node::opt || p->typ == Node::iter)
-		{
-			SetContextTrans(p->sub);
-		}
-		else if (p->typ == Node::alt)
-		{
-			SetContextTrans(p->sub); SetContextTrans(p->down);
+		switch (p->typ) {
+			case Node::chr:
+			case Node::clas:
+				p->code = Node::contextTrans;
+				break;
+			case Node::opt:
+			case Node::iter:
+				SetContextTrans(p->sub);
+				break;
+			case Node::alt:
+				SetContextTrans(p->sub); SetContextTrans(p->down);
+				break;
+			default: break;    // nothing
 		}
 		if (p->up) break;
 		p = p->next;
@@ -514,29 +515,26 @@ void Tab::PrintNodes()
 
 		fwprintf(trace, L"%5d ", Ptr(p->next, p->up));
 
-		if (p->typ == Node::t || p->typ == Node::nt || p->typ == Node::wt)
-		{
-			fwprintf(trace, L"             %5s", Pos(p->pos).c_str());
-		}
-		if (p->typ == Node::chr)
-		{
-			fwprintf(trace, L"%5d %5d       ", p->val, p->code);
-		}
-		if (p->typ == Node::clas)
-		{
-			fwprintf(trace, L"      %5d       ", p->code);
-		}
-		if (p->typ == Node::alt || p->typ == Node::iter || p->typ == Node::opt)
-		{
-			fwprintf(trace, L"%5d %5d       ", Ptr(p->down, false), Ptr(p->sub, false));
-		}
-		if (p->typ == Node::sem)
-		{
-			fwprintf(trace, L"             %5s", Pos(p->pos).c_str());
-		}
-		if (p->typ == Node::eps || p->typ == Node::any || p->typ == Node::sync)
-		{
-			fwprintf(trace, L"                  ");
+		switch (p->typ) {
+			case Node::t: case Node::nt: case Node::wt:
+				fwprintf(trace, L"             %5s", Pos(p->pos).c_str());
+				break;
+			case Node::chr:
+				fwprintf(trace, L"%5d %5d       ", p->val, p->code);
+				break;
+			case Node::clas:
+				fwprintf(trace, L"      %5d       ", p->code);
+				break;
+			case Node::alt: case Node::iter: case Node::opt:
+				fwprintf(trace, L"%5d %5d       ", Ptr(p->down, false), Ptr(p->sub, false));
+				break;
+			case Node::sem:
+				fwprintf(trace, L"             %5s", Pos(p->pos).c_str());
+				break;
+			case Node::eps: case Node::any: case Node::sync:
+				fwprintf(trace, L"                  ");
+				break;
+			default: break;    // nothing
 		}
 		fwprintf(trace, L"%5d\n", p->line);
 	}
@@ -645,41 +643,46 @@ BitArray* Tab::First0(Node *p, BitArray *mark)
 	while (p != NULL && !((*mark)[p->n]))
 	{
 		mark->Set(p->n, true);
-		if (p->typ == Node::nt)
-		{
-			if (p->sym->firstReady)
-			{
-				fs->Or(p->sym->first);
+		switch (p->typ) {
+			case Node::nt: {
+				if (p->sym->firstReady)
+				{
+					fs->Or(p->sym->first);
+				}
+				else
+				{
+					BitArray *fs0 = First0(p->sym->graph, mark);
+					fs->Or(fs0);
+					delete fs0;
+				}
+				break;
 			}
-			else
-			{
-				BitArray *fs0 = First0(p->sym->graph, mark);
+			case Node::t:
+			case Node::wt: {
+				fs->Set(p->sym->n, true);
+				break;
+			}
+			case Node::any: {
+				fs->Or(p->set);
+				break;
+			}
+			case Node::alt: {
+				BitArray *fs0 = First0(p->sub, mark);
 				fs->Or(fs0);
 				delete fs0;
+				fs0 = First0(p->down, mark);
+				fs->Or(fs0);
+				delete fs0;
+				break;
 			}
-		}
-		else if (p->typ == Node::t || p->typ == Node::wt)
-		{
-			fs->Set(p->sym->n, true);
-		}
-		else if (p->typ == Node::any)
-		{
-			fs->Or(p->set);
-		}
-		else if (p->typ == Node::alt)
-		{
-			BitArray *fs0 = First0(p->sub, mark);
-			fs->Or(fs0);
-			delete fs0;
-			fs0 = First0(p->down, mark);
-			fs->Or(fs0);
-			delete fs0;
-		}
-		else if (p->typ == Node::iter || p->typ == Node::opt)
-		{
-			BitArray *fs0 = First0(p->sub, mark);
-			fs->Or(fs0);
-			delete fs0;
+			case Node::iter:
+			case Node::opt: {
+				BitArray *fs0 = First0(p->sub, mark);
+				fs->Or(fs0);
+				delete fs0;
+				break;
+			}
+			default: break;    // nothing
 		}
 
 		if (!DelNode(p)) break;

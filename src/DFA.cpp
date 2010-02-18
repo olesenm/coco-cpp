@@ -259,43 +259,47 @@ void DFA::Step(State *from, Node *p, BitArray *stepped)
 	if (p == NULL) return;
 	stepped->Set(p->n, true);
 
-	if (p->typ == Node::clas || p->typ == Node::chr)
-	{
-		NewTransition(from, TheState(p->next), p->typ, p->val, p->code);
-	}
-	else if (p->typ == Node::alt)
-	{
-		Step(from, p->sub, stepped);
-		Step(from, p->down, stepped);
-	}
-	else if (p->typ == Node::iter)
-	{
-		if (tab->DelSubGraph(p->sub))
-		{
-			parser->SemErr(L"contents of {...} must not be deletable");
-			return;
+	switch (p->typ) {
+		case Node::clas:
+		case Node::chr: {
+			NewTransition(from, TheState(p->next), p->typ, p->val, p->code);
+			break;
 		}
+		case Node::alt: {
+			Step(from, p->sub, stepped);
+			Step(from, p->down, stepped);
+			break;
+		}
+		case Node::iter: {
+			if (tab->DelSubGraph(p->sub))
+			{
+				parser->SemErr(L"contents of {...} must not be deletable");
+				return;
+			}
 
-		if (p->next != NULL && !((*stepped)[p->next->n]))
-		{
-			Step(from, p->next, stepped);
-		}
-		Step(from, p->sub, stepped);
+			if (p->next != NULL && !((*stepped)[p->next->n]))
+			{
+				Step(from, p->next, stepped);
+			}
+			Step(from, p->sub, stepped);
 
-		if (p->state != from)
-		{
-			BitArray *newStepped = new BitArray(tab->nodes.Count);
-			Step(p->state, p, newStepped);
-			delete newStepped;
+			if (p->state != from)
+			{
+				BitArray *newStepped = new BitArray(tab->nodes.Count);
+				Step(p->state, p, newStepped);
+				delete newStepped;
+			}
+			break;
 		}
-	}
-	else if (p->typ == Node::opt)
-	{
-		if (p->next != NULL && !((*stepped)[p->next->n]))
-		{
-			Step(from, p->next, stepped);
+		case Node::opt: {
+			if (p->next != NULL && !((*stepped)[p->next->n]))
+			{
+				Step(from, p->next, stepped);
+			}
+			Step(from, p->sub, stepped);
+			break;
 		}
-		Step(from, p->sub, stepped);
+		default: break;    // nothing
 	}
 }
 
@@ -318,25 +322,29 @@ void DFA::NumberNodes(Node *p, State *state, bool renumIter)
 	p->state = state;
 	if (tab->DelGraph(p)) state->endOf = curSy;
 
-	if (p->typ == Node::clas || p->typ == Node::chr)
-	{
-		NumberNodes(p->next, NULL, false);
-	}
-	else if (p->typ == Node::opt)
-	{
-		NumberNodes(p->next, NULL, false);
-		NumberNodes(p->sub, state, true);
-	}
-	else if (p->typ == Node::iter)
-	{
-		NumberNodes(p->next, state, true);
-		NumberNodes(p->sub, state, true);
-	}
-	else if (p->typ == Node::alt)
-	{
-		NumberNodes(p->next, NULL, false);
-		NumberNodes(p->sub, state, true);
-		NumberNodes(p->down, state, renumIter);
+	switch (p->typ) {
+		case Node::clas:
+		case Node::chr: {
+			NumberNodes(p->next, NULL, false);
+			break;
+		}
+		case Node::opt: {
+			NumberNodes(p->next, NULL, false);
+			NumberNodes(p->sub, state, true);
+			break;
+		}
+		case Node::iter: {
+			NumberNodes(p->next, state, true);
+			NumberNodes(p->sub, state, true);
+			break;
+		}
+		case Node::alt: {
+			NumberNodes(p->next, NULL, false);
+			NumberNodes(p->sub, state, true);
+			NumberNodes(p->down, state, renumIter);
+			break;
+		}
+		default: break;    // nothing
 	}
 }
 
@@ -352,21 +360,25 @@ void DFA::FindTrans(Node *p, bool start, BitArray *marked)
 		delete stepped;
 	}
 
-	if (p->typ == Node::clas || p->typ == Node::chr)
-	{
-		FindTrans(p->next, true, marked);
-	}
-	else if (p->typ == Node::opt)
-	{
-		FindTrans(p->next, true, marked); FindTrans(p->sub, false, marked);
-	}
-	else if (p->typ == Node::iter)
-	{
-		FindTrans(p->next, false, marked); FindTrans(p->sub, false, marked);
-	}
-	else if (p->typ == Node::alt)
-	{
-		FindTrans(p->sub, false, marked); FindTrans(p->down, false, marked);
+	switch (p->typ) {
+		case Node::clas:
+		case Node::chr: {
+			FindTrans(p->next, true, marked);
+			break;
+		}
+		case Node::opt: {
+			FindTrans(p->next, true, marked); FindTrans(p->sub, false, marked);
+			break;
+		}
+		case Node::iter: {
+			FindTrans(p->next, false, marked); FindTrans(p->sub, false, marked);
+			break;
+		}
+		case Node::alt: {
+			FindTrans(p->sub, false, marked); FindTrans(p->down, false, marked);
+			break;
+		}
+		default: break;    // nothing
 	}
 }
 
@@ -494,7 +506,8 @@ bool DFA::Overlap(Action *a, Action *b)
 		else
 		{
 			CharSet *setb = tab->CharClassSet(b->sym);
-			return setb->Get(a->sym);}
+			return setb->Get(a->sym);
+		}
 	}
 	else
 	{

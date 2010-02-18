@@ -93,27 +93,30 @@ void ParserGen::GenErrorMsg(ParserGen::errorType errTyp, Symbol *sym)
 	coco_swprintf(format, 32, L"\t\tcase %d:", errorNr);
 	err += format;
 	err += L" return L\"";
-	if (errTyp == tErr)
-	{
-		if (sym->name[0] == '"')
-		{
-			err += Tab::Escape(sym->name);
+	switch (errTyp) {
+		case tErr: {
+			if (sym->name[0] == '"')
+			{
+				err += Tab::Escape(sym->name);
+			}
+			else
+			{
+				err += sym->name;
+			}
+			err += L" expected";
+			break;
 		}
-		else
-		{
+		case altErr: {
+			err += L"invalid ";
 			err += sym->name;
+			break;
 		}
-		err += L" expected";
-	}
-	else if (errTyp == altErr)
-	{
-		err += L"invalid ";
-		err += sym->name;
-	}
-	else if (errTyp == syncErr)
-	{
-		err += L"this symbol not expected in ";
-		err += sym->name;
+		case syncErr: {
+			err += L"this symbol not expected in ";
+			err += sym->name;
+			break;
+		}
+		default: break;    // nothing
 	}
 	err += L"\"; break;\n";
 }
@@ -167,161 +170,162 @@ void ParserGen::PutCaseLabels(const BitArray *s)
 
 void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked)
 {
-	Node *p2;
-	BitArray *s1, *s2;
 	while (p != NULL)
 	{
-		if (p->typ == Node::nt)
+		switch(p->typ)
 		{
-			Indent(indent);
-			fwprintf(gen, L"%ls(", p->sym->name.c_str());
-			CopySourcePart(p->pos, 0);
-			fwprintf(gen, L");\n");
-		}
-		else if (p->typ == Node::t)
-		{
-			Indent(indent);
-			// assert: if isChecked[p->sym->n] is true, then isChecked contains only p->sym->n
-			if ((*isChecked)[p->sym->n]) fwprintf(gen, L"Get();\n");
-			else fwprintf(gen, L"Expect(%d);\n", p->sym->n);
-		}
-		if (p->typ == Node::wt)
-		{
-			Indent(indent);
-			s1 = tab->Expected(p->next, curSy);
-			s1->Or(tab->allSyncSets);
-			fwprintf(gen, L"ExpectWeak(%d, %d);\n", p->sym->n, NewCondSet(s1));
-		}
-		if (p->typ == Node::any)
-		{
-			Indent(indent);
-			int acc = Sets::Elements(p->set);
-			if
-			(
-			    tab->terminals.Count == (acc + 1)
-			 || (acc > 0 && Sets::Equals(p->set, isChecked))
-			)
-			{
-				// either this ANY accepts any terminal (the + 1 = end of file), or exactly what's allowed here
-				fwprintf(gen, L"Get();\n");
-			}
-			else
-			{
-				GenErrorMsg(altErr, curSy);
-				if (acc > 0)
-				{
-					fwprintf(gen, L"if ("); GenCond(p->set, p); fwprintf(gen, L") Get(); else SynErr(%d);\n", errorNr);
-				}
-				else
-				{
-					fwprintf(gen, L"SynErr(%d); // ANY node that matches no symbol\n", errorNr);
-				}
-			}
-		}
-
-		if (p->typ == Node::eps)     // nothing
-		{}
-		if (p->typ == Node::rslv)   // nothing
-		{}
-		if (p->typ == Node::sem)
-		{
-			CopySourcePart(p->pos, indent);
-		}
-		if (p->typ == Node::sync)
-		{
-			Indent(indent);
-			GenErrorMsg(syncErr, curSy);
-			s1 = p->set->Clone();
-			fwprintf(gen, L"while (!("); GenCond(s1, p); fwprintf(gen, L")) {");
-			fwprintf(gen, L"SynErr(%d); Get();", errorNr); fwprintf(gen, L"}\n");
-		}
-		if (p->typ == Node::alt)
-		{
-			s1 = tab->First(p);
-			bool equal = Sets::Equals(s1, isChecked);
-			bool useSwitch = UseSwitch(p);
-			if (useSwitch)
-			{
-				Indent(indent); fwprintf(gen, L"switch (la->kind) {\n");
-			}
-			p2 = p;
-			while (p2 != NULL)
-			{
-				s1 = tab->Expected(p2->sub, curSy);
+			case Node::nt: {
 				Indent(indent);
-				if (useSwitch)
+				fwprintf(gen, L"%ls(", p->sym->name.c_str());
+				CopySourcePart(p->pos, 0);
+				fwprintf(gen, L");\n");
+				break;
+			}
+			case Node::t: {
+				Indent(indent);
+				// assert: if isChecked[p->sym->n] is true, then isChecked contains only p->sym->n
+				if ((*isChecked)[p->sym->n]) fwprintf(gen, L"Get();\n");
+				else fwprintf(gen, L"Expect(%d);\n", p->sym->n);
+				break;
+			}
+			case Node::wt: {
+				Indent(indent);
+				BitArray *s1 = tab->Expected(p->next, curSy);
+				s1->Or(tab->allSyncSets);
+				fwprintf(gen, L"ExpectWeak(%d, %d);\n", p->sym->n, NewCondSet(s1));
+				break;
+			}
+			case Node::any: {
+				Indent(indent);
+				int acc = Sets::Elements(p->set);
+				if
+				(
+				    tab->terminals.Count == (acc + 1)
+				 || (acc > 0 && Sets::Equals(p->set, isChecked))
+				)
 				{
-					PutCaseLabels(s1); fwprintf(gen, L"{\n");
-				}
-				else if (p2 == p)
-				{
-					fwprintf(gen, L"if ("); GenCond(s1, p2->sub); fwprintf(gen, L") {\n");
-				}
-				else if (p2->down == NULL && equal)
-				{
-					fwprintf(gen, L"} else {\n");
+					// either this ANY accepts any terminal (the + 1 = end of file), or exactly what's allowed here
+					fwprintf(gen, L"Get();\n");
 				}
 				else
 				{
-					fwprintf(gen, L"} else if (");  GenCond(s1, p2->sub); fwprintf(gen, L") {\n");
+					GenErrorMsg(altErr, curSy);
+					if (acc > 0)
+					{
+						fwprintf(gen, L"if ("); GenCond(p->set, p); fwprintf(gen, L") Get(); else SynErr(%d);\n", errorNr);
+					}
+					else
+					{
+						fwprintf(gen, L"SynErr(%d); // ANY node that matches no symbol\n", errorNr);
+					}
 				}
-				GenCode(p2->sub, indent + 1, s1);
+				break;
+			}
+			case Node::eps: break;    // nothing
+			case Node::rslv: break;   // nothing
+			case Node::sem: {
+				CopySourcePart(p->pos, indent);
+				break;
+			}
+			case Node::sync: {
+				Indent(indent);
+				GenErrorMsg(syncErr, curSy);
+				BitArray *s1 = p->set->Clone();
+				fwprintf(gen, L"while (!("); GenCond(s1, p); fwprintf(gen, L")) {");
+				fwprintf(gen, L"SynErr(%d); Get();", errorNr); fwprintf(gen, L"}\n");
+				break;
+			}
+			case Node::alt: {
+				BitArray *s1 = tab->First(p);
+				bool equal = Sets::Equals(s1, isChecked);
+				bool useSwitch = UseSwitch(p);
 				if (useSwitch)
 				{
-					Indent(indent); fwprintf(gen, L"\tbreak;\n");
-					Indent(indent); fwprintf(gen, L"}\n");
+					Indent(indent); fwprintf(gen, L"switch (la->kind) {\n");
 				}
-				p2 = p2->down;
-			}
-			Indent(indent);
-			if (equal)
-			{
-				fwprintf(gen, L"}\n");
-			}
-			else
-			{
-				GenErrorMsg(altErr, curSy);
-				if (useSwitch)
+				Node *p2 = p;
+				while (p2 != NULL)
 				{
-					fwprintf(gen, L"default: SynErr(%d); break;\n", errorNr);
-					Indent(indent); fwprintf(gen, L"}\n");
+					BitArray *s1 = tab->Expected(p2->sub, curSy);
+					Indent(indent);
+					if (useSwitch)
+					{
+						PutCaseLabels(s1); fwprintf(gen, L"{\n");
+					}
+					else if (p2 == p)
+					{
+						fwprintf(gen, L"if ("); GenCond(s1, p2->sub); fwprintf(gen, L") {\n");
+					}
+					else if (p2->down == NULL && equal)
+					{
+						fwprintf(gen, L"} else {\n");
+					}
+					else
+					{
+						fwprintf(gen, L"} else if (");  GenCond(s1, p2->sub); fwprintf(gen, L") {\n");
+					}
+					GenCode(p2->sub, indent + 1, s1);
+					if (useSwitch)
+					{
+						Indent(indent); fwprintf(gen, L"\tbreak;\n");
+						Indent(indent); fwprintf(gen, L"}\n");
+					}
+					p2 = p2->down;
+				}
+				Indent(indent);
+				if (equal)
+				{
+					fwprintf(gen, L"}\n");
 				}
 				else
 				{
-					fwprintf(gen, L"} "); fwprintf(gen, L"else SynErr(%d);\n", errorNr);
+					GenErrorMsg(altErr, curSy);
+					if (useSwitch)
+					{
+						fwprintf(gen, L"default: SynErr(%d); break;\n", errorNr);
+						Indent(indent); fwprintf(gen, L"}\n");
+					}
+					else
+					{
+						fwprintf(gen, L"} "); fwprintf(gen, L"else SynErr(%d);\n", errorNr);
+					}
 				}
+				break;
 			}
-		}
-		if (p->typ == Node::iter)
-		{
-			Indent(indent);
-			p2 = p->sub;
-			fwprintf(gen, L"while (");
-			if (p2->typ == Node::wt)
-			{
-				s1 = tab->Expected(p2->next, curSy);
-				s2 = tab->Expected(p->next, curSy);
-				fwprintf(gen, L"WeakSeparator(%d,%d,%d) ", p2->sym->n, NewCondSet(s1), NewCondSet(s2));
-				s1 = new BitArray(tab->terminals.Count);  // for inner structure
-				if (p2->up || p2->next == NULL) p2 = NULL; else p2 = p2->next;
+			case Node::iter: {
+				Indent(indent);
+				Node *p2 = p->sub;
+				BitArray *s1;
+				fwprintf(gen, L"while (");
+				if (p2->typ == Node::wt)
+				{
+					s1 = tab->Expected(p2->next, curSy);
+					BitArray *s2 = tab->Expected(p->next, curSy);
+					fwprintf(gen, L"WeakSeparator(%d,%d,%d) ", p2->sym->n, NewCondSet(s1), NewCondSet(s2));
+					s1 = new BitArray(tab->terminals.Count);  // for inner structure
+					if (p2->up || p2->next == NULL) p2 = NULL; else p2 = p2->next;
+				}
+				else
+				{
+					s1 = tab->First(p2);
+					GenCond(s1, p2);
+				}
+				fwprintf(gen, L") {\n");
+				GenCode(p2, indent + 1, s1);
+				Indent(indent); fwprintf(gen, L"}\n");
+				break;
 			}
-			else
-			{
-				s1 = tab->First(p2);
-				GenCond(s1, p2);
+			case Node::opt: {
+				BitArray *s1 = tab->First(p->sub);
+				Indent(indent);
+				fwprintf(gen, L"if ("); GenCond(s1, p->sub); fwprintf(gen, L") {\n");
+				GenCode(p->sub, indent + 1, s1);
+				Indent(indent); fwprintf(gen, L"}\n");
+				break;
 			}
-			fwprintf(gen, L") {\n");
-			GenCode(p2, indent + 1, s1);
-			Indent(indent); fwprintf(gen, L"}\n");
-		}
-		if (p->typ == Node::opt)
-		{
-			s1 = tab->First(p->sub);
-			Indent(indent);
-			fwprintf(gen, L"if ("); GenCond(s1, p->sub); fwprintf(gen, L") {\n");
-			GenCode(p->sub, indent + 1, s1);
-			Indent(indent); fwprintf(gen, L"}\n");
-		}
+			default: break;   // nothing
+		}  // end switch
+
 		if (p->typ != Node::eps && p->typ != Node::sem && p->typ != Node::sync)
 			isChecked->SetAll(false);  // = new BitArray(Symbol.terminals.Count);
 		if (p->up) break;

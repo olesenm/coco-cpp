@@ -51,10 +51,13 @@ class BitArray
 
 public:
 
+	//! An empty BitArray
+	static const BitArray null;
+
 	// Constructors
 
 		//! Construct null or with specified size and default value
-		BitArray(int length = 0, const bool defaultValue = false);
+		BitArray(const int length = 0, const bool value = false);
 
 		//! Construct as a copy
 		BitArray(const BitArray &copy);
@@ -66,6 +69,9 @@ public:
 
 		//! Return size
 		int size() const;
+
+		//! Reset the size and value
+		void reset(const int length, const bool value = false);
 
 		//! Get value at index I.
 		bool Get(const int index) const;

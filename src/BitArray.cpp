@@ -37,26 +37,37 @@ License
 namespace Coco
 {
 
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+const BitArray BitArray::null(0);
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-BitArray::BitArray(const int length, const bool defaultValue)
+BitArray::BitArray(const int length, const bool value)
 :
 	size_(length),
-	data_(new unsigned char[(size_+7)>>3])
+	data_(0)
 {
-	if (defaultValue)
-		memset(data_, 0xFF, (size_+7)>>3);
-	else
-		memset(data_, 0x00, (size_+7)>>3);
+	const int storedSize = (size_+7) >> 3;
+	if (storedSize)
+	{
+		data_ = new unsigned char[storedSize];
+		memset(data_, (value ? 0xFF : 0x00), storedSize);
+	}
 }
 
 
 BitArray::BitArray(const BitArray &copy)
 :
 	size_(copy.size_),
-	data_(new unsigned char[(size_+7)>>3])
+	data_(0)
 {
-	memcpy(data_, copy.data_, (size_+7)>>3);
+	const int storedSize = (size_+7) >> 3;
+	data_ = new unsigned char[storedSize];
+
+	memcpy(data_, copy.data_, storedSize);
 }
 
 
@@ -74,6 +85,25 @@ BitArray::~BitArray()
 int BitArray::size() const
 {
 	return size_;
+}
+
+
+void BitArray::reset(const int length, const bool value)
+{
+	// the new size
+	const int storedSize = (length+7) >> 3;
+
+	if (storedSize != (size_+7) >> 3)
+	{
+		if (data_)
+		{
+			delete[] data_;
+		}
+		data_ = new unsigned char[storedSize];
+	}
+
+	size_ = length;
+	memset(data_, (value ? 0xFF : 0x00), storedSize);
 }
 
 
@@ -98,16 +128,14 @@ void BitArray::Set(const int index, const bool value)
 
 void BitArray::SetAll(const bool value)
 {
-	if (value)
-		memset(data_, 0xFF, (size_+7)>>3);
-	else
-		memset(data_, 0x00, (size_+7)>>3);
+	memset(data_, (value ? 0xFF : 0x00), (size_+7)>>3);
 }
 
 
 void BitArray::Not()
 {
-	for (int i=0; i<(size_+7)>>3; ++i)
+	const int storedSize = (size_+7) >> 3;
+	for (int i=0; i < storedSize; ++i)
 	{
 		data_[i] ^= 0xFF;
 	}
@@ -115,7 +143,10 @@ void BitArray::Not()
 
 void BitArray::And(const BitArray& b)
 {
-	for (int i=0; (i<(size_+7)>>3) && (i<(b.size_+7)>>3); ++i)
+	const int storedSize  = (size_+7) >> 3;
+	const int storedSizeB = (b.size_+7) >> 3;
+
+	for (int i=0; i < storedSize && i < storedSizeB; ++i)
 	{
 		data_[i] &= b.data_[i];
 	}
@@ -124,7 +155,10 @@ void BitArray::And(const BitArray& b)
 
 void BitArray::Or(const BitArray& b)
 {
-	for (int i=0; (i<(size_+7)>>3) && (i<(b.size_+7)>>3); ++i)
+	const int storedSize  = (size_+7) >> 3;
+	const int storedSizeB = (b.size_+7) >> 3;
+
+	for (int i=0; i < storedSize && i < storedSizeB; ++i)
 	{
 		data_[i] |= b.data_[i];
 	}
@@ -133,22 +167,31 @@ void BitArray::Or(const BitArray& b)
 
 void BitArray::Xor(const BitArray& b)
 {
-	for (int i=0; (i<(size_+7)>>3) && (i<(b.size_+7)>>3); ++i)
+	const int storedSize  = (size_+7) >> 3;
+	const int storedSizeB = (b.size_+7) >> 3;
+
+	for (int i=0; i < storedSize && i < storedSizeB; ++i)
 	{
 		data_[i] ^= b.data_[i];
 	}
 }
 
 
-bool BitArray::Equal(const BitArray& right) const
+bool BitArray::Equal(const BitArray& b) const
 {
-	if (size_ != right.size_)
+	if (size_ != b.size_)
 	{
 		return false;
 	}
+
+	// NOTE: could simply use byte-wise instead of bit-wise comparison
 	for (int i = 0; i < size_; ++i)
 	{
-		if ((data_[(i>>3)] & (1<<(i&7))) != (right.data_[(i>>3)] & (1<<(i&7))))
+		if
+		(
+		    (data_[(i>>3)] & (1<<(i&7)))
+		 != (b.data_[(i>>3)] & (1<<(i&7)))
+		)
 		{
 			return false;
 		}
@@ -159,16 +202,18 @@ bool BitArray::Equal(const BitArray& right) const
 
 // * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
-BitArray& BitArray::operator=(const BitArray& right)
+BitArray& BitArray::operator=(const BitArray& rhs)
 {
-	if (this != &right)          // avoid self assignment
+	if (this != &rhs)            // avoid self assignment
 	{
-		delete[] data_;           // prevents memory leak
-		size_ = right.size_;
-		data_ = new unsigned char[(size_+7)>>3];
-		memcpy(data_, right.data_, (size_+7)>>3);
+		delete[] data_;          // prevent memory leak
+		size_ = rhs.size_;
+		const int storedSize = (size_+7) >> 3;
+
+		data_ = new unsigned char[storedSize];
+		memcpy(data_, rhs.data_, storedSize);
 	}
-	return *this;   // enables cascaded assignments
+	return *this;   // enable cascaded assignments
 }
 
 

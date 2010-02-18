@@ -121,9 +121,9 @@ public:
 	void GetTargetStates(Action *a, BitArray* &targets, Symbol* &endOf, bool &ctx);
 
 	//------------------------- melted states ------------------------------
-	Melted* NewMelted(BitArray *set, State *state);
-	BitArray* MeltedSet(int nr);
-	Melted* StateWithSet(BitArray *s);
+	Melted* NewMelted(const BitArray& set, State *state);
+	const BitArray& MeltedSet(int nr);
+	Melted* StateWithSet(const BitArray& s);
 
 	//------------------------ comments --------------------------------
 	

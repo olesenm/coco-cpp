@@ -50,11 +50,11 @@ class BitArray;
 class Melted
 {
 public:
-	BitArray *set;  //!< set of old states
+	BitArray set;   //!< set of old states
 	State *state;   //!< new state
 	Melted *next;   //!< next Melted
 
-	Melted(BitArray *oldStates, State *newState)
+	Melted(const BitArray& oldStates, State *newState)
 	:
 		set(oldStates),
 		state(newState),

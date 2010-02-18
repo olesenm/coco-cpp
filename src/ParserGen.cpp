@@ -119,7 +119,7 @@ void ParserGen::GenErrorMsg(ParserGen::errorType errTyp, Symbol *sym)
 }
 
 
-int ParserGen::NewCondSet(BitArray *s)
+int ParserGen::NewCondSet(const BitArray *s)
 {
 	for (int i = 1; i < symSet.Count; i++) // skip symSet[0] (reserved for union of SYNC sets)
 		if (Sets::Equals(s, symSet[i])) return i;
@@ -128,7 +128,7 @@ int ParserGen::NewCondSet(BitArray *s)
 }
 
 
-void ParserGen::GenCond(BitArray *s, Node *p)
+void ParserGen::GenCond(const BitArray *s, Node *p)
 {
 	if (p->typ == Node::rslv) CopySourcePart(p->pos, 0);
 	else {
@@ -155,7 +155,7 @@ void ParserGen::GenCond(BitArray *s, Node *p)
 }
 
 
-void ParserGen::PutCaseLabels(BitArray *s)
+void ParserGen::PutCaseLabels(const BitArray *s)
 {
 	for (int i=0; i < tab->terminals.Count; i++)
 	{

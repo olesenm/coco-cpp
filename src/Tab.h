@@ -150,7 +150,7 @@ public:
 
 	void PrintSym(Symbol *sym) const;
 	void PrintSymbolTable();
-	void PrintSet(BitArray *s, int indent);
+	void PrintSet(const BitArray *s, int indent);
 	void PrintStatistics() const;
 
 	//---------------------------------------------------------------------
@@ -264,7 +264,7 @@ public:
 	//--------------- check for LL(1) errors ----------------------
 
 	void LL1Error(int cond, Symbol *sym);
-	void CheckOverlap(BitArray *s1, BitArray *s2, int cond);
+	void CheckOverlap(const BitArray *s1, const BitArray *s2, int cond);
 	void CheckAlts(Node *p);
 	void CheckLL1();
 
@@ -286,7 +286,7 @@ public:
 	//--------- check if every nts can be derived to terminals  ------------
 
 	//! true if graph can be derived to terminals
-	bool IsTerm(Node *p, BitArray *mark);
+	bool IsTerm(Node *p, const BitArray *mark);
 	bool AllNtToTerm();
 
 	//---------------------------------------------------------------------

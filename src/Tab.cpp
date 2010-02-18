@@ -236,7 +236,7 @@ void Tab::PrintSymbolTable()
 }
 
 
-void Tab::PrintSet(BitArray *s, int indent)
+void Tab::PrintSet(const BitArray *s, int indent)
 {
 	int col = indent;
 	for (int i=0; i < terminals.Count; i++)
@@ -1279,7 +1279,7 @@ void Tab::LL1Error(int cond, Symbol *sym)
 }
 
 
-void Tab::CheckOverlap(BitArray *s1, BitArray *s2, int cond)
+void Tab::CheckOverlap(const BitArray *s1, const BitArray *s2, int cond)
 {
 	for (int i=0; i < terminals.Count; i++)
 	{
@@ -1294,16 +1294,15 @@ void Tab::CheckOverlap(BitArray *s1, BitArray *s2, int cond)
 
 void Tab::CheckAlts(Node *p)
 {
-	BitArray *s1, *s2;
 	while (p != NULL)
 	{
 		if (p->typ == Node::alt)
 		{
+			BitArray *s1 = new BitArray(terminals.Count);
 			Node *q = p;
-			s1 = new BitArray(terminals.Count);
 			while (q != NULL)  // for all alternatives
 			{
-				s2 = Expected0(q->sub, curSy);
+				BitArray *s2 = Expected0(q->sub, curSy);
 				CheckOverlap(s1, s2, 1);
 				s1->Or(s2);
 				CheckAlts(q->sub);
@@ -1318,8 +1317,8 @@ void Tab::CheckAlts(Node *p)
 			}
 			else
 			{
-				s1 = Expected0(p->sub, curSy);
-				s2 = Expected(p->next, curSy);
+				BitArray *s1 = Expected0(p->sub, curSy);
+				BitArray *s2 = Expected(p->next, curSy);
 				CheckOverlap(s1, s2, 2);
 			}
 			CheckAlts(p->sub);
@@ -1476,7 +1475,7 @@ bool Tab::AllNtReached()
 
 //--------- check if every nts can be derived to terminals  ------------
 
-bool Tab::IsTerm(Node *p, BitArray *mark) // true if graph can be derived to terminals
+bool Tab::IsTerm(Node *p, const BitArray *mark) // true if graph can be derived to terminals
 {
 	while (p != NULL)
 	{

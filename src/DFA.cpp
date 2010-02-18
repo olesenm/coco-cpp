@@ -546,7 +546,7 @@ void DFA::MeltStates(State *state)
 			bool changed, ctx;
 
 			GetTargetStates(action, targets, endOf, ctx);
-			Melted *melt = StateWithSet(targets);
+			Melted *melt = StateWithSet(*targets);
 			if (melt == NULL)
 			{
 				State *s = NewState(); s->endOf = endOf; s->ctx = ctx;
@@ -559,7 +559,7 @@ void DFA::MeltStates(State *state)
 				{
 					changed = MakeUnique(s);
 				} while (changed);
-				melt = NewMelted(targets, s);
+				melt = NewMelted(*targets, s);
 			}
 			action->target->next = NULL;
 			action->target->state = melt->state;
@@ -747,7 +747,7 @@ void DFA::GetTargetStates
 //------------------------- melted states ------------------------------
 
 
-Melted* DFA::NewMelted(BitArray *set, State *state)
+Melted* DFA::NewMelted(const BitArray& set, State *state)
 {
 	Melted *m = new Melted(set, state);
 	m->next = firstMelted; firstMelted = m;
@@ -755,7 +755,7 @@ Melted* DFA::NewMelted(BitArray *set, State *state)
 }
 
 
-BitArray* DFA::MeltedSet(int nr)
+const BitArray& DFA::MeltedSet(int nr)
 {
 	for (Melted *m = firstMelted; m != NULL; m = m->next)
 	{
@@ -765,11 +765,11 @@ BitArray* DFA::MeltedSet(int nr)
 
 	//Errors::Exception("-- compiler error in Melted::Set");
 	//throw new Exception("-- compiler error in Melted::Set");
-	return NULL;
+	return BitArray::null;
 }
 
 
-Melted* DFA::StateWithSet(BitArray *s)
+Melted* DFA::StateWithSet(const BitArray& s)
 {
 	for (Melted *m = firstMelted; m != NULL; m = m->next)
 	{

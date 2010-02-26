@@ -36,9 +36,7 @@ License
 
 #include "DFA.h"
 #include "Action.h"
-#include "Tab.h"
 #include "Parser.h"
-#include "BitArray.h"
 #include "Scanner.h"
 #include "Utils.h"
 

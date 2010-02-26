@@ -33,6 +33,8 @@ License
 #ifndef COCO_NODE_H__
 #define COCO_NODE_H__
 
+#include "BitArray.h"
+
 #include "Position.h"
 #include "State.h"
 
@@ -41,7 +43,6 @@ namespace Coco
 
 // forward declarations
 class Symbol;
-class BitArray;
 
 /*---------------------------------------------------------------------------*\
                             Class Node Declaration

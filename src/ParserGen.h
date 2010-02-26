@@ -33,6 +33,9 @@ License
 #ifndef COCO_PARSERGEN_H__
 #define COCO_PARSERGEN_H__
 
+#include "ArrayList.h"
+#include "BitArray.h"
+
 #include "Position.h"
 #include "Tab.h"
 #include "Symbol.h"
@@ -45,7 +48,6 @@ namespace Coco
 // forward declarations
 class Errors;
 class Parser;
-class BitArray;
 
 /*---------------------------------------------------------------------------*\
                           Class ParserGen Declaration

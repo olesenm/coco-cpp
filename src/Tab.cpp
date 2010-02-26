@@ -34,7 +34,6 @@ License
 #include "CocoInfo.h"
 #include "Tab.h"
 #include "Parser.h"
-#include "BitArray.h"
 #include "Utils.h"
 
 #include <sstream>

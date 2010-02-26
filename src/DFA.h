@@ -35,6 +35,8 @@ License
 
 #include <stdlib.h>
 
+#include "BitArray.h"
+
 #include "Comment.h"
 #include "State.h"
 #include "Symbol.h"
@@ -49,8 +51,6 @@ namespace Coco
 // forward declarations
 class Action;
 class Parser;
-class Tab;
-class BitArray;
 
 /*---------------------------------------------------------------------------*\
                              Class DFA Declaration

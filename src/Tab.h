@@ -35,7 +35,9 @@ License
 #define COCO_TAB_H__
 
 #include "ArrayList.h"
+#include "BitArray.h"
 #include "HashTable.h"
+
 #include "Utils.h"
 #include "Position.h"
 #include "Symbol.h"
@@ -52,7 +54,6 @@ namespace Coco
 // forward declarations
 class Errors;
 class Parser;
-class BitArray;
 
 /*---------------------------------------------------------------------------*\
                              Class Tab Declaration

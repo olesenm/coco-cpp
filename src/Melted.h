@@ -33,14 +33,13 @@ License
 #ifndef COCO_MELTED_H__
 #define COCO_MELTED_H__
 
+#include "BitArray.h"
+
 #include "State.h"
 #include "Utils.h"
 
 namespace Coco
 {
-
-// forward declarations
-class BitArray;
 
 /*---------------------------------------------------------------------------*\
                            Class Melted Declaration

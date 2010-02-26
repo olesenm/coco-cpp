@@ -33,10 +33,8 @@ License
 
 #include <ctype.h>
 
-#include "ArrayList.h"
 #include "ParserGen.h"
 #include "Parser.h"
-#include "BitArray.h"
 #include "Utils.h"
 
 namespace Coco

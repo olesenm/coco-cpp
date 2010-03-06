@@ -111,10 +111,10 @@ public:
 	Symbol *gramSy;         //!< root nonterminal; filled by ATG
 	Symbol *eofSy;          //!< end of file symbol
 	Symbol *noSym;          //!< used in case of an error
-	BitArray *allSyncSets;  //!< union of all synchronisation sets
+	BitArray allSyncSets;   //!< union of all synchronisation sets
 	HashTable<Symbol> literals;    //!< symbols that are used as literals
 
-	BitArray *visited;      //!< mark list for graph traversals
+	BitArray visited;       //!< mark list for graph traversals
 	Symbol *curSy;          //!< current symbol in computation of sets
 
 	Parser *parser;         //!< other Coco objects
@@ -149,9 +149,9 @@ public:
 	//! Return node number
 	static int Num(Node *p);
 
-	void PrintSym(Symbol *sym) const;
+	void PrintSym(const Symbol *sym) const;
 	void PrintSymbolTable();
-	void PrintSet(const BitArray *s, int indent);
+	void PrintSet(const BitArray& s, int indent);
 	void PrintStatistics() const;
 
 	//---------------------------------------------------------------------
@@ -187,8 +187,8 @@ public:
 
 	//----------------- graph printing ----------------------
 
-	static int Ptr(Node *p, bool up);
-	static std::string Pos(Position *pos);
+	static int Ptr(const Node *p, bool up);
+	static std::string Pos(const Position *pos);
 	void PrintNodes();
 
 	//---------------------------------------------------------------------
@@ -203,7 +203,7 @@ public:
 	//----------- character class printing
 
 	static std::string Ch(const wchar_t ch);
-	void WriteCharSet(CharSet *s);
+	void WriteCharSet(const CharSet *s);
 	void WriteCharClasses();
 
 	//---------------------------------------------------------------------
@@ -211,8 +211,8 @@ public:
 	//---------------------------------------------------------------------
 
 	//! Computes the first set for the given Node
-	BitArray* First0(Node *p, BitArray *mark);
-	BitArray* First(Node *p);
+	BitArray First0(Node *p, BitArray& mark);
+	BitArray First(Node *p);
 	void CompFirstSets();
 	void CompFollow(Node *p);
 	void Complete(Symbol *sym);
@@ -220,9 +220,9 @@ public:
 	static Node* LeadingAny(Node *p);
 	void FindAS(Node *p); // find ANY sets
 	void CompAnySets();
-	BitArray* Expected(Node *p, Symbol *curSy);
+	BitArray Expected(Node *p, Symbol *curSy);
 	//! does not look behind resolvers; only called during LL(1) test and in CheckRes
-	BitArray* Expected0(Node *p, Symbol *curSy);
+	BitArray Expected0(Node *p, Symbol *curSy);
 	void CompSync(Node *p);
 	void CompSyncSets();
 	void SetupAnys();
@@ -265,13 +265,13 @@ public:
 	//--------------- check for LL(1) errors ----------------------
 
 	void LL1Error(int cond, Symbol *sym);
-	void CheckOverlap(const BitArray *s1, const BitArray *s2, int cond);
+	void CheckOverlap(const BitArray& s1, const BitArray& s2, int cond);
 	void CheckAlts(Node *p);
 	void CheckLL1();
 
 	//------------- check if resolvers are legal  --------------------
 
-	void ResErr(Node *p, const wchar_t* msg);
+	void ResErr(const Node *p, const wchar_t* msg);
 	void CheckRes(Node *p, bool rslvAllowed);
 	void CheckResolvers();
 
@@ -287,7 +287,7 @@ public:
 	//--------- check if every nts can be derived to terminals  ------------
 
 	//! true if graph can be derived to terminals
-	bool IsTerm(Node *p, const BitArray *mark);
+	bool IsTerm(const Node *p, const BitArray& mark) const;
 	bool AllNtToTerm();
 
 	//---------------------------------------------------------------------

@@ -49,7 +49,7 @@ Node::Node(Node::nodeType theTyp, Symbol* theSym, int lineNr)
 	val(0),
 	code(Node::normalTrans),
 	line(lineNr),
-	set(NULL),
+	set(0),
 	pos(NULL),
 	state(NULL),
 	up(false),

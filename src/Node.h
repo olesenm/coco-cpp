@@ -86,7 +86,7 @@ public:
 	transitionType code;  //!< chr, clas: transition code
 	int      line;  //!< source text line number of item in this node
 
-	BitArray *set;  //!< any, sync: the set represented by this node
+	BitArray set;   //!< any, sync: the set represented by this node
 
 	//! nt, t, wt: pos of actual attributes
 	//! sem:  pos of semantic action in source text

@@ -120,16 +120,16 @@ void ParserGen::GenErrorMsg(ParserGen::errorType errTyp, Symbol *sym)
 }
 
 
-int ParserGen::NewCondSet(const BitArray *s)
+int ParserGen::NewCondSet(const BitArray& s)
 {
 	for (int i = 1; i < symSet.Count; i++) // skip symSet[0] (reserved for union of SYNC sets)
-		if (Sets::Equals(s, symSet[i])) return i;
-	symSet.Add(s->Clone());
+		if (Sets::Equals(s, *(symSet[i]))) return i;
+	symSet.Add(s.Clone());
 	return symSet.Count-1;
 }
 
 
-void ParserGen::GenCond(const BitArray *s, Node *p)
+void ParserGen::GenCond(const BitArray& s, Node *p)
 {
 	if (p->typ == Node::rslv) CopySourcePart(p->pos, 0);
 	else {
@@ -140,7 +140,7 @@ void ParserGen::GenCond(const BitArray *s, Node *p)
 			for (int i=0; i < tab->terminals.Count; i++)
 			{
 				Symbol *sym = tab->terminals[i];
-				if ((*s)[sym->n])
+				if (s[sym->n])
 				{
 					fwprintf(gen, L"la->kind == %d", sym->n);
 					--n;
@@ -156,17 +156,17 @@ void ParserGen::GenCond(const BitArray *s, Node *p)
 }
 
 
-void ParserGen::PutCaseLabels(const BitArray *s)
+void ParserGen::PutCaseLabels(const BitArray& s)
 {
 	for (int i=0; i < tab->terminals.Count; i++)
 	{
 		Symbol *sym = tab->terminals[i];
-		if ((*s)[sym->n]) fwprintf(gen, L"case %d: ", sym->n);
+		if (s[sym->n]) fwprintf(gen, L"case %d: ", sym->n);
 	}
 }
 
 
-void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked)
+void ParserGen::GenCode(Node *p, int indent, BitArray& isChecked)
 {
 	while (p != NULL)
 	{
@@ -182,14 +182,14 @@ void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked)
 			case Node::t: {
 				Indent(indent);
 				// assert: if isChecked[p->sym->n] is true, then isChecked contains only p->sym->n
-				if ((*isChecked)[p->sym->n]) fwprintf(gen, L"Get();\n");
+				if (isChecked[p->sym->n]) fwprintf(gen, L"Get();\n");
 				else fwprintf(gen, L"Expect(%d);\n", p->sym->n);
 				break;
 			}
 			case Node::wt: {
 				Indent(indent);
-				BitArray *s1 = tab->Expected(p->next, curSy);
-				s1->Or(tab->allSyncSets);
+				BitArray s1 = tab->Expected(p->next, curSy);
+				s1.Or(tab->allSyncSets);
 				fwprintf(gen, L"ExpectWeak(%d, %d);\n", p->sym->n, NewCondSet(s1));
 				break;
 			}
@@ -228,15 +228,14 @@ void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked)
 			case Node::sync: {
 				Indent(indent);
 				GenErrorMsg(syncErr, curSy);
-				BitArray *s1 = p->set->Clone();
-				fwprintf(gen, L"while (!("); GenCond(s1, p); fwprintf(gen, L")) {");
+				fwprintf(gen, L"while (!("); GenCond(p->set, p); fwprintf(gen, L")) {");
 				fwprintf(gen, L"SynErr(%d); Get();", errorNr); fwprintf(gen, L"}\n");
 				break;
 			}
 			case Node::alt: {
-				BitArray *s1 = tab->First(p);
-				bool equal = Sets::Equals(s1, isChecked);
-				bool useSwitch = UseSwitch(p);
+				BitArray s1 = tab->First(p);
+				const bool equal = Sets::Equals(s1, isChecked);
+				const bool useSwitch = UseSwitch(p);
 				if (useSwitch)
 				{
 					Indent(indent); fwprintf(gen, L"switch (la->kind) {\n");
@@ -244,7 +243,7 @@ void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked)
 				Node *p2 = p;
 				while (p2 != NULL)
 				{
-					BitArray *s1 = tab->Expected(p2->sub, curSy);
+					BitArray s1 = tab->Expected(p2->sub, curSy);
 					Indent(indent);
 					if (useSwitch)
 					{
@@ -293,14 +292,14 @@ void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked)
 			case Node::iter: {
 				Indent(indent);
 				Node *p2 = p->sub;
-				BitArray *s1;
+				BitArray s1;
 				fwprintf(gen, L"while (");
 				if (p2->typ == Node::wt)
 				{
 					s1 = tab->Expected(p2->next, curSy);
-					BitArray *s2 = tab->Expected(p->next, curSy);
+					BitArray s2 = tab->Expected(p->next, curSy);
 					fwprintf(gen, L"WeakSeparator(%d,%d,%d) ", p2->sym->n, NewCondSet(s1), NewCondSet(s2));
-					s1 = new BitArray(tab->terminals.Count);  // for inner structure
+					s1.reset(tab->terminals.Count);  // for inner structure
 					if (p2->up || p2->next == NULL) p2 = NULL; else p2 = p2->next;
 				}
 				else
@@ -314,7 +313,7 @@ void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked)
 				break;
 			}
 			case Node::opt: {
-				BitArray *s1 = tab->First(p->sub);
+				BitArray s1 = tab->First(p->sub);
 				Indent(indent);
 				fwprintf(gen, L"if ("); GenCond(s1, p->sub); fwprintf(gen, L") {\n");
 				GenCode(p->sub, indent + 1, s1);
@@ -325,7 +324,7 @@ void ParserGen::GenCode(Node *p, int indent, BitArray *isChecked)
 		}  // end switch
 
 		if (p->typ != Node::eps && p->typ != Node::sem && p->typ != Node::sync)
-			isChecked->SetAll(false);  // = new BitArray(Symbol.terminals.Count);
+			isChecked.SetAll(false);  // = new BitArray(Symbol.terminals.Count);
 		if (p->up) break;
 		p = p->next;
 	}
@@ -394,7 +393,8 @@ void ParserGen::GenProductions()
 		CopySourcePart(sym->attrPos, 0);
 		fwprintf(gen, L")\n{\n");
 		CopySourcePart(sym->semPos, 1);
-		GenCode(sym->graph, 1, new BitArray(tab->terminals.Count));
+		BitArray isChecked(tab->terminals.Count);
+		GenCode(sym->graph, 1, isChecked);
 		fwprintf(gen, L"}\n\n\n");
 	}
 }
@@ -406,13 +406,13 @@ void ParserGen::InitSets()
 
 	for (int i=0; i < symSet.Count; i++)
 	{
-		BitArray *s = symSet[i];
+		const BitArray& s = *(symSet[i]);
 		fwprintf(gen, L"\t\t{");
 		int j = 0;
 		for (int k=0; k<tab->terminals.Count; k++)
 		{
 			Symbol *sym = tab->terminals[k];
-			if ((*s)[sym->n]) fwprintf(gen, L"T,"); else fwprintf(gen, L"x,");
+			if (s[sym->n]) fwprintf(gen, L"T,"); else fwprintf(gen, L"x,");
 			++j;
 			if (j % 4 == 0) fwprintf(gen, L" ");
 		}
@@ -427,7 +427,7 @@ void ParserGen::WriteParser()
 {
 	tab->preproc_.reset();               // reset pre-processor logic
 	int oldPos = tab->buffer->GetPos();  // Pos is modified by CopySourcePart
-	symSet.Add(tab->allSyncSets);
+	symSet.Add(tab->allSyncSets.Clone());
 
 	fram = tab->OpenFrameFile("Parser.frame");
 	if (fram == NULL)
@@ -568,6 +568,8 @@ ParserGen::ParserGen(Parser *parser)
 
 ParserGen::~ParserGen()
 {
+	symSet.Delete();
+
 	if (preamblePos) { delete preamblePos; }
 	if (semDeclPos) { delete semDeclPos; }
 	if (initCodePos) { delete initCodePos; }

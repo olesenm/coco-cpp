@@ -83,16 +83,16 @@ public:
 		void SetAll(const bool value);
 
 		//! Invert bits
-		void Not();
+		BitArray& Not();
 
 		//! And with the bits in b
-		void And(const BitArray& b);
+		BitArray& And(const BitArray& b);
 
 		//! Or with the bits in b
-		void Or(const BitArray& b);
+		BitArray& Or(const BitArray& b);
 
 		//! Xor with the bits in b
-		void Xor(const BitArray& b);
+		BitArray& Xor(const BitArray& b);
 
 		//! Return true if bits are identical
 		bool Equal(const BitArray& b) const;
@@ -113,31 +113,6 @@ public:
 		{
 			return new BitArray(*this);
 		}
-
-		//! And with the bits in b
-		inline void And(const BitArray *b)
-		{
-			this->And(*b);
-		}
-
-		//! Or with the bits in b
-		inline void Or(const BitArray *b)
-		{
-			this->Or(*b);
-		}
-
-		//! Xor with the bits in b
-		inline void Xor(const BitArray *b)
-		{
-			this->Xor(*b);
-		}
-
-		//! Return true if bits are identical
-		inline bool Equal(const BitArray *b) const
-		{
-			return this->Equal(*b);
-		}
-
 
 };
 

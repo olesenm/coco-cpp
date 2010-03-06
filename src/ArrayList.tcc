@@ -76,7 +76,7 @@ void ArrayList<Type>::Add(Type *ptr)
 
 
 template<class Type>
-bool ArrayList<Type>::Remove(Type *ptr)
+bool ArrayList<Type>::Remove(const Type *ptr)
 {
 	for (int i=0; i < Count; i++)
 	{

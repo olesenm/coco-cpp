@@ -54,7 +54,7 @@ BitArray::BitArray(const int length, const bool value)
 	if (storedSize)
 	{
 		data_ = new unsigned char[storedSize];
-		memset(data_, (value ? 0xFF : 0x00), storedSize);
+		memset(data_, (value ? ~0 : 0), storedSize);
 	}
 }
 
@@ -103,7 +103,7 @@ void BitArray::reset(const int length, const bool value)
 	}
 
 	size_ = length;
-	memset(data_, (value ? 0xFF : 0x00), storedSize);
+	memset(data_, (value ? ~0 : 0), storedSize);
 }
 
 
@@ -128,20 +128,21 @@ void BitArray::Set(const int index, const bool value)
 
 void BitArray::SetAll(const bool value)
 {
-	memset(data_, (value ? 0xFF : 0x00), (size_+7)>>3);
+	memset(data_, (value ? ~0 : 0), (size_+7)>>3);
 }
 
 
-void BitArray::Not()
+BitArray& BitArray::Not()
 {
 	const int storedSize = (size_+7) >> 3;
 	for (int i=0; i < storedSize; ++i)
 	{
-		data_[i] ^= 0xFF;
+		data_[i] ^= ~0;
 	}
+	return *this;   // enable cascaded operations
 }
 
-void BitArray::And(const BitArray& b)
+BitArray& BitArray::And(const BitArray& b)
 {
 	const int storedSize  = (size_+7) >> 3;
 	const int storedSizeB = (b.size_+7) >> 3;
@@ -150,10 +151,11 @@ void BitArray::And(const BitArray& b)
 	{
 		data_[i] &= b.data_[i];
 	}
+	return *this;   // enable cascaded operations
 }
 
 
-void BitArray::Or(const BitArray& b)
+BitArray& BitArray::Or(const BitArray& b)
 {
 	const int storedSize  = (size_+7) >> 3;
 	const int storedSizeB = (b.size_+7) >> 3;
@@ -162,10 +164,11 @@ void BitArray::Or(const BitArray& b)
 	{
 		data_[i] |= b.data_[i];
 	}
+	return *this;   // enable cascaded operations
 }
 
 
-void BitArray::Xor(const BitArray& b)
+BitArray& BitArray::Xor(const BitArray& b)
 {
 	const int storedSize  = (size_+7) >> 3;
 	const int storedSizeB = (b.size_+7) >> 3;
@@ -174,6 +177,7 @@ void BitArray::Xor(const BitArray& b)
 	{
 		data_[i] ^= b.data_[i];
 	}
+	return *this;   // enable cascaded operations
 }
 
 
@@ -213,7 +217,7 @@ BitArray& BitArray::operator=(const BitArray& rhs)
 		data_ = new unsigned char[storedSize];
 		memcpy(data_, rhs.data_, storedSize);
 	}
-	return *this;   // enable cascaded assignments
+	return *this;   // enable cascaded operations
 }
 
 

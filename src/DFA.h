@@ -95,12 +95,12 @@ public:
 		Node::nodeType typ, int sym, Node::transitionType tc
 	);
 	void CombineShifts();
-	void FindUsedStates(State *state, BitArray *used);
+	void FindUsedStates(State *state, BitArray& used);
 	void DeleteRedundantStates();
 	State* TheState(Node *p);
-	void Step(State *from, Node *p, BitArray *stepped);
+	void Step(State *from, Node *p, BitArray& stepped);
 	void NumberNodes(Node *p, State *state, bool renumIter);
-	void FindTrans(Node *p, bool start, BitArray *marked);
+	void FindTrans(Node *p, bool start, BitArray& marked);
 	void ConvertToStates(Node *p, Symbol *sym);
 
 	// match string against current automaton; store it either as a fixedToken or as a litToken
@@ -118,7 +118,7 @@ public:
 
 	//---------------------------- actions --------------------------------
 	Action* FindAction(State *state, wchar_t ch);
-	void GetTargetStates(Action *a, BitArray* &targets, Symbol* &endOf, bool &ctx);
+	Symbol* GetTargetStates(Action *a, BitArray& targets, bool &ctx);
 
 	//------------------------- melted states ------------------------------
 	Melted* NewMelted(const BitArray& set, State *state);
@@ -126,7 +126,7 @@ public:
 	Melted* StateWithSet(const BitArray& s);
 
 	//------------------------ comments --------------------------------
-	
+
 	std::wstring CommentStr(Node *p);
 	void NewComment(Node *from, Node *to, bool nested);
 

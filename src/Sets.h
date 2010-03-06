@@ -98,7 +98,7 @@ struct Sets
 		const int max = a.size();
 		for (int i=0; i<max; i++)
 		{
-			if (b[i] && ! a[i])
+			if (b[i] && !a[i])
 			{
 				return false;
 			}
@@ -123,45 +123,6 @@ struct Sets
 		BitArray c(b);
 		c.Not();
 		a.And(c);
-	}
-
-
-	// Member Functions with pointers
-
-	//! Return the first element set in b, -1 if nothing is set
-	static inline int First(const BitArray *b)
-	{
-		return Sets::First(*b);
-	}
-
-	//! Return the number of elements set in b
-	static inline int Elements(const BitArray *b)
-	{
-		return Sets::Elements(*b);
-	}
-
-	//! Check: (a == b)?
-	static inline bool Equals(const BitArray *a, const BitArray *b)
-	{
-		return Sets::Equals(*a, *b);
-	}
-
-	//! Check: (a > b)?
-	static inline bool Includes(const BitArray *a, const BitArray *b)
-	{
-		return Sets::Includes(*a, *b);
-	}
-
-	//! Check: (a * b != {})
-	static inline bool Intersect(const BitArray *a, const BitArray *b)
-	{
-		return Sets::Intersect(*a, *b);
-	}
-
-	//! Operation: a = a - b
-	static inline void Subtract(BitArray *a, const BitArray *b)
-	{
-		Sets::Subtract(*a, *b);
 	}
 
 };

@@ -95,10 +95,10 @@ public:
 	void CopyFramePart(const std::string& stop, const bool doOutput=true);
 	void CopySourcePart(Position *pos, int indent);
 	void GenErrorMsg(errorType errTyp, Symbol *sym);
-	int  NewCondSet(const BitArray *s);
-	void GenCond(const BitArray *s, Node *p);
-	void PutCaseLabels(const BitArray *s);
-	void GenCode(Node *p, int indent, BitArray *isChecked);
+	int  NewCondSet(const BitArray& s);
+	void GenCond(const BitArray& s, Node *p);
+	void PutCaseLabels(const BitArray& s);
+	void GenCode(Node *p, int indent, BitArray& isChecked);
 	void GenTokens();
 	void GenTokensHeader();
 	void GenPragmas();

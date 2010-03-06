@@ -158,10 +158,10 @@ void DFA::CombineShifts()
 }
 
 
-void DFA::FindUsedStates(State *state, BitArray *used)
+void DFA::FindUsedStates(State *state, BitArray& used)
 {
-	if ((*used)[state->nr]) return;
-	used->Set(state->nr, true);
+	if (used[state->nr]) return;
+	used.Set(state->nr, true);
 	for (Action *a = state->firstAction; a != NULL; a = a->next)
 	{
 		FindUsedStates(a->target->state, used);
@@ -172,7 +172,7 @@ void DFA::FindUsedStates(State *state, BitArray *used)
 void DFA::DeleteRedundantStates()
 {
 	State **newState = new State*[lastStateNr + 1];
-	BitArray *used = new BitArray(lastStateNr + 1);
+	BitArray used(lastStateNr + 1);
 	FindUsedStates(firstState, used);
 
 	// combine equal final states
@@ -180,7 +180,7 @@ void DFA::DeleteRedundantStates()
 	{
 		if
 		(
-		    (*used)[s1->nr]
+		    used[s1->nr]
 		 && s1->endOf != NULL
 		 && s1->firstAction == NULL
 		 && !(s1->ctx)
@@ -190,13 +190,13 @@ void DFA::DeleteRedundantStates()
 			{
 				if
 				(
-				    (*used)[s2->nr]
+				    used[s2->nr]
 				 && s1->endOf == s2->endOf
 				 && s2->firstAction == NULL
 				 && !(s2->ctx)
 				)
 				{
-					used->Set(s2->nr, false);
+					used.Set(s2->nr, false);
 					newState[s2->nr] = s1;
 				}
 			}
@@ -205,11 +205,11 @@ void DFA::DeleteRedundantStates()
 
 	for (State *state = firstState; state != NULL; state = state->next)
 	{
-		if ((*used)[state->nr])
+		if (used[state->nr])
 		{
 			for (Action *a = state->firstAction; a != NULL; a = a->next)
 			{
-				if (!((*used)[a->target->state->nr]))
+				if (!used[a->target->state->nr])
 				{
 					a->target->state = newState[a->target->state->nr];
 				}
@@ -221,7 +221,7 @@ void DFA::DeleteRedundantStates()
 	lastState = firstState; lastStateNr = 0; // firstState has number 0
 	for (State *state = firstState->next; state != NULL; state = state->next)
 	{
-		if ((*used)[state->nr])
+		if (used[state->nr])
 		{
 			state->nr = ++lastStateNr;
 			lastState = state;
@@ -233,7 +233,6 @@ void DFA::DeleteRedundantStates()
 	}
 
 	delete[] newState;
-	delete used;
 }
 
 
@@ -252,10 +251,10 @@ State* DFA::TheState(Node *p)
 }
 
 
-void DFA::Step(State *from, Node *p, BitArray *stepped)
+void DFA::Step(State *from, Node *p, BitArray& stepped)
 {
 	if (p == NULL) return;
-	stepped->Set(p->n, true);
+	stepped.Set(p->n, true);
 
 	switch (p->typ) {
 		case Node::clas:
@@ -275,7 +274,7 @@ void DFA::Step(State *from, Node *p, BitArray *stepped)
 				return;
 			}
 
-			if (p->next != NULL && !((*stepped)[p->next->n]))
+			if (p->next != NULL && !stepped[p->next->n])
 			{
 				Step(from, p->next, stepped);
 			}
@@ -283,14 +282,13 @@ void DFA::Step(State *from, Node *p, BitArray *stepped)
 
 			if (p->state != from)
 			{
-				BitArray *newStepped = new BitArray(tab->nodes.Count);
+				BitArray newStepped(tab->nodes.Count);
 				Step(p->state, p, newStepped);
-				delete newStepped;
 			}
 			break;
 		}
 		case Node::opt: {
-			if (p->next != NULL && !((*stepped)[p->next->n]))
+			if (p->next != NULL && !stepped[p->next->n])
 			{
 				Step(from, p->next, stepped);
 			}
@@ -347,15 +345,14 @@ void DFA::NumberNodes(Node *p, State *state, bool renumIter)
 }
 
 
-void DFA::FindTrans(Node *p, bool start, BitArray *marked)
+void DFA::FindTrans(Node *p, bool start, BitArray& marked)
 {
-	if (p == NULL || (*marked)[p->n]) return;
-	marked->Set(p->n, true);
+	if (p == NULL || marked[p->n]) return;
+	marked.Set(p->n, true);
 	if (start)
 	{
-		BitArray *stepped = new BitArray(tab->nodes.Count);
+		BitArray stepped(tab->nodes.Count);
 		Step(p->state, p, stepped); // start of group of equally numbered nodes
-		delete stepped;
 	}
 
 	switch (p->typ) {
@@ -390,12 +387,12 @@ void DFA::ConvertToStates(Node *p, Symbol *sym)
 		return;
 	}
 	NumberNodes(curGraph, firstState, true);
-	FindTrans(curGraph, true, new BitArray(tab->nodes.Count));
+	BitArray marked(tab->nodes.Count);
+	FindTrans(curGraph, true, marked);
 	if (p->typ == Node::iter)
 	{
-		BitArray *stepped = new BitArray(tab->nodes.Count);
+		BitArray stepped(tab->nodes.Count);
 		Step(firstState, p, stepped);
-		delete stepped;
 	}
 }
 
@@ -552,12 +549,11 @@ void DFA::MeltStates(State *state)
 	{
 		if (action->target->next != NULL)
 		{
-			BitArray *targets;
-			Symbol *endOf;
-			bool changed, ctx;
+			BitArray targets;
+			bool ctx;
 
-			GetTargetStates(action, targets, endOf, ctx);
-			Melted *melt = StateWithSet(*targets);
+			Symbol *endOf = GetTargetStates(action, targets, ctx);
+			Melted *melt = StateWithSet(targets);
 			if (melt == NULL)
 			{
 				State *s = NewState(); s->endOf = endOf; s->ctx = ctx;
@@ -566,11 +562,12 @@ void DFA::MeltStates(State *state)
 					s->MeltWith(targ->state);
 				}
 
+				bool changed;
 				do
 				{
 					changed = MakeUnique(s);
 				} while (changed);
-				melt = NewMelted(*targets, s);
+				melt = NewMelted(targets, s);
 			}
 			action->target->next = NULL;
 			action->target->state = melt->state;
@@ -701,25 +698,27 @@ Action* DFA::FindAction(State *state, wchar_t ch)
 }
 
 
-void DFA::GetTargetStates
+Symbol* DFA::GetTargetStates
 (
-    Action *a, BitArray* &targets, Symbol* &endOf, bool &ctx
+    Action *a, BitArray& targets, bool &ctx
 )
 {
 	// compute the set of target states
-	targets = new BitArray(maxStates); endOf = NULL;
+	targets.reset(maxStates);
+	Symbol *endOf = NULL;
 	ctx = false;
+
 	for (Target *t = a->target; t != NULL; t = t->next)
 	{
 		int stateNr = t->state->nr;
 
 		if (stateNr <= lastSimState)
 		{
-			targets->Set(stateNr, true);
+			targets.Set(stateNr, true);
 		}
 		else
 		{
-			targets->Or(MeltedSet(stateNr));
+			targets.Or(MeltedSet(stateNr));
 		}
 		if (t->state->endOf != NULL)
 		{
@@ -752,6 +751,8 @@ void DFA::GetTargetStates
 			// }
 		}
 	}
+
+	return endOf;
 }
 
 

@@ -51,14 +51,14 @@ class ArrayList
 public:
 	int Count;
 
-	ArrayList(int size=10);     //!< Construct with default capacity
-	virtual ~ArrayList();       //<! Destructor
+	ArrayList(int size=10);   //!< Construct with default capacity
+	virtual ~ArrayList();     //!< Destructor
 
-	void Add(Type *ptr);        //!< Add pointer to the list
-	bool Remove(Type *ptr);     //!< Remove pointer from the list
+	void Add(Type *ptr);          //!< Add pointer to the list
+	bool Remove(const Type *ptr); //!< Remove pointer from the list
 
-	void Delete();              //!< Delete all pointers in the list
-	void Clear();               //!< Reduce size to zero, does not delete pointers
+	void Delete();        //!< Delete all pointers in the list
+	void Clear();         //!< Reduce size to zero, does not delete pointers
 
 	//! Return pointer corresponding to the index, return NULL for out-of-range
 	Type* operator[](int index);

@@ -106,6 +106,30 @@ command-line options:
 
 ---------------
 
+#### Frame Locations
+
+Scanner.frame and Parser.frame must be located in one of these
+directories:
+
+1. In the specified -frames directory.
+2. The current directory.
+3. The same directory as the atg grammar.
+4. The share directory relative to the executable: ../share/coco-cpp/
+
+If *--prefix* (not *--exec-prefix*) is used when configuring and
+installing coco-cpp (on Unix-style systems), the files will be
+installed, for example, in these locations
+
+    /usr/bin/coco-cpp
+    /usr/share/coco-cpp/Parser.frame
+    /usr/share/coco-cpp/Scanner.frame
+
+The frame files can then be found in a share directory relative to the
+executable, without needing to specify *-frames* separately.
+
+
+---------------
+
 #### Scanner memory allocation
 
 To avoid repeated allocation/deallocation for each token, an internal

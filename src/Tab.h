@@ -97,6 +97,7 @@ public:
 #else
 	static std::string srcDir;     //!< directory path of the atg file
 	static std::string frameDir;   //!< directory containing the frame files
+	static std::string shareDir;   //!< directory containing the frame files
 	static std::string outDir;     //!< directory for generated files
 
 	// Data member

@@ -1099,12 +1099,13 @@ void DFA::WriteStartTab()
 void DFA::WriteScanner()
 {
 	tab->preproc_.reset();               // reset pre-processor logic
-	int oldPos = tab->buffer->GetPos();  // Pos is modified by CopySourcePart
+	const int oldPos = tab->buffer->GetPos();  // Pos is modified by CopySourcePart
 
+	wprintf(L"scanner - ");
 	fram = tab->OpenFrameFile("Scanner.frame");
 	if (fram == NULL)
 	{
-		errors->Exception(L"-- Cannot open Scanner frame.\n");
+		errors->Exception(L"-- Cannot open Scanner frame\n");
 	}
 
 

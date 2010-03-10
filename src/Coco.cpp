@@ -59,6 +59,7 @@ directories:
 -# In the specified -frames directory.
 -# The current directory.
 -# The same directory as the atg grammar.
+-# The share directory relative to the executable: ../share/coco-cpp (non-Windows)
 
 Unless specified with the @em -o option, the generated scanner/parser
 files are written in the same directory as the atg grammar!
@@ -149,7 +150,7 @@ with the same syntax. For example,
 /*-------------------------------------------------------------------------*/
 
 #include <stdio.h>
-#include "CocoInfo.h"
+#include "CocoDefs.h"
 #include "Scanner.h"
 #include "Parser.h"
 #include "Utils.h"
@@ -191,8 +192,12 @@ void printUsage(const char* message = NULL)
 	wprintf(L"Scanner.frame and Parser.frame must be located in one of these directories:\n");
 	wprintf(L"  1. In the specified -frames directory.\n");
 	wprintf(L"  2. The current directory.\n");
-	wprintf(L"  3. The same directory as the atg grammar.\n\n");
-	wprintf(L"%s\n\n", PACKAGE_URL);
+	wprintf(L"  3. The same directory as the atg grammar.\n");
+#ifndef _WIN32
+	wprintf(L"  4. The share directory relative to the executable: %s\n", COCO_SHARE);
+#endif
+
+	wprintf(L"\n%s\n\n", PACKAGE_URL);
 }
 
 
@@ -211,7 +216,20 @@ int main(int argc, char *argv[])
 	std::wstring srcName;
 #else
 	std::string srcName;
+
+	// set location of share directory relative to the executable
+	{
+		const std::string exeName(argv[0]);
+		// find last '/' - path separator
+		int pos = exeName.find_last_of('/');
+		if (pos >= 0)
+		{
+			Tab::shareDir = exeName.substr(0, pos+1);
+		}
+		Tab::shareDir += COCO_SHARE;
+	}
 #endif
+
 	bool traceToFile = true;
 
 	for (int i = 1; i < argc; i++)

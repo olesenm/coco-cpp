@@ -31,7 +31,7 @@ License
     Coco/R itself) does not fall under the GNU General Public License.
 \*---------------------------------------------------------------------------*/
 
-#include "CocoInfo.h"
+#include "CocoDefs.h"
 #include "Tab.h"
 #include "Parser.h"
 #include "Utils.h"
@@ -76,6 +76,7 @@ std::wstring Tab::outDir;
 #else
 std::string Tab::srcDir;
 std::string Tab::frameDir;
+std::string Tab::shareDir;
 std::string Tab::outDir;
 #endif
 
@@ -1778,6 +1779,7 @@ FILE* Tab::OpenFrameFile(const std::string& frameName) const
 
 		if ((ifh = _wfopen(fullName.c_str(), L"r")) != NULL)
 		{
+			wprintf(L"using frame: '%ls'\n", fullName.c_str());
 			return ifh;
 		}
 	}
@@ -1786,6 +1788,7 @@ FILE* Tab::OpenFrameFile(const std::string& frameName) const
 	fullName = coco_stdWString(frameName);
 	if ((ifh = _wfopen(fullName.c_str(), L"r")) != NULL)
 	{
+		wprintf(L"using frame: '%ls'\n", fullName.c_str());
 		return ifh;
 	}
 
@@ -1795,6 +1798,7 @@ FILE* Tab::OpenFrameFile(const std::string& frameName) const
 
 	if ((ifh = _wfopen(fullName.c_str(), L"r")) != NULL)
 	{
+		wprintf(L"using frame: '%ls'\n", fullName.c_str());
 		return ifh;
 	}
 #else
@@ -1810,6 +1814,7 @@ FILE* Tab::OpenFrameFile(const std::string& frameName) const
 
 		if ((ifh = fopen(fullName.c_str(), "r")) != NULL)
 		{
+			wprintf(L"using frame: '%s'\n", fullName.c_str());
 			return ifh;
 		}
 	}
@@ -1818,6 +1823,7 @@ FILE* Tab::OpenFrameFile(const std::string& frameName) const
 	fullName = frameName;
 	if ((ifh = fopen(fullName.c_str(), "r")) != NULL)
 	{
+		wprintf(L"using frame: '%s'\n", fullName.c_str());
 		return ifh;
 	}
 
@@ -1827,7 +1833,21 @@ FILE* Tab::OpenFrameFile(const std::string& frameName) const
 
 	if ((ifh = fopen(fullName.c_str(), "r")) != NULL)
 	{
+		wprintf(L"using frame: '%s'\n", fullName.c_str());
 		return ifh;
+	}
+
+	// 4: look in shareDir
+	if (!shareDir.empty())
+	{
+		fullName = shareDir;
+		fullName += frameName;
+
+		if ((ifh = fopen(fullName.c_str(), "r")) != NULL)
+		{
+			wprintf(L"using frame: '%s'\n", fullName.c_str());
+			return ifh;
+		}
 	}
 #endif
 

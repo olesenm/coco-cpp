@@ -426,13 +426,14 @@ void ParserGen::InitSets()
 void ParserGen::WriteParser()
 {
 	tab->preproc_.reset();               // reset pre-processor logic
-	int oldPos = tab->buffer->GetPos();  // Pos is modified by CopySourcePart
+	const int oldPos = tab->buffer->GetPos();  // Pos is modified by CopySourcePart
 	symSet.Add(tab->allSyncSets.Clone());
 
+	wprintf(L"parser  - ");
 	fram = tab->OpenFrameFile("Parser.frame");
 	if (fram == NULL)
 	{
-		errors->Exception(L"-- Cannot open Parser frame.\n");
+		errors->Exception(L"-- Cannot open Parser frame\n");
 	}
 
 	//

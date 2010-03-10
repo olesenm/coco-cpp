@@ -27,7 +27,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 /*!
- * @file CocoInfo.h
+ * @file CocoDefs.h
  * @brief Static version and configuration information.
  *
  * This information could normally be provided by the GNU autoconfig,
@@ -36,13 +36,25 @@ License
  *
  */
 
-#ifndef COCO_INFO_H__
-#define COCO_INFO_H__
+#ifndef COCO_DEFS_H__
+#define COCO_DEFS_H__
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define PACKAGE_DATE   "6 Mar 2010"
+#define PACKAGE_DATE   "10 Mar 2010"
 #define PACKAGE_URL    "http://www.ssw.uni-linz.ac.at/coco/"
+
+// location of share directory relative to the executable (needs trailing slash)
+// this corresponds to the usual packaging:
+//     - /usr/bin/coco-cpp
+//     - /usr/share/coco-cpp/
+// or
+//     - /usr/local/bin/coco-cpp
+//     - /usr/local/share/coco-cpp/
+//
+#ifndef _WIN32
+# define COCO_SHARE    "../share/coco-cpp/"
+#endif
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

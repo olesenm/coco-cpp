@@ -350,6 +350,7 @@ int main(int argc, char *argv[])
 	if (srcName.empty())
 	{
 		printUsage();
+		return 1;
 	}
 	else
 	{

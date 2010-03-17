@@ -35,7 +35,7 @@ docclean:
 	/bin/rm -rf html/*
 
 distclean: docclean
-	/bin/rm -f *~ Coco Makefile config.status config.log config.cache
+	/bin/rm -f *~ coco-cpp Makefile config.status config.log config.cache
 	cd src && $(MAKE) distclean
 
 install: makefiles

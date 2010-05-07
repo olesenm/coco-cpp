@@ -52,8 +52,6 @@ const std::wstring Parser::noString(L"-none-");
 
 //! @cond fileScope
 //
-
-//
 //  Create by copying str - only used locally
 inline static wchar_t* coco_string_create(const wchar_t* str)
 {
@@ -72,7 +70,7 @@ inline static void coco_string_delete(wchar_t* &str)
 	str = NULL;
 }
 //
-//! @endcond fileScope
+//! @endcond
 
 
 // ----------------------------------------------------------------------------

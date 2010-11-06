@@ -28,8 +28,9 @@
 # Corefiles
 core
 
-# ignore generated executable
-/coco-cpp
+# ignore generated executables, manpage
+/src/coco-cpp
+/src/coco-cpp*gz
 
 # ignore Doxygen docs
 /html

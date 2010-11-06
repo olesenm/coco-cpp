@@ -41,7 +41,7 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define PACKAGE_DATE   "10 Mar 2010"
+#define PACKAGE_DATE   "06 Nov 2010"
 #define PACKAGE_URL    "http://www.ssw.uni-linz.ac.at/coco/"
 
 // location of share directory relative to the executable (needs trailing slash)

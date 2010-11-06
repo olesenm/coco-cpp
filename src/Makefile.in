@@ -18,6 +18,7 @@ docdir = @docdir@
 exec_prefix = @exec_prefix@
 htmldir = @htmldir@
 includedir = @includedir@
+mandir = @mandir@/man1
 prefix = @prefix@
 srcdir = @srcdir@
 
@@ -25,49 +26,80 @@ INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 DATA_FILES = $(srcdir)/Parser.frame $(srcdir)/Scanner.frame
 DOC_FILES  = $(srcdir)/Coco-cpp.atg
-DATA_DIR   = $(datarootdir)/coco-cpp
 
-COCO = ../coco-cpp
+COCONAME = coco-cpp
+MANEXT = 1.gz
+
+#---------------------------------------------------------------------------
+# DESTDIR is designed to facilitate making packages.  Normally it is empty
+#---------------------------------------------------------------------------
+#DESTDIR =
+DEST_BINDIR  = $(DESTDIR)$(bindir)
+DEST_DOCDIR  = $(DESTDIR)$(docdir)
+DEST_DATADIR = $(DESTDIR)$(datarootdir)/$(COCONAME)
+DEST_MANDIR  = $(DESTDIR)$(mandir)
 
 # -----------------------------------------------------------------------------
 # There should be no need to modify anything below here.
 # -----------------------------------------------------------------------------
 
-all: $(COCO)
+all: $(COCONAME) $(COCONAME).$(MANEXT)
 
-$(COCO): *.cpp
+$(COCONAME): *.cpp
 	$(CXX) -o $@ $(CXXFLAGS) $^
 
+$(COCONAME).$(MANEXT): ../etc/$(COCONAME).pod
+	@echo
+	@echo "create man pages from pod sources"
+	@echo
+	pod2man -c "User Commands" -r "$(COCONAME)-@PACKAGE_VERSION@" $^ | gzip > $@
+
+
 # -----------------------------------------------------------------------------
+# clean targets
 
 clean:
-	/bin/rm -f *~ \#*
+	/bin/rm -f *~ \#* $(COCONAME) $(COCONAME).$(MANEXT)
 
 distclean: clean
 	/bin/rm -rf Makefile sysconf.h config.h $(srcdir)/*.bak
 
+
+# -----------------------------------------------------------------------------
+# installation
+
 install_bin_directories:
-	mkdir -p $(bindir)
+	mkdir -p $(DEST_BINDIR)
 
 install_data_directories:
-	mkdir -p $(DATA_DIR)
+	mkdir -p $(DEST_DATADIR)
+
+install_man_directories:
+	mkdir -p $(DEST_MANDIR)
+
 
 install_bin: install_bin_directories
-	$(INSTALL) $(COCO) $(bindir)/
+	$(INSTALL) $(COCONAME) $(DEST_BINDIR)/
 
 install_data: install_data_directories
 	@for i in $(DATA_FILES); \
 	do \
-		echo $(INSTALL_DATA) $$i $(DATA_DIR)/; \
-		$(INSTALL_DATA) $$i $(DATA_DIR)/; \
+		echo $(INSTALL_DATA) $$i $(DEST_DATADIR)/; \
+		$(INSTALL_DATA) $$i $(DEST_DATADIR)/; \
 		if [ "$$?" != "0" ]; then \
 		  exit 1; \
 		fi; \
 	done
 
-install: all install_bin install_data
+install_man: install_man_directories
+	$(INSTALL_DATA) $(COCONAME).$(MANEXT) $(DEST_MANDIR)/
+
+install: all install_bin install_data install_man
 
 
-.PHONY: all install_bin install_data install_bin_directories install_data_directories
+.PHONY: all \
+    install_bin  install_bin_directories  \
+    install_data install_data_directories \
+    install_man  install_man_directories
 
 # -----------------------------------------------------------------------------

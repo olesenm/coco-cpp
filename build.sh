@@ -55,10 +55,14 @@ done
 
 echo "compile Coco executable"
 echo "~~~~~~~~~~~~~~~~~~~~~~~"
-echo "g++ $defs src/*.cpp -o coco-cpp -g -O2 $warn"
+echo "    cd src"
+echo "    g++ $defs *.cpp -o coco-cpp -g -O2 $warn"
 echo
 
-g++ $defs src/*.cpp -o coco-cpp -g -O2 $warn
+(
+    cd src && \
+    g++ $defs *.cpp -o coco-cpp -g -O2 $warn
+)
 
 if [ $? -eq 0 ]
 then

@@ -1,3 +1,10 @@
+coco-cpp (20101106-1.1) UNRELEASED; urgency=low
+
+  * Non-maintainer upload
+  * Adjust debian packaging for GNU autoconfig system
+
+ -- Mark Olesen <mark.olesen@faurecia.com>  Wed, 10 Nov 2010 22:33:13 +0100
+
 coco-cpp (20090622-1) unstable; urgency=low
 
   * New upstream release

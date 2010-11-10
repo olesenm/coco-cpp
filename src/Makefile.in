@@ -52,7 +52,7 @@ $(COCONAME).$(MANEXT): ../etc/$(COCONAME).pod
 	@echo
 	@echo "create man pages from pod sources"
 	@echo
-	pod2man -c "User Commands" -r "$(COCONAME)-@PACKAGE_VERSION@" $^ | gzip > $@
+	pod2man -c "User Commands" -r "$(COCONAME)-@PACKAGE_VERSION@" $^ | gzip -9 > $@
 
 
 # -----------------------------------------------------------------------------

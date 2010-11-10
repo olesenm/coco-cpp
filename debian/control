@@ -2,8 +2,8 @@ Source: coco-cpp
 Section: devel
 Priority: optional
 Maintainer: Markus Loeberbauer <Loeberbauer@ssw.jku.at>
-Build-Depends: debhelper (>= 7), g++ (>= 4.1.1)
-Standards-Version: 3.8.1
+Build-Depends: debhelper (>= 7), g++ (>= 4.1.1), perl
+Standards-Version: 3.9.1
 Homepage: http://www.ssw.uni-linz.ac.at/Research/Projects/Coco/
 
 Package: coco-cpp
@@ -16,5 +16,5 @@ Description: Coco/R Compiler Generator (C++ Version)
  LL(1) conflicts can be resolved by a multi-symbol lookahead or by semantic
  checks. Thus the class of accepted grammars is LL(k) for an arbitrary k.
  .
- To start Coco call cococpp, which is a shell script in /usr/bin.
+ Use the command 'coco-cpp' to start Coco/R.
 

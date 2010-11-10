@@ -1,5 +1,0 @@
-coco-cpp (1:20101106) unstable; urgency=low
-
-  * Add debian packaging into upstream source
-
- -- Mark Olesen <mark.olesen@faurecia.com>  Mon, 08 Nov 2010 22:16:42 +0100

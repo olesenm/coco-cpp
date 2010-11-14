@@ -28,7 +28,8 @@ DATA_FILES = $(srcdir)/Parser.frame $(srcdir)/Scanner.frame
 DOC_FILES  = $(srcdir)/Coco-cpp.atg
 
 COCONAME = coco-cpp
-MANEXT = 1.gz
+EXEEXT = @EXEEXT@
+MANEXT = .1.gz
 
 #---------------------------------------------------------------------------
 # DESTDIR is designed to facilitate making packages.  Normally it is empty
@@ -45,13 +46,16 @@ DEST_MANDIR  = $(DESTDIR)$(mandir)
 
 all: bin man
 
-bin: $(COCONAME)
-man: $(COCONAME).$(MANEXT)
+bin: $(COCONAME)$(EXEEXT)
+man: $(COCONAME)$(MANEXT)
 
-$(COCONAME): *.cpp
+parser: bin
+	./$(COCONAME) $(srcdir)/Coco-cpp.atg -bak
+
+$(COCONAME)$(EXEEXT): *.cpp
 	$(CXX) -o $@ $(CXXFLAGS) $^
 
-$(COCONAME).$(MANEXT): ../etc/$(COCONAME).pod
+$(COCONAME)$(MANEXT): ../etc/$(COCONAME).pod
 	@echo
 	@echo "create man pages from pod sources"
 	@echo
@@ -62,7 +66,7 @@ $(COCONAME).$(MANEXT): ../etc/$(COCONAME).pod
 # clean targets
 
 clean:
-	/bin/rm -f *~ \#* $(COCONAME) $(COCONAME).$(MANEXT)
+	/bin/rm -f *~ \#* $(COCONAME)$(EXEEXT) $(COCONAME)$(MANEXT)
 
 distclean: clean
 	/bin/rm -rf Makefile sysconf.h config.h $(srcdir)/*.bak
@@ -95,12 +99,12 @@ install_data: install_data_directories
 	done
 
 install_man: install_man_directories
-	$(INSTALL_DATA) $(COCONAME).$(MANEXT) $(DEST_MANDIR)/
+	$(INSTALL_DATA) $(COCONAME)$(MANEXT) $(DEST_MANDIR)/
 
 install: all install_bin install_data install_man
 
 
-.PHONY: all bin man\
+.PHONY: all bin man parser \
     install_bin  install_bin_directories  \
     install_data install_data_directories \
     install_man  install_man_directories

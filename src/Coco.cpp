@@ -50,6 +50,7 @@ Options:
   -lines                 include #line pragmas in the generated code
   -single                include the Scanner code in the Parser file
   -bak                   save existing Parser/Scanner files as .bak
+  -version               exit after displaying version information
   -help                  print this usage
 @endverbatim
 The valid trace string values are listed below.
@@ -161,7 +162,7 @@ with the same syntax. For example,
 using namespace Coco;
 
 
-void printUsage(const char* message = NULL)
+static void printUsage(const char* message = NULL)
 {
 	if (message)
 	{
@@ -179,6 +180,7 @@ void printUsage(const char* message = NULL)
 	wprintf(L"  -lines                 include #line pragmas in the generated code\n");
 	wprintf(L"  -single                include the Scanner code in the Parser file\n");
 	wprintf(L"  -bak                   save existing Parser/Scanner files as .bak\n");
+	wprintf(L"  -version               exit after displaying version information\n");
 	wprintf(L"  -help                  print this usage\n");
 	wprintf(L"\nValid characters in the trace string:\n");
 	wprintf(L"  A  trace automaton\n");
@@ -210,7 +212,7 @@ void printUsage(const char* message = NULL)
 int main(int argc, char *argv[])
 #endif
 {
-	wprintf(L"Coco/R C++ (%s)\n", PACKAGE_DATE);
+	wprintf(L"Coco/R C++, version: %s\n", PACKAGE_VERSION);
 
 #ifdef _WIN32
 	std::wstring srcName;
@@ -232,14 +234,25 @@ int main(int argc, char *argv[])
 
 	bool traceToFile = true;
 
-	for (int i = 1; i < argc; i++)
+	// pass 1: find -help, -version options
+	for (int i = 1; i < argc; ++i)
 	{
 		if (coco_string_equal(argv[i], "-help"))
 		{
 			printUsage();
 			return 0;
 		}
-		else if (coco_string_equal(argv[i], "-namespace"))
+		if (coco_string_equal(argv[i], "-version"))
+		{
+			// version already printed above
+			return 0;
+		}
+	}
+
+	// pass 2: process other options
+	for (int i = 1; i < argc; ++i)
+	{
+		if (coco_string_equal(argv[i], "-namespace"))
 		{
 			if (++i == argc)
 			{
@@ -327,6 +340,7 @@ int main(int argc, char *argv[])
 		}
 		else if (argv[i][0] == '-')
 		{
+			// output format as per printUsage
 #ifdef _WIN32
 			wprintf(L"\nError: unknown option: '%ls'\n\n", argv[i]);
 #else

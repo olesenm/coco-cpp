@@ -41,8 +41,11 @@ License
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#define PACKAGE_DATE   "06 Nov 2010"
-#define PACKAGE_URL    "http://www.ssw.uni-linz.ac.at/coco/"
+// the version of this package, when not supplied by autoconfig
+#ifndef PACKAGE_VERSION
+# define PACKAGE_VERSION "20101106"
+#endif
+#define PACKAGE_URL      "http://www.ssw.uni-linz.ac.at/coco/"
 
 // location of share directory relative to the executable (needs trailing slash)
 // this corresponds to the usual packaging:
@@ -53,7 +56,7 @@ License
 //     - /usr/local/share/coco-cpp/
 //
 #ifndef _WIN32
-# define COCO_SHARE    "../share/coco-cpp/"
+# define COCO_SHARE      "../share/coco-cpp/"
 #endif
 
 

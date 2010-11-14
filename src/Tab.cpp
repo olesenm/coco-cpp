@@ -2033,8 +2033,8 @@ void Tab::AddNotice(FILE* dst) const
 	fwprintf
 	(
 		dst,
-		L"// This file was generated with Coco/R C++ (%s)\n// %s\n",
-		PACKAGE_DATE,
+		L"// This file was generated with Coco/R C++, version: %s\n// %s\n",
+		PACKAGE_VERSION,
 		PACKAGE_URL
 	);
 

@@ -1,3 +1,12 @@
+coco-cpp (20101106-1.2) UNRELEASED; urgency=low
+
+  * Non-maintainer upload
+  * Simplified debian/rules, use existing Makefile 'install' targets
+  * Update debian/control Depends, Build-Depends, Standards-Version
+  * Include atg and NOTES in the debian packaging
+
+ -- Mark Olesen <mark.olesen@faurecia.com>  Sun, 14 Nov 2010 10:51:16 +0100
+
 coco-cpp (20101106-1.1) UNRELEASED; urgency=low
 
   * Non-maintainer upload

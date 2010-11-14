@@ -24,7 +24,6 @@ endif
 configure_flags = --prefix=/usr \
   --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE)
 
-# export DEB_BUILD_HARDENING=1
 
 # get-orig-source:
 #
@@ -49,6 +48,15 @@ build-stamp: configure-stamp
 	$(MAKE) -C src
 	touch $@
 
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+
+	# Install the package into debian/coco-cpp
+	$(MAKE) -C src install DESTDIR=$(CURDIR)/debian/coco-cpp
+
 # Build architecture-independent files here.
 binary-indep: build install
 # We have nothing to do by default.
@@ -56,34 +64,19 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	# keep dh_install informations (debian/files) and debian/tmp
-	dh_clean
-	dh_installdirs
-
-	#
-	# binary
-	#
-	dh_install src/coco-cpp usr/bin
-
-	#
-	# shared
-	#
-	dh_install src/Parser.frame src/Scanner.frame  usr/share/coco-cpp
-
-	#
-	# man - using dh_installman undoes the gz compression!
-	#
-	dh_install src/coco-cpp.1.gz  usr/share/man/man1/
-
 	dh_installchangelogs
-	dh_installdeb
-	dh_installdocs
-	dh_compress
-	dh_shlibdeps
+	dh_link
 	dh_strip
+	dh_compress
+	dh_installdocs NOTES.mkdn src/Coco-cpp.atg
+	dh_installexamples
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
+	dh_clean -d
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure

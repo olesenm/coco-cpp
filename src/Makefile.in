@@ -43,7 +43,10 @@ DEST_MANDIR  = $(DESTDIR)$(mandir)
 # There should be no need to modify anything below here.
 # -----------------------------------------------------------------------------
 
-all: $(COCONAME) $(COCONAME).$(MANEXT)
+all: bin man
+
+bin: $(COCONAME)
+man: $(COCONAME).$(MANEXT)
 
 $(COCONAME): *.cpp
 	$(CXX) -o $@ $(CXXFLAGS) $^
@@ -97,7 +100,7 @@ install_man: install_man_directories
 install: all install_bin install_data install_man
 
 
-.PHONY: all \
+.PHONY: all bin man\
     install_bin  install_bin_directories  \
     install_data install_data_directories \
     install_man  install_man_directories

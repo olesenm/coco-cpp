@@ -13,10 +13,10 @@ Upstream Author(s):
     ported to C++ by Csaba Balazs, University of Szeged
     with improvements
     - Pat Terry, Rhodes University
-    - 2010 Mark Olesen
+    - Mark Olesen
 
 
-This package contains version of coco-cpp modified by Mark Olesen to
+This package contains a version of coco-cpp modified by Mark Olesen to
 extend the ATG syntax and includes various other improvements.
 
 Downloaded from git://github.com/olesenm/coco-cpp.git
